@@ -1,0 +1,100 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>Demo</groupId>
+    <artifactId>Demo1</artifactId>
+    <packaging>war</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>Demo1 Maven Webapp</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- spring版本号 -->
+        <!--<spring.version>4.1.1.RELEASE</spring.version>-->
+        <!-- mybatis版本号 -->
+        <!--<mybatis.version>3.2.6</mybatis.version>-->
+        <!-- log4j日志文件管理包版本 -->
+        <!--<slf4j.version>1.7.7</slf4j.version>-->
+        <!--<log4j.version>1.2.17</log4j.version>-->
+        <!-- jackson包版本 -->
+        <!--<jackson.version>2.5.0</jackson.version>-->
+    </properties>
+    <dependencies>
+        <!--servlet的jar包-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <!--struts2的jar包-->
+        <dependency>
+            <groupId>org.apache.struts</groupId>
+            <artifactId>struts2-core</artifactId>
+            <version>2.5.14.1</version>
+        </dependency>
+        <!--c3p0的jar包-->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.2</version>
+        </dependency>
+        <!--mysql的jar包-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>6.0.6</version>
+        </dependency>
+        <!--sqlite的jar包-->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.21.0</version>
+        </dependency>
+        <!--org.json的jar包-->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20171018</version>
+        </dependency>
+        <!--加解密算法的jar包-->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.11</version>
+        </dependency>
+        <!--javax.mail的jar包-->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>junit</groupId>-->
+        <!--<artifactId>junit</artifactId>-->
+        <!--<version>3.8.1</version>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+        <!--<dependency>-->
+        <!--<groupId>javax.servlet</groupId>-->
+        <!--<artifactId>javax.servlet-api</artifactId>-->
+        <!--<version>4.0.0</version>-->
+        <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+        <!--<groupId>org.apache.struts</groupId>-->
+        <!--<artifactId>struts2-core</artifactId>-->
+        <!--<version>2.1.8.1</version>-->
+        <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/org.apache.struts/struts2-core -->
+        <!--<dependency>-->
+        <!--<groupId>org.apache.struts</groupId>-->
+        <!--<artifactId>struts2-core</artifactId>-->
+        <!--<version>2.3.34</version>-->
+        <!--</dependency>-->
+    </dependencies>
+    <build>
+        <finalName>Demo1</finalName>
+    </build>
+</project>

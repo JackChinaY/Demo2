@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
+    <link rel="stylesheet" href="../zui/zui.css">
+    <script src="../javascript/jquery-2.0.3.min.js"></script>
+    <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../zui/zui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            /**
+             *在此统一定义一些常用字符串
+             */
+            var loginTimeout = "Login timeout, please login again !";
+            var serverError = "possible reasons：server error !";
+            /*******************************************************************************************/
+            //查询所有外汇 点击事件
+            $("#submit2").click(function () {
+                findAllCurrency();
+            });
+            //自动加载数据
+            findAllCurrency();
+
+            //查询所有外汇 无参
+            function findAllCurrency() {
+                $.ajax({
+                    type: "GET",
+                    url: "ActionPart1_findAllCurrency.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login.html";//重定向
+                            }, 2000);
+                        }
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                        //正确传输过来数据
+                        else {
+                            //后台传过来的是json数组的字符串，需要先转成json数组对象
+                            var jsonArray = $.parseJSON(data.jsonObject);
+                            //当数组为[]空时
+                            if (jsonArray.length == 0) {
+                                $("#thead").html('<tr><th>No data！</th></tr>');
+                                $("#tbody").html('');
+                            }
+                            //当数组为不为空时
+                            else if (jsonArray.length != 0) {
+                                var head = '<tr><th>Number</th><th>Name</th><th>Abbreviation</th><th>Symbol</th><th>Exchange Rate</th><th>Current</th><th>Operation</th></tr>';
+                                $("#thead").html(head);
+                                var html;
+                                for (var i = 0; i < jsonArray.length; i++) {
+                                    var temp;
+                                    if (jsonArray[i].value3 == "") {
+                                        temp = "";
+                                    } else {
+                                        temp = (parseFloat(jsonArray[i].value3) / 10000).toFixed(4);
+                                    }
+                                    html += '<tr><td class="number">' + jsonArray[i].value1 + '</td>'
+                                        + '<td class="name">' + jsonArray[i].value5 + '</td>'
+                                        + '<td class="abbreviation">' + jsonArray[i].value2 + '</td>'
+                                        + '<td class="symbol">' + jsonArray[i].value6 + '</td>'
+                                        + '<td class="rate">' + temp + '</td>'
+                                        + '<td class="current">' + jsonArray[i].value4 + '</td>'
+                                        + '<td>&nbsp;&nbsp;&nbsp;&nbsp;<a name="update" href="#" data-toggle="tooltip" data-tip-class="tooltip-primary" title="Modify"><i class="icon icon-edit"></i></a></tr>';
+                                }
+                                $("#tbody").html(html);
+                                // 手动初始化工具提示
+                                $('[data-toggle="tooltip"]').tooltip();
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        $("#modal-content").html("The operation failed, please try again. Possible causes:" + jqXHR.status + "！");
+                        $("#myModal").modal();
+                    }
+                });
+            }
+
+            /*******************************************************************************************/
+            //加载所有可选外币集合
+
+            //所有外币
+//            var abb = ["CNY", "USD", "GBP", "EUR", "JPY", "HKD", "DEM", "CHF", "FRF", "NLG", "ATS", "BEF", "ITL", "CAD", "AUD", "SEK", "DKK", "NOK", "FIM", "KRW", "THB", "PHP", "INR", "SUR", "BUK", "NZD", "SGD"];
+            //组合成所有外币
+//            function findAllAbbreviation() {
+//                var html = '<div class="table-responsive" style="height: 360px;"><table class="table table-striped table-hover table-bordered" >' +
+//                    '<thead><tr><th>ID</th><th>Abbreviation</th><th>Selection</th></tr></thead><tbody>';
+//                for (var i = 0; i < abb.length; i++) {
+//                    html += '<tr><td>' + i + '</td>'
+//                        + '<td class="abbreviation">' + abb[i] + '</td>'
+//                        + '<td>&nbsp;&nbsp;<a name="abbreviation" href="#" title="select this one"><i class="icon icon-tag"></i></a></td></tr>';
+//                }
+//                html += '</tbody></table></div>';
+//                return html;
+//            }
+            //查询所有商品信息，并显示
+            function findAllAbbreviation() {
+                var html = '<div style="height: 440px;" class="table-responsive"><table class="table table-striped table-hover table-bordered">' +
+                    '<thead><tr><th>Number</th><th>Name</th><th>Abbreviation</th><th>Symbol</th><th>Selection</th></tr></thead>' +
+                    '<tbody>';
+                //查询所有商品信息
+                $.ajax({
+                    type: "POST",
+                    url: "ActionPart1_findAllAbbreviationList.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    dataType: "json",
+                    async: false,//ajax 默认是 异步请求，为了获得校验结果，需设置成async: false,同步方式
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top'
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login.html";//重定向
+                            }, 2000);
+                        }
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top'
+                            }).show();
+                        }
+                        //正确传输过来数据
+                        else {
+                            //后台传过来的是json数组的字符串，需要先转成json数组对象
+                            var jsonArray = $.parseJSON(data.jsonObject);
+                            if (jsonArray.length != 0) {
+                                for (var i = 0; i < jsonArray.length; i++) {
+                                    html += '<tr><td class="Number">' + jsonArray[i].value1 + '</td>'
+                                        + '<td class="name">' + jsonArray[i].value2 + '</td>'
+                                        + '<td class="abbreviation">' + jsonArray[i].value3 + '</td>'
+                                        + '<td class="symbol">' + jsonArray[i].value4 + '</td>'
+                                        + '<td>&nbsp;&nbsp;<a name="abbreviation" href="#" title="select this one"><i class="icon icon-tag"></i></a></td></tr>';
+                                }
+                                html += '</tbody></table></div>';
+                                return html;
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                    }
+                });
+                return html;
+            }
+
+            //弹出面板进行初始化，选择外币
+            $("#Choose").popover({
+                html: true,
+                title: "Choose Abbreviation",
+                placement: 'left',
+                content: findAllAbbreviation()
+            });
+            /*******************************************************************************************/
+            //修改按钮，弹出对话框
+            $("#tbody").on("click", "a[name='update']", function () {
+                //数据初始化
+                $("#number").html($(this).parents("tr").find(".number").text());
+                $("#abbreviation").val($(this).parents("tr").find(".abbreviation").text());
+                $("#abbreviation_copy").val($(this).parents("tr").find(".abbreviation").text());
+                $("#name").val($(this).parents("tr").find(".name").text());
+                $("#symbol").val($(this).parents("tr").find(".symbol").text());
+                $("#rate").val($(this).parents("tr").find(".rate").text());
+//              设置按钮开关的初始状态
+                if ($(this).parents("tr").find(".current").text() == "1") {
+                    $("#checkbox").prop("checked", true)
+                } else {
+                    $("#checkbox").attr("checked", false)
+                }
+                $("#myModal1").modal({moveable: true});//显示对话框
+            });
+            //选择一种新的外币，并验证是否存在
+            //因为表格是自动生成的，所以只能用on函数，click事件无效
+            $("body").on("click", "a[name='abbreviation']", function () {
+                //如果和当前外币一样
+                if ($("#abbreviation_copy").val() == $(this).parents("tr").find(".abbreviation").text()) {
+                    new $.zui.Messager('The Abbreviation is the same as the one that you are modifying, but you can submit it again !', {
+                        type: 'warning',
+                        placement: 'top'
+                    }).show();
+                    $("#code_info").html(1);//0代表不可用，1代表可用
+                }
+                //验证外币是否存在
+                else {
+                    var abbreviation = $(this).parents("tr").find(".abbreviation").text();
+                    var name = $(this).parents("tr").find(".name").text();
+                    var symbol = $(this).parents("tr").find(".symbol").text();
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_verifyAbbreviation.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "value1": abbreviation
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//最顶层的页面进行跳转
+//                                    parent.window.returnToLeginPage();
+//                                    location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top'
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "0") {//0代表不存在
+                                    //赋值
+                                    $("#abbreviation").val(abbreviation);
+                                    $("#name").val(name);
+                                    $("#symbol").val(symbol);
+                                    $("#Choose").popover('hide');//关闭对话框
+                                    $("#code_info").html(1);//0代表不可用，1代表可用
+                                } else if (data.jsonObject == "1") {//1代表已存在，0代表可用
+                                    $("#code_info").html(0);//0代表不可用，1代表可用
+                                    new $.zui.Messager('The Abbreviation already existed in the table. Please re-enter it !', {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+            });
+            /*******************************************************************************************/
+            //保存修改后的外汇
+            $("#submit3").click(function () {
+                if ($("#abbreviation").val() == "" && $("#rate").val() != "") {
+                    new $.zui.Messager('The Abbreviation can not be empty !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#abbreviation").val().length != 3 && $("#rate").val() != "") {
+                    new $.zui.Messager('The length of the Abbreviation must be 3 numbers !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#abbreviation").val() != "" && $("#rate").val() == "") {
+                    new $.zui.Messager('The Exchange Rate can not be empty !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#rate").val() == "0") {
+                    new $.zui.Messager('The Exchange Rate can not be "0" !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if (parseFloat($("#rate").val()) > 99999.9999) {
+                    new $.zui.Messager('The rate exceeds the upper limit, it should be less than or equal to 99999.9999 !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if (parseFloat($("#rate").val()) < 0.0001) {
+                    new $.zui.Messager('The exchange rate is lower than the offline, it should be more than or equal to 0.0001 !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#abbreviation").val() == "" && $("#rate").val() == "" && $("#checkbox").is(':checked')) {
+                    new $.zui.Messager('The Abbreviation and Exchange Rate cannot be all empty when you set to Current!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#code_info").text() == "0") {
+                    new $.zui.Messager('The Abbreviation already existed in the table. Please re-enter it !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else {
+//                    console.log();
+                    var abbreviation;//外币缩写
+                    if ($("#abbreviation").val() == "" && $("#rate").val() == "") {
+                        abbreviation = "";
+                    } else {
+                        abbreviation = (parseFloat($("#rate").val()) * 10000);
+                    }
+                    var current;//当前外币标志
+                    if ($("#checkbox").is(':checked')) {
+                        current = 1;
+
+                    } else {
+                        current = 0;
+                    }
+                    //如果开关被选中
+                    if ($("#checkbox").is(':checked')) {
+                        //第一步，将其它外币的Current设置为0
+                        $.ajax({
+                            type: "POST",
+                            url: "ActionPart1_setAllAbbreviation0.action",
+                            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                            async: false,//ajax 默认是 异步请求，为了获得校验结果，需设置成async: false,同步方式
+                            dataType: "json",
+                            cache: false,
+                            success: function (data) {
+                                //登录超时，请重新登录
+                                if (data.jsonObject == "-3") {
+                                    new $.zui.Messager(loginTimeout, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    setTimeout(function () {
+                                        top.location.href = "../login.html";//重定向
+                                    }, 2000);
+                                }
+                                //服务器出错
+                                else if (data.jsonObject == "-1") {
+                                    new $.zui.Messager(serverError, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                }
+                                //正确传输过来数据
+                                else {
+                                }
+                            },
+                            error: function (jqXHR) {
+                                new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                        });
+                        //第二步，如果当前外币被设置为当前使用的外币，则需要将商品库中的所有商品的Currency设置为当前的外币的缩写
+                        $.ajax({
+                            type: "POST",
+                            url: "ActionPart1_setAllGoodsCurrency.action",
+                            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                            data: {
+                                "value1": $("#abbreviation").val()
+                            },
+                            async: false,//ajax 默认是 异步请求，为了获得校验结果，需设置成async: false,同步方式
+                            dataType: "json",
+                            cache: false,
+                            success: function (data) {
+                                //登录超时，请重新登录
+                                if (data.jsonObject == "-3") {
+                                    new $.zui.Messager(loginTimeout, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    setTimeout(function () {
+                                        top.location.href = "../login.html";//重定向
+                                    }, 2000);
+                                }
+                                //服务器出错
+                                else if (data.jsonObject == "-1") {
+                                    new $.zui.Messager(serverError, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                }
+                                //正确传输过来数据
+                                else {
+                                }
+                            },
+                            error: function (jqXHR) {
+                                new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                        });
+                    }
+                    //第三步，修改外币值
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_modifyAbbreviation.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "value1": $("#number").text(),
+                            "value2": $("#abbreviation").val(),
+                            "value3": abbreviation,
+                            "value4": current,
+                            "value5": $("#name").val(),
+                            "value6": $("#symbol").val()
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "0") {
+                                    new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                        type: 'danger',
+                                        placement: 'top'
+                                    }).show();
+                                } else if (data.jsonObject == "1") {
+                                    if (abbreviation == "") {
+                                        new $.zui.Messager('Submitting null data is equivalent to clearing the record !', {
+                                            type: 'warning',
+                                            placement: 'top',
+                                            time: 6000
+                                        }).show();
+                                    }
+                                    else {
+                                        new $.zui.Messager('Submit successfully !', {
+                                            type: 'success',
+                                            placement: 'top'
+                                        }).show();
+                                    }
+                                }
+                                $("#myModal1").modal('hide');
+                                findAllCurrency();
+                                //清除对话框中内容
+                                $("#number").html("");
+                                $("#abbreviation").val("");
+                                $("#name").val("");
+                                $("#symbol").val("");
+                                $("#code_info").html("");
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+            });
+            /*******************************************************************************************/
+        });
+    </script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            font-family: Arial;
+            font-size: 14px;
+            /*min-height: 500px;*/
+            /*min-width: 500px;*/
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            overflow-x: auto;
+        }
+
+        .popover {
+            width: auto;
+            max-width: 800px;
+            height: auto;
+            max-height: 600px;
+        }
+    </style>
+</head>
+<body>
+<!--外币-->
+<div>
+    <div style="margin-top: 10px;width: 100%;height: 40px;">
+        <span class="label label-badge label-primary label-define"
+              style="float: left; margin-left: 20px;margin-top: 10px">Foreign Currency</span>
+        <!--<button id="submit2" class="btn btn-primary" type="button"-->
+        <!--style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i> Refresh-->
+        <!--</button>-->
+    </div>
+    <div style="background-color: white;"
+         class="table-responsive">
+        <!--height: 400px;overflow: scroll; overflow-x: hidden-->
+        <table id="table2_1" class="table table-striped table-hover table-bordered">
+            <thead id="thead">
+            </thead>
+            <tbody id="tbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<!--对话框-->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Messages</h4>
+            </div>
+            <div class="modal-body">
+                <p id="modal-content" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 修改-->
+<div class="modal fade" id="myModal1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Modify Foreign Currency</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3">Number</label>
+                        <label id="number" class="col-sm-6" style="text-align: center"></label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3">Abbreviation</label>
+                        <div class="col-sm-6">
+                            <input id="abbreviation" type="text" class="form-control" maxlength="3"
+                                   style="text-transform: uppercase" disabled="disabled">
+                        </div>
+                        <strong>*</strong>
+                        <button id="Choose" class="btn btn-default" type="button">
+                            ...
+                        </button>
+                        <input id="abbreviation_copy" type="text" style="display: none">
+                        <input id="name" type="text" style="display: none">
+                        <input id="symbol" type="text" style="display: none">
+                        <label id="code_info" hidden="hidden"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Exchange Rate</label>
+                        <div class="col-sm-6">
+                            <input id="rate" type="tel" class="form-control" maxlength="10"
+                                   placeholder="0.0001 - 99999.9999">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Set to Current</label>
+                        <div class="col-sm-6">
+                            <div class="switch">
+                                <input id="checkbox" type="checkbox">
+                                <label>ON/OFF</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit3" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

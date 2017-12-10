@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>machineSN</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
+    <link rel="stylesheet" href="../zui/zui.css">
+    <script src="../javascript/jquery-2.0.3.min.js"></script>
+    <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../zui/zui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            /**
+             *在此统一定义一些常用字符串
+             */
+            var loginTimeout = "Login timeout, please login again !";
+            var serverError = "possible reasons：server error !";
+            /*******************************************************************************************/
+            //页面加载时自动执行的函数，生成表格
+            findAllMachine();
+            /*******************************************************************************************/
+
+            //查询所有机器编号 无参
+            function findAllMachine() {
+                $.ajax({
+                    type: "POST",
+                    url: "ActionAdmin_findAllMachine.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login_admin.html";//重定向
+                            }, 2000);
+                        }
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                        //正确传输过来数据
+                        else {
+                            //后台传过来的是json数组的字符串，需要先转成json数组对象
+                            var jsonArray = $.parseJSON(data.jsonObject);
+                            //当数组为[]空时
+                            if (jsonArray.length == 0) {
+                                $("#thead").html('<tr><th>No data！</th></tr>');
+                                $("#tbody").html('');
+                            }
+                            //当数组为不为空时
+                            else if (jsonArray.length != 0) {
+                                var head = '<tr><th style="display: none">Id</th><th>ID</th><th>Machine Type</th><th>Machine SN</th><th>Entry time</th><th>Operation</th></tr>';
+                                $("#thead").html(head);
+                                var html;
+                                for (var i = 0; i < jsonArray.length; i++) {
+                                    html += '<tr><td class="Id" style="display: none">' + jsonArray[i].value1 + '</td>'
+                                        + '<td>' + (i + 1) + '</td>'
+                                        + '<td class="MachineType">' + jsonArray[i].value2 + '</td>'
+                                        + '<td class="MachineSN">' + jsonArray[i].value3 + '</td>'
+                                        + '<td>' + jsonArray[i].value4.substr(0, 19) + '</td>'
+                                        + '<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="delete" href="#" data-toggle="tooltip" data-tip-class="tooltip-danger" title="Delete" style="color: #ea644a"><i class="icon icon-trash"></i></a></td></tr>';
+                                }
+                                $("#tbody").html(html);
+                                // 手动初始化工具提示
+                                $('[data-toggle="tooltip"]').tooltip();
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                    }
+                });
+            }
+
+            /*******************************************************************************************/
+            //新增仪器编号  弹出对话框
+            $("#submit1").click(function () {
+                $("#myModal_add").modal({moveable: true});
+            });
+            //新增仪器编号 提交
+            $("#submit1_1").click(function () {
+                if ($("#number").val() == "") {
+                    new $.zui.Messager('The Machine SN cannot be empty ！', {
+                        type: 'danger',
+                        placement: 'top' // 定义显示位置
+                    }).show();
+                } else if ($("#number").val().trim() == "") {
+                    new $.zui.Messager('The Machine SN cannot be all spaces!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                }else if ($("#number").val().indexOf(" ") != -1) {
+                    new $.zui.Messager('The Machine SN cannot contain space !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                }else if ($("#number").val().length != 12) {
+                    new $.zui.Messager('The length of the Machine SN is fixed 12 numbers !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionAdmin_addMachineId.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "machineType": $("#type").val(),
+                            "machineId": $("#number").val()
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login_admin.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "1") {
+                                    new $.zui.Messager("Machine ( SN：" + $("#number").val() + " ) add successfully！", {
+                                        type: 'success',
+                                        placement: 'top' //定义显示位置
+                                    }).show();
+//                                $("#myModal_add").modal('hide');//关闭对话框
+                                    $("#number").val(parseFloat($("#number").val()) + 1);
+                                    findAllMachine();//刷新表格
+                                } else if (data.jsonObject == "-2") {
+                                    new $.zui.Messager("Machine ( SN：" + $("#number").val() + " ) is already added ！", {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+            });
+            /*******************************************************************************************/
+            //删除仪器编号 ，因为表格是自动生成的，所以只能用on函数，click事件无效
+            $("#tbody").on("click", "a[name='delete']", function () {
+//                $("#deleteId").val($(this).parents("tr").find(".Id").text());
+                $("#deleteMachineType").val($(this).parents("tr").find(".MachineType").text());
+                $("#deleteMachineSN").val($(this).parents("tr").find(".MachineSN").text());
+                $("#deleteTip").html("( Machine Type: " + $(this).parents("tr").find(".MachineType").text() + " , Machine SN : " + $(this).parents("tr").find(".MachineSN").text() + " ) <br>Do you want to delete this record ？");
+                $("#myModal_delete").modal({moveable: true});
+            });
+            //删除仪器编号 提交
+            $("#submit4").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "ActionAdmin_deleteOneMachine.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {
+                        "machineType": $("#deleteMachineType").val(),
+                        "machineId": $("#deleteMachineSN").val()
+                    },
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login_admin.html";//重定向
+                            }, 2000);
+                        }
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                        //正确传输过来数据
+                        else {
+                            if (data.jsonObject == "0") {
+                                new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            } else if (data.jsonObject == "1") {
+                                new $.zui.Messager('Submit successfully !', {
+                                    type: 'success',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                findAllMachine();
+                                $("#myModal_delete").modal('hide');   //显示对话框
+
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                    }
+                });
+            });
+            /*******************************************************************************************/
+        })
+    </script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            font-family: Arial;
+            font-size: 14px;
+            /*min-height: 500px;*/
+            /*min-width: 500px;*/
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<!--机器编号管理-->
+<div>
+    <div style="margin-top: 10px;width: 100%;height: 40px;">
+        <span class="label label-badge label-primary label-define"
+              style="float: left; margin-left: 20px;margin-top: 10px">Machine SN Management</span>
+        <button id="submit1" class="btn btn-primary" type="button"
+                style="float: right; margin-right: 20px"><i class="icon icon-plus"></i> Add
+        </button>
+    </div>
+    <div style="background-color: white" class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+            <thead id="thead">
+            </thead>
+            <tbody id="tbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<!--对话框-->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Messages</h4>
+            </div>
+            <div class="modal-body">
+                <p id="modal-content" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 新增机器编号-->
+<div class="modal fade" id="myModal_add">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Add a New Machine</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3">Machine Type</label>
+                        <div class="col-sm-6">
+                            <select id="type" class="form-control">
+                                <option value="IP-200">IP-200</option>
+                            </select>
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Machine SN</label>
+                        <div class="col-sm-6">
+                            <input id="number" type="tel" class="form-control" maxlength="12"
+                                   placeholder="the length of SN is fixed to 12 numbers">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit1_1" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 删除机器编号-->
+<div class="modal fade" id="myModal_delete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Delete Or Not</h4>
+            </div>
+            <div class="modal-body">
+                <div style="display: none">
+                    <!--<input id="deleteId">-->
+                    <input id="deleteMachineType">
+                    <input id="deleteMachineSN">
+                </div>
+                <p id="deleteTip" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="submit4" type="button" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

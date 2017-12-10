@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Backstage</title>
+    <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico"/>
+    <link rel="stylesheet" href="zui/zui.css">
+    <script src="javascript/jquery-2.0.3.min.js"></script>
+    <script src="javascript/jquery.cookie.js"></script>
+    <script src="zui/zui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            /**
+             * 实现左部位置到顶部时就静止
+             */
+                //获取要定位元素距离浏览器顶部的距离
+            var navH = $(".left").offset().top;
+            //滚动条事件
+            $(window).scroll(function () {
+                //获取滚动条的滑动距离
+                var scroH = $(this).scrollTop();
+                //滚动条的滑动距离大于等于定位元素距离浏览器顶部的距离，就固定，反之就不固定
+                if (scroH >= navH) {
+                    $(".left").css({"position": "fixed", "top": 0});
+                } else if (scroH < navH) {
+                    $(".left").css({"position": "static"});
+                }
+            });
+            /*******************************************************************************************/
+            // 手动点击某个菜单，使该菜单背景变成蓝色
+            $('#treeMenu').on('click', 'a', function () {
+                $('#treeMenu li.active').removeClass('active');
+                $(this).closest('li').addClass('active');
+            });
+
+            //手动点击某个菜单选项，在就右侧显示对应的内容，其他内容就隐藏掉
+            function tabs(tabCon) {
+                $(tabCon).each(function () {
+                    $(this).children().hide();
+                    $(this).children().eq(15).show();//0代表第一个
+                });
+                $('#treeMenu ul').children().click(function () {
+                    var index = $('#treeMenu ul').children().index(this);
+                    $(tabCon).children().eq(index).show().siblings().hide();
+                });
+            }
+
+//            tabs(".context");
+            // 手动初始化工具提示
+            $('[data-toggle="tooltip"]').tooltip();
+            /*******************************************************************************************/
+
+            //成功登陆后加载用户信息
+            function loginsuccess() {
+                if ($.cookie("username") != null) {
+                    $("#successlogin").html('  ' + $.cookie("username") + '  ');
+                } else {
+                    location.href = "login_admin.html";
+                }
+            }
+
+            loginsuccess();
+
+            //注销
+            $("#loginout").click(function () {
+                if ($.cookie("username") != null) {
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionAdmin_loginOut.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            $.cookie("username", null, {expires: -1});//删除cookie信息
+                            location.href = "login_admin.html";
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            location.href = "login_admin.html";
+                        }
+                    });
+
+                } else {
+                    location.href = "login_admin.html";
+                }
+            });
+        })
+    </script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            font-family: Arial;
+            font-size: 14px;
+            /*min-height: 500px;*/
+            /*min-width: 500px;*/
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            overflow-x: auto;
+        }
+
+        .title {
+            width: 100%;
+            /*保持在顶部悬浮*/
+            position: absolute;
+            background-color: #D3D3D3;
+            border-bottom: #ffffff 2px solid;
+        }
+
+        .title .title_context {
+            line-height: 45px;
+            font-size: 23px;
+            color: white;
+            margin-left: 5%;
+            font-weight: 900;
+            font-family: Arial;
+        }
+
+        .title .title_context a {
+            /*color: #ffffff;*/
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .title .title_context a:link, a:visited {
+            /*color: #ffffff;*/
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .title .title_context a:hover, a:active {
+            /*color: #ffffff;*/
+            /*background-color: #4682B4;*/
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /*登录处*/
+        .login a:hover, a:active {
+            /*background-color: #4682B4;*/
+            /*text-decoration: none;*/
+            cursor: pointer;
+        }
+
+        .login {
+            margin-top: 5px;
+            float: right;
+            color: black;
+            font-size: 15px;
+        }
+
+        .login div {
+            margin-top: 0px;
+        }
+
+        h3 {
+            color: blue;
+        }
+
+        .center {
+            width: 100%;
+            height: 100%;
+            padding-top: 47px;
+            /*以下为控制位于此div中的模块垂直和水平居中*/
+            /*display: flex;*/
+            /*justify-content: center;*/
+            /*align-items: center;*/
+        }
+
+        .left {
+            float: left;
+            width: 18%;
+            height: 100%;
+            border-right: #ffffff 2px solid;
+        }
+
+        /*左侧选择区--结束*/
+
+        /*右侧--开始*/
+        .right {
+            float: right;
+            width: 82%;
+            height: 100%;
+            background-color: #F5F5F5;
+        }
+
+        .right .context select {
+            font-size: 16px;
+        }
+
+        .label-define {
+            font-size: 16px;
+            margin-left: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px
+        }
+    </style>
+</head>
+<body>
+<div class="title">
+    <span class="title_context">
+        <a style="font-family: Arial;" href="index_admin.html" data-toggle="tooltip" data-tip-class="tooltip-default"
+           data-placement="bottom"
+           title="Refresh">Management System Backstage</a>
+    </span>
+    <div class="login">
+        <div id="p1">
+            <button class="btn btn-link" type="button"
+                    style="font-weight: 800"><i class="icon icon-user"></i>
+            </button>
+            <span id="successlogin" class="label label-badge " style="font-size: 16px;"></span>
+            <button id="loginout" class="btn btn-link" type="button"
+                    style="float: right;font-weight: 800"><i class="icon icon-off"></i> Log off
+            </button>
+        </div>
+    </div>
+</div>
+<div class="center">
+    <div class="left">
+        <nav class="menu" data-ride="menu">
+            <ul id="treeMenu" class="tree tree-menu" data-ride="tree">
+                <li class="open"><a href="#"><i class="icon icon-cubes"></i>Machine Management</a>
+                    <ul>
+                        <li><a href="part_admin/machineSN.html" target="mainbox"><i class="icon icon-circle-blank"></i>Machine SN</a></li>
+                    </ul>
+                </li>
+                <li class="open"><a href="#"><i class="icon icon-group"></i>Users Management</a>
+                    <ul>
+                        <li><a href="part_admin/usersStatistics.html" target="mainbox"><i class="icon icon-circle-blank"></i>Users
+                            Statistics</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="right">
+        <iframe name="mainbox" width="100%" height="99%" frameborder="0">
+        </iframe>
+    </div>
+</div>
+<!--对话框-->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Messages</h4>
+            </div>
+            <div class="modal-body">
+                <p id="modal-content" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

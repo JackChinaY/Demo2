@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>cashier</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../image/favicon.ico"/>
+    <link rel="stylesheet" href="../zui/zui.css">
+    <script src="../javascript/jquery-2.0.3.min.js"></script>
+    <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../zui/zui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+                /**
+                 *在此统一定义一些常用字符串
+                 */
+                var loginTimeout = "Login timeout, please login again !";
+                var serverError = "possible reasons：server error !";
+                /*******************************************************************************************/
+                //页面加载时自动执行的函数，生成表格
+                findAllCashiers();
+                /*******************************************************************************************/
+                //增加按钮，添加收银员
+                $("#submit1").click(function () {
+                    getCashiersMaxNumber();
+                    getCashiersMaxCode();
+                    $("#myModal1").modal({moveable: true});   //显示对话框
+                });
+
+                //查询收银员最大编号，并填充加1后的数值
+                function getCashiersMaxNumber() {
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_getCashiersMaxNumber.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        dataType: "json",
+                        cache: false,
+                        async: false,//设置为同步
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //可能原因：服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            } else if (data.jsonObject == "null") {
+                                //null代表数据表为空，编号从1开始
+                                $("#number").html(1);
+                            } else {
+                                $("#number").html(parseInt(data.jsonObject) + 1);//商品编号最大值加1
+                            }
+                        },
+                        error: function (jqXHR) {
+                            //操作失败，可能原因
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+
+                //查询收银员最大代码，并填充加1后的数值
+                function getCashiersMaxCode() {
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_getCashiersMaxCode.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        dataType: "json",
+                        cache: false,
+                        async: false,//设置为同步
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //可能原因：服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            } else if (data.jsonObject == "null") {
+                                //null代表数据表为空，编号从1开始
+                                $("#code").val("001");
+                                $("#code_flag1").show();//对号
+                                $("#code_flag2").hide();//叉号
+                                $("#code_info").html(1);//0代表已存在，1代表可用
+                            } else {
+                                $("#code").val(buquan(parseInt(data.jsonObject) + 1, 3));//code最大值加1,并保留三位数据，如1，保留为001
+                                $("#code_flag1").show();//对号
+                                $("#code_flag2").hide();//叉号
+                                $("#code_info").html(1);//0代表已存在，1代表可用
+                            }
+                        },
+                        error: function (jqXHR) {
+                            //操作失败，可能原因
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+
+                //验证验证收银员code是否存在
+                $("#code").blur(function () {
+                    if ($("#code").val() == "") {
+                        new $.zui.Messager('The Code can not be empty!', {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else if ($("#code").val() == "000") {
+                        new $.zui.Messager('The Code can not be "000"!', {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else if ($("#code").val().length != 3) {
+                        new $.zui.Messager('The length of the Code is fixed 3 numbers!', {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else {
+                        $.ajax({
+                            type: "POST",
+                            url: "ActionPart1_verifyCashierCode.action",
+                            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                            data: {
+                                "value1": $("#code").val()
+                            },
+                            dataType: "json",
+                            cache: false,
+                            success: function (data) {
+                                //登录超时，请重新登录
+                                if (data.jsonObject == "-3") {
+                                    new $.zui.Messager(loginTimeout, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    setTimeout(function () {
+                                        top.location.href = "../login.html";//重定向
+                                    }, 2000);
+                                }
+                                //服务器出错
+                                else if (data.jsonObject == "-1") {
+                                    new $.zui.Messager(serverError, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                }
+                                //正确传输过来数据
+                                else {
+                                    if (data.jsonObject == "0") {
+                                        $("#code_flag1").show();//对号
+                                        $("#code_flag2").hide();//叉号
+                                        $("#code_info").html(1);//0代表已存在，1代表可用
+                                    } else if (data.jsonObject == "1") {
+                                        $("#code_flag1").hide();//对号
+                                        $("#code_flag2").show();//叉号
+                                        $("#code_info").html(0);//0代表已存在，1代表可用
+                                        new $.zui.Messager('The Code already existed in the database. Please re-enter it !', {
+                                            type: 'danger',
+                                            placement: 'top' // 定义显示位置
+                                        }).show();
+                                    }
+                                }
+                            },
+                            error: function (jqXHR) {
+                                new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                        });
+                    }
+                });
+                //保存新增的收银员
+                $("#submit1_1").click(function () {
+                    if ($("#code").val() == "") {
+                        new $.zui.Messager('The Code can not be empty!', {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else if ($("#code").val() == "000") {
+                        new $.zui.Messager('The Code can not be "000"!', {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else if ($("#code").val().length != 3) {
+                        new $.zui.Messager('The length of the Code is fixed 3 numbers!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else if ($("#code_info").text() == "0") {
+                        new $.zui.Messager('The Code already existed in the database. Please re-enter it !', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else if ($("#name").val() == "") {
+                        new $.zui.Messager('The Name can not be empty!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#name").val().trim() == "") {
+                        new $.zui.Messager('The Name can not be all spaces!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#password").val() == "") {
+                        new $.zui.Messager('The Password can not be empty!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#password").val().length != 6) {
+                        new $.zui.Messager('The length of the Password must be 6 numbers!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#password").val().indexOf(" ") != -1) {
+                        new $.zui.Messager('The Password can not contain space!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#re_password").val() == "") {
+                        new $.zui.Messager('The Re-Password can not be empty!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#re_password").val().length != 6) {
+                        new $.zui.Messager('The length of the Re-Password must be 6 numbers!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#re_password").val().indexOf(" ") != -1) {
+                        new $.zui.Messager('The Password can not contain space!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#re_password").val() != $("#password").val()) {
+                        new $.zui.Messager('The Password and Re-Password are inconsistent!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else {
+                        $.ajax({
+                            type: "POST",
+                            url: "ActionPart1_saveCashier.action",
+                            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                            data: {
+                                "value1": $("#number").text(),
+                                "value2": $("#code").val(),
+                                "value3": $("#name").val(),
+                                "value4": $("#password").val()
+                            },
+                            dataType: "json",
+                            cache: false,
+                            success: function (data) {
+                                //登录超时，请重新登录
+                                if (data.jsonObject == "-3") {
+                                    new $.zui.Messager(loginTimeout, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    setTimeout(function () {
+                                        top.location.href = "../login.html";//重定向
+                                    }, 2000);
+                                }
+                                //服务器出错
+                                else if (data.jsonObject == "-1") {
+                                    new $.zui.Messager(serverError, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                }
+                                //正确传输过来数据
+                                else {
+                                    if (data.jsonObject == "0") {
+                                        new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                            type: 'danger',
+                                            placement: 'top' // 定义显示位置
+                                        }).show();
+                                    } else if (data.jsonObject == "1") {
+                                        new $.zui.Messager('Submit successfully !', {
+                                            type: 'success',
+                                            placement: 'top' // 定义显示位置
+                                        }).show();
+                                        $("#myModal1").modal('hide');   //显示对话框
+                                        findAllCashiers();//刷新页面
+                                        //将原输入框内容置零
+                                        $("#name").val("");
+                                        $("#password").val("");
+                                        $("#re_password").val("");
+                                    }
+                                }
+                            },
+                            error: function (jqXHR) {
+                                new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                        });
+                    }
+                });
+                /*******************************************************************************************/
+                //查询所有收银员 点击事件
+                $("#submit2").click(function () {
+                    findAllCashiers();
+                });
+
+                //查询所有收银员 无参
+                function findAllCashiers() {
+                    //查询所有收银员
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_findAllCashiers.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                //后台传过来的是json数组的字符串，需要先转成json数组对象
+                                var jsonArray = $.parseJSON(data.jsonObject);
+                                //当数组为[]空时
+                                if (jsonArray.length == 0) {
+                                    $("#thead").html('<tr><th>No data！</th></tr>');
+                                    $("#tbody").html('');
+                                }
+                                //当数组为不为空时
+                                else if (jsonArray.length != 0) {
+                                    var head = '<tr><th>Number</th><th>Name</th><th>Code</th><th>Password</th><th>Operation</th></tr>';
+                                    $("#thead").html(head);
+                                    var html;
+                                    for (var i = 0; i < jsonArray.length; i++) {
+                                        html += '<tr><td class="Id">' + jsonArray[i].value1 + '</td>'
+                                            + '<td class="Name">' + jsonArray[i].value2 + '</td>'
+                                            + '<td class="Code">' + jsonArray[i].value3 + '</td>'
+                                            + '<td class="Password">' + jsonArray[i].value4 + '</td>'
+                                            + '<td>&nbsp;&nbsp;<a name="update" href="#" data-toggle="tooltip" data-tip-class="tooltip-primary" title="Modify"><i class="icon icon-edit"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="delete" href="#" data-toggle="tooltip" data-tip-class="tooltip-danger" title="Delete" style="color: #ea644a"><i class="icon icon-trash"></i></a></td></tr>';
+                                    }
+                                    $("#tbody").html(html);
+//                                    console.log(jsonArray.length);
+//                                    console.log(jsonArray.toString());
+//                                    console.log(html);
+                                    // 手动初始化工具提示
+                                    $('[data-toggle="tooltip"]').tooltip();
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            $("#modal-content").html("The operation failed, please try again. Possible causes:" + jqXHR.status + "！");
+                            $("#myModal").modal();
+                        }
+                    });
+                }
+
+                /*******************************************************************************************/
+                //修改按钮，修改收银员
+                $("#tbody").on("click", "a[name='update']", function () {
+                    //数据初始化
+                    $("#number2").html($(this).parents("tr").find(".Id").text());
+                    $("#code2").html($(this).parents("tr").find(".Code").text());
+                    $("#name2").val($(this).parents("tr").find(".Name").text());
+                    $("#password2").val($(this).parents("tr").find(".Password").text());
+                    $("#re_password2").val($(this).parents("tr").find(".Password").text());
+                    $("#myModal2").modal({moveable: true});//显示对话框
+                });
+                //保存修改后的收银员
+                $("#submit3").click(function () {
+                    if ($("#name2").val().trim() == "") {
+                        new $.zui.Messager('The Name can not be all spaces!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#password2").val() == "") {
+                        new $.zui.Messager('The Password can not be empty!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#password2").val().length != 6) {
+                        new $.zui.Messager('The length of the Password must be 6 numbers!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#password2").val().indexOf(" ") != -1) {
+                        new $.zui.Messager('The Password can not contain space!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#re_password2").val() == "") {
+                        new $.zui.Messager('The Re-Password can not be empty!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#re_password2").val().length != 6) {
+                        new $.zui.Messager('The length of the Re-Password must be 6 numbers!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#re_password2").val().indexOf(" ") != -1) {
+                        new $.zui.Messager('The Re-Password can not contain space!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else if ($("#re_password2").val() != $("#password2").val()) {
+                        new $.zui.Messager('The Password and Re-Password are inconsistent!', {
+                            type: 'danger',
+                            placement: 'top'
+                        }).show();
+                    } else {
+                        $.ajax({
+                            type: "POST",
+                            url: "ActionPart1_modifyCashier.action",
+                            contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                            data: {
+                                "value1": $("#number2").text(),
+                                "value2": $("#code2").text(),
+                                "value3": $("#name2").val(),
+                                "value4": $("#password2").val()
+                            },
+                            dataType: "json",
+                            cache: false,
+                            success: function (data) {
+                                //登录超时，请重新登录
+                                if (data.jsonObject == "-3") {
+                                    new $.zui.Messager(loginTimeout, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    setTimeout(function () {
+                                        top.location.href = "../login.html";//重定向
+                                    }, 2000);
+                                }
+                                //服务器出错
+                                else if (data.jsonObject == "-1") {
+                                    new $.zui.Messager(serverError, {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                }
+                                //正确传输过来数据
+                                else {
+                                    if (data.jsonObject == "0") {
+                                        new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                            type: 'danger',
+                                            placement: 'top' // 定义显示位置
+                                        }).show();
+                                    } else if (data.jsonObject == "1") {
+                                        new $.zui.Messager('Submit successfully !', {
+                                            type: 'success',
+                                            placement: 'top' // 定义显示位置
+                                        }).show();
+                                        $("#myModal2").modal('hide');   //显示对话框
+                                        findAllCashiers();
+                                    }
+                                }
+                            },
+                            error: function (jqXHR) {
+                                new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                        });
+                    }
+                });
+                /*******************************************************************************************/
+                //删除收银员，因为表格是自动生成的，所以只能用on函数，click事件无效
+                $("#tbody").on("click", "a[name='delete']", function () {
+                    $("#deleteId").val($(this).parents("tr").find(".Id").text());
+                    $("#deleteTip").html("Do you want to delete this record ( Number : " + $(this).parents("tr").find(".Id").text() + " ) ？");
+                    $("#myModal3").modal({moveable: true});
+                });
+                //删除收银员 提交
+                $("#submit4").click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_deleteOneCashier.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "value1": $("#deleteId").val()
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "0") {
+                                    new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                } else if (data.jsonObject == "1") {
+                                    new $.zui.Messager('Submit successfully !', {
+                                        type: 'success',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    $("#myModal3").modal('hide');   //显示对话框
+                                    findAllCashiers();
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                });
+                /*******************************************************************************************/
+
+                //数据补全函数，如1，保留为001，num为待操作数，length为最终保留的长度
+                function buquan(num, length) {
+                    var numstr = num.toString();
+                    var l = numstr.length;
+                    if (numstr.length >= length) {
+                        return numstr;
+                    }
+                    for (var i = 0; i < length - l; i++) {
+                        numstr = "0" + numstr;
+                    }
+                    return numstr;
+                }
+            }
+        );
+    </script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            font-family: Arial;
+            font-size: 14px;
+            /*min-height: 500px;*/
+            /*min-width: 500px;*/
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<!--收银员-->
+<div>
+    <div style="margin-top: 10px;width: 100%;height: 40px;">
+        <span class="label label-badge label-primary label-define"
+              style="float: left; margin-left: 20px;margin-top: 10px">Cashier Management</span>
+        <!--<button id="submit2" class="btn btn-primary" type="button"-->
+                <!--style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i> Refresh-->
+        <!--</button>-->
+        <button id="submit1" class="btn btn-primary" type="button"
+                style="float: right; margin-right: 20px"><i class="icon icon-plus"></i> Add
+        </button>
+    </div>
+    <div style="background-color: white;"
+         class="table-responsive">
+        <!--height: 400px;overflow: scroll; overflow-x: hidden-->
+        <table id="table2_1" class="table table-striped table-hover table-bordered">
+            <thead id="thead">
+            </thead>
+            <tbody id="tbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<!--基础对话框-->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Messages</h4>
+            </div>
+            <div class="modal-body">
+                <p id="modal-content" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 新增-->
+<div class="modal fade" id="myModal1">
+    <div class="modal-dialog modal-moveable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Add A New Cashier</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3">Number</label>
+                        <label id="number" class="col-sm-6" style="text-align: center"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Code</label>
+                        <div class="col-sm-6">
+                            <input id="code" type="tel" class="form-control" maxlength="3"
+                                   placeholder="fixed 3 digits number">
+                        </div>
+                        <strong>*</strong>
+                        <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check"
+                                                             style="color: green"></i> <i id="code_flag2"
+                                                                                          class="icon icon-times"
+                                                                                          style="color: red"></i></label>
+                        <label id="code_info" hidden="hidden"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Name</label>
+                        <div class="col-sm-6">
+                            <input id="name" type="text" class="form-control" maxlength="15"
+                                   placeholder="1-15 characters">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Password</label>
+                        <div class="col-sm-6">
+                            <input id="password" type="password" class="form-control" maxlength="6"
+                                   placeholder="fixed 6 digits number"
+                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Re-Password</label>
+                        <div class="col-sm-6">
+                            <input id="re_password" type="password" class="form-control" maxlength="6"
+                                   placeholder="fixed 6 digits number"
+                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit1_1" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 修改-->
+<div class="modal fade" id="myModal2">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Modify A Cashier</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3">Number</label>
+                        <label id="number2" class="col-sm-6" style="text-align: center"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Code</label>
+                        <label id="code2" class="col-sm-6" style="text-align: center"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Name</label>
+                        <div class="col-sm-6">
+                            <input id="name2" type="text" class="form-control" maxlength="15"
+                                   placeholder="1-15 characters">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Password</label>
+                        <div class="col-sm-6">
+                            <input id="password2" type="password" class="form-control" maxlength="6"
+                                   placeholder="fixed 6 digits number"
+                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Re-Password</label>
+                        <div class="col-sm-6">
+                            <input id="re_password2" type="password" class="form-control" maxlength="6"
+                                   placeholder="fixed 6 digits number"
+                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit3" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 删除商品-->
+<div class="modal fade" id="myModal3">
+    <div class="modal-dialog modal-moveable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Delete Or Not</h4>
+            </div>
+            <div class="modal-body">
+                <div style="display: none">
+                    <input id="deleteId">
+                </div>
+                <p id="deleteTip" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="submit4" type="button" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

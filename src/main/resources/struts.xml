@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--<!DOCTYPE struts PUBLIC-->
+<!--"-//Apache Software Foundation//DTD Struts Configuration 2.1//EN"-->
+<!--"http://struts.apache.org/dtds/struts-2.1.dtd">-->
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+    <!-- 配置为开发模式 -->
+    <!--<constant name="struts.devMode" value="true"/>-->
+    <!-- 	配置扩展名为action ? -->
+    <constant name="struts.action.extension" value="action"/>
+    <!--<constant name="struts.multipart.saveDir" value="/temp/"/>-->
+    <!--<constant name="struts.enable.DynamicMethodInvocation" value="true"/>-->
+    <!-- 配置文件上传 -->
+    <!--<bean type= "org.apache.struts2.dispatcher.multipart.MultiPartRequest" name= "myRequestParser" class= "control.RequestParseWrapper" scope= "default" optional= "true" />-->
+    <!--<constant name= "struts.multipart.handler" value= "myRequestParser" />-->
+
+    <!-- 配置主题 -->
+    <!-- 	<constant name="struts.ui.theme" value="simple" /> -->
+
+    <!--各种请求 strict-method-invocation="false"-->
+    <package name="default" namespace="/" extends="struts-default">
+    </package>
+    <!--2.5以上的版本需要主动设置strict-method-invocation="false"，以便可以使用通配符-->
+    <package name="control" namespace="/" extends="struts-default" strict-method-invocation="false">
+        <!-- 用户的请求 -->
+        <action name="Action_*" class="control.HQAction" method="{1}">
+        </action>
+        <!--第一、三部分的请求-->
+        <action name="ActionPart1_*" class="control.HQAction_Part1" method="{1}">
+        </action>
+        <!--第二部分的请求-->
+        <action name="ActionPart2_*" class="control.HQAction_Part2" method="{1}">
+        </action>
+        <!--管理员的请求 -->
+        <action name="ActionAdmin_*" class="control.HQAction_Admin" method="{1}">
+        </action>
+    </package>
+</struts>

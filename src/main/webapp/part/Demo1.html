@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../image/favicon.ico"/>
+    <link rel="stylesheet" href="../zui/zui.css">
+    <script src="../javascript/jquery-2.0.3.min.js"></script>
+    <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../zui/zui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            // 或者在初始化时指定弹出方向
+//            $('[data-toggle="tooltip"]').tooltip();
+//            $('[data-toggle="popover"]').popover({
+//                placement: 'right',
+//                html:true,
+//                container: 'body'
+//            });
+
+            $("#submit2").click(function () {
+                $("#myModal1").modal({
+                    moveable:true
+                });
+
+            });
+//            var abb = ["CNY", "USD", "GBP", "EUR", "JPY", "HKD", "DEM", "CHF", "FRF", "NLG", "ATS", "BEF", "ITL", "CAD", "AUD", "SEK", "DKK", "NOK", "FIM", "KRW", "THB", "PHP", "INR", "SUR", "BUK", "NZD", "SGD"];
+//            findAllAbbreviation();
+//            //组合成所有外币
+//            function findAllAbbreviation() {
+//                var html = '<div><table class="table table-striped table-hover table-bordered">' +
+//                    '<thead><tr><th>ID</th><th>Abbreviation</th><th>Choose</th></tr></thead><tbody>';
+////                alert(abbreviationArray.length);
+//                for (var i = 0; i < abb.length; i++) {
+//                    html += '<tr><td>' + i  + '</td>'
+//                        + '<td class="abbreviation">' + abb[i] + '</td>'
+//                        + '<td><a name="abbreviation" href="#" data-toggle="tooltip" data-tip-class="tooltip-primary" title="Choose"><i class="icon icon-pencil"></i></a></td></tr>';
+//                }
+//                html += '</tbody></table></div>';
+//                alert(html);
+//                return html;
+//            }
+        })
+    </script>
+</head>
+<body>
+<button id="submit2" class="btn btn-primary" type="button" style="margin-left: 100px;margin-top: 100px"><i
+        class="icon icon-plus"></i> 弹出
+</button>
+<div class="switch text-left">
+    <input id="check" type="checkbox">
+    <label>夜间模式</label>
+</div>
+<!--对话框 新增-->
+<div class="modal fade" id="myModal1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Add A New Cashier</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3">Number</label>
+                        <label id="number" class="col-sm-6" style="text-align: center"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Code</label>
+                        <div class="col-sm-6">
+                            <input id="code" type="tel" class="form-control" maxlength="3"
+                                   placeholder="fixed 3 digits number">
+                        </div>
+                        <strong>*</strong>
+                        <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check"
+                                                             style="color: green"></i> <i id="code_flag2"
+                                                                                          class="icon icon-times"
+                                                                                          style="color: red"></i></label>
+                        <label id="code_info" hidden="hidden"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Name</label>
+                        <div class="col-sm-6">
+                            <input id="name" type="text" class="form-control" maxlength="15"
+                                   placeholder="1-15 characters">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Password</label>
+                        <div class="col-sm-6">
+                            <input id="password" type="password" class="form-control" maxlength="6"
+                                   placeholder="fixed 6 digits number">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Re-Password</label>
+                        <div class="col-sm-6">
+                            <input id="re_password" type="password" class="form-control" maxlength="6"
+                                   placeholder="fixed 6 digits number">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit1_1" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/2002/xmlspec/dtd/2.10/xmlspec.dtd">-->
+<c3p0-config>
+    <!-- 所有数据都存放在一个数据库中 -->
+    <!--<named-config name="CashMachine">-->
+    <default-config>
+        <!-- mysql连接方式 -->
+        <!--<property name="driverClass">org.gjt.mm.mysql.Driver</property>-->
+        <!--6.0的版本需要如下配置-->
+        <property name="driverClass">com.mysql.cj.jdbc.Driver</property>
+        <!--  本地测试时用以下数据库 用户名 密码-->
+        <!--<property name="jdbcUrl">jdbc:mysql://localhost:3306/taxmastercomputer</property>-->
+        <!--&lt;!&ndash;用户名&ndash;&gt;-->
+        <!--<property name="user">root</property>-->
+        <!--&lt;!&ndash;密码&ndash;&gt;-->
+        <!--<property name="password"></property>-->
+
+        <!--  部署在阿里云上用以下数据库 用户名 密码47.93.232.64 -->
+        <!--<property name="jdbcUrl">jdbc:mysql://localhost:3306/taxmastercomputer</property>-->
+        <!--6.0的版本需要加上时区-->
+        <property name="jdbcUrl">jdbc:mysql://localhost:3306/taxmastercomputer?serverTimezone=UTC&amp;characterEncoding=utf8&amp;useSSL=true</property>
+        <!--用户名-->
+        <property name="user">root</property>
+        <!--部署在阿里云上用到以下密码-->
+        <!--<property name="password">1236547</property>-->
+        <property name="password"></property>
+        <!--以下为sqlite的连接方式-->
+        <!-- 	<property name="driverClass">org.sqlite.JDBC</property> -->
+        <!-- 	<property name="jdbcUrl">jdbc:sqlite:E:\\DB\\programmingDB.db</property> -->
+
+        <!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
+        <property name="acquireIncrement">3</property>
+
+        <!--初始化时获取三个连接，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
+        <property name="initialPoolSize">3</property>
+
+        <property name="minPoolSize">3</property>
+
+        <!--连接池中保留的最大连接数。Default: 15 -->
+        <property name="maxPoolSize">500</property>
+
+        <!--解决mysql 8小时断开连接问题-->
+        <!--每3600秒检查所有连接池中的空闲连接。Default: 0 -->
+        <property name="idleConnectionTestPeriod">3600</property>
+        <!--最大空闲时间,3600秒内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 -->
+        <!--<property name="maxIdleTime">3600</property>-->
+
+        <!--JDBC的标准参数，用以控制数据源内加载的PreparedStatements数量。但由于预缓存的statements
+    属于单个connection而不是整个连接池。所以设置这个参数需要考虑到多方面的因素。
+    如果maxStatements与maxStatementsPerConnection均为0，则缓存被关闭。Default: 0-->
+        <property name="maxStatements">200</property>
+
+        <!--maxStatementsPerConnection定义了连接池内单个连接所拥有的最大缓存statements数。Default: 0 -->
+        <property name="maxStatementsPerConnection">20</property>
+    </default-config>
+    <!--</named-config>-->
+</c3p0-config>

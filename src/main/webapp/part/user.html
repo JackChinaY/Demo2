@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
+    <link rel="stylesheet" href="../zui/zui.css">
+    <script src="../javascript/jquery-2.0.3.min.js"></script>
+    <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../zui/zui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            /**
+             *在此统一定义一些常用字符串
+             */
+            var loginTimeout = "Login timeout, please login again !";
+            var serverError = "possible reasons：server error !";
+            // 手动初始化工具提示
+            $('[data-toggle="tooltip"]').tooltip();
+            /*******************************************************************************************/
+            //查询所有收银员 点击事件
+            $("#submit2").click(function () {
+                findUserInfo();
+            });
+            //自动加载数据
+            findUserInfo();
+
+            //查询用户个人信息 无参
+            function findUserInfo() {
+                //查询所有收银员
+                $.ajax({
+                    type: "GET",
+                    url: "Action_findUserInfo.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login.html";//重定向
+                            }, 2000);
+                        }
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                        //正确传输过来数据
+                        else {
+                            //后台传过来的是json数组的字符串，需要先转成json数组对象
+                            var jsonArray = $.parseJSON(data.jsonObject);
+                            //当数组为[]空时
+                            if (jsonArray.length == 0) {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //当数组为不为空时
+                            else if (jsonArray.length != 0) {
+                                $("#type").val(jsonArray[0].value1);
+                                $("#id").val(jsonArray[0].value2);
+                                $("#username").val(jsonArray[0].value3);
+                                $("#email").val(jsonArray[0].value4);
+                                $("#tel").val(jsonArray[0].value5);
+                                $("#address").val(jsonArray[0].value6);
+
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                    }
+                });
+            }
+
+            /*******************************************************************************************/
+            //修改用户信息 弹出框
+            $("#submit2").click(function () {
+                $("#email2").val($("#email").val());
+                $("#tel2").val($("#tel").val());
+                $("#address2").val($("#address").val());
+                $("#myModal2").modal({moveable: true});//显示对话框
+            });
+            //修改用户信息 提交
+            $("#submit3").click(function () {
+                if ($("#email2").val() == "") {
+                    new $.zui.Messager('E-mail cannot be empty！', {
+                        type: 'danger',
+                        placement: 'center'
+                    }).show();
+                } else if ($("#email2").val().indexOf(" ") != -1) {
+                    new $.zui.Messager('The E-mail can not contain space!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#email2").val().indexOf("@") == -1) {
+                    new $.zui.Messager('The format of the E-mail is incorrect, please re-enter it !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "Action_saveUserInfo.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "email": $("#email2").val(),
+                            "tel": $("#tel2").val(),
+                            "address": $("#address2").val()
+
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "0") {
+                                    new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                } else if (data.jsonObject == "1") {
+                                    new $.zui.Messager('Submit successfully !', {
+                                        type: 'success',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    $("#myModal2").modal('hide');   //显示对话框
+                                    findUserInfo();
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+            });
+            /*******************************************************************************************/
+            //修改密码 弹出框
+            $("#submit1").click(function () {
+                $("#myModal3").modal({moveable: true});//显示对话框
+            });
+            //修改密码 提交
+            $("#submit5").click(function () {
+                if ($("#password").val() == "") {
+                    new $.zui.Messager('old password cannot be empty！', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#password").val().indexOf(" ") != -1) {
+                    new $.zui.Messager('The old password can not contain space!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#new_password").val() == "") {
+                    new $.zui.Messager('New Password cannot be empty！', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#new_password").val().indexOf(" ") != -1) {
+                    new $.zui.Messager('The New Password can not contain space!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#re_new_password").val() == "") {
+                    new $.zui.Messager('Confirm Password cannot be empty！', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#re_new_password").val().indexOf(" ") != -1) {
+                    new $.zui.Messager('The Confirm Password can not contain space!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#new_password").val() != $("#re_new_password").val()) {
+                    new $.zui.Messager('The New Password and Confirm Password are inconsistent！', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "Action_saveNewPassword.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "value1": $("#password").val(),
+                            "value2": $("#new_password").val()
+
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "0") {
+                                    new $.zui.Messager('Submission failure.possible causes： Old Password error!', {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                } else if (data.jsonObject == "1") {
+                                    new $.zui.Messager('Submit successfully !', {
+                                        type: 'success',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    $("#myModal3").modal('hide');   //显示对话框
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+            });
+            /*******************************************************************************************/
+        });
+    </script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            font-family: Arial;
+            font-size: 14px;
+            /*min-height: 500px;*/
+            /*min-width: 500px;*/
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<!--用户中心-->
+<div>
+    <div style="margin-top: 10px;width: 100%;height: 40px;">
+        <span class="label label-badge label-primary label-define"
+              style="float: left; margin-left: 20px;margin-top: 10px">User Center</span>
+        <button id="submit1" class="btn btn-primary" type="button"
+                style="float: right; margin-right: 20px" data-toggle="tooltip" data-tip-class="tooltip-default"
+                data-placement="bottom"
+                title="Modify password"><i class="icon icon-key"></i> Change
+        </button>
+        <button id="submit2" class="btn btn-primary" type="button" data-toggle="tooltip"
+                data-tip-class="tooltip-default"
+                title="Modifying user information" data-placement="bottom"
+                style="float: right; margin-right: 20px"><i class="icon icon-edit"></i> Edit
+        </button>
+    </div>
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-3">Machine Type</label>
+            <div class="col-sm-6">
+                <input id="type" type="text" class="form-control" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3">Machine SN</label>
+            <div class="col-sm-6">
+                <input id="id" type="text" class="form-control" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3">Username</label>
+            <div class="col-sm-6">
+                <input id="username" type="text" class="form-control" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3">E-mail</label>
+            <div class="col-sm-6">
+                <input id="email" type="text" class="form-control" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3">Telephone</label>
+            <div class="col-sm-6">
+                <input id="tel" type="text" class="form-control" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3">Address</label>
+            <div class="col-sm-6">
+                <input id="address" type="text" class="form-control" disabled="disabled">
+            </div>
+        </div>
+    </form>
+</div>
+<!--对话框-->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Messages</h4>
+            </div>
+            <div class="modal-body">
+                <p id="modal-content" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 修改用户信息-->
+<div class="modal fade" id="myModal2">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Modify User Information</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-sm-3">E-mail</label>
+                        <div class="col-sm-6">
+                            <input id="email2" type="email" class="form-control" maxlength="50"
+                                   placeholder="0-50 characters">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Telephone</label>
+                        <div class="col-sm-6">
+                            <input id="tel2" type="tel" class="form-control" maxlength="18"
+                                   placeholder="0-18 characters">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Address</label>
+                        <div class="col-sm-6">
+                            <input id="address2" type="text" class="form-control" maxlength="100"
+                                   placeholder="0-100 characters">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit3" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 修改密码-->
+<div class="modal fade" id="myModal3">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Modify Password</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-sm-3">Old Password</label>
+                        <div class="col-sm-6">
+                            <input id="password" type="password" class="form-control" maxlength="50"
+                                   placeholder="old password">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">New Password</label>
+                        <div class="col-sm-6">
+                            <input id="new_password" type="password" class="form-control" maxlength="20"
+                                   placeholder="0-20 characters">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Password Again</label>
+                        <div class="col-sm-6">
+                            <input id="re_new_password" type="password" class="form-control" maxlength="20"
+                                   placeholder="0-20 characters">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit5" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

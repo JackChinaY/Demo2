@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
+    <link rel="stylesheet" href="../zui/zui.css">
+    <script src="../javascript/jquery-2.0.3.min.js"></script>
+    <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../zui/zui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            /**
+             *在此统一定义一些常用字符串
+             */
+            var loginTimeout = "Login timeout, please login again !";
+            var serverError = "possible reasons：server error !";
+            /*******************************************************************************************/
+            //查询所有税率 点击事件
+            $("#submit2").click(function () {
+                findAllFiscals();
+            });
+            //自动加载数据
+            findAllFiscals();
+            //查询所有税率 无参
+            function findAllFiscals() {
+                //查询所有税率
+                $.ajax({
+                    type: "GET",
+                    url: "ActionPart1_findAllFiscals.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login.html";//重定向
+                            }, 2000);
+                        }
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                        //正确传输过来数据
+                        else {
+                            //后台传过来的是json数组的字符串，需要先转成json数组对象
+                            var jsonArray = $.parseJSON(data.jsonObject);
+                            //当数组为[]空时
+                            if (jsonArray.length == 0) {
+                                $("#thead").html('<tr><th>No data！</th></tr>');
+                                $("#tbody").html('');
+                            }
+                            //当数组为不为空时
+                            else if (jsonArray.length != 0) {
+//                                var head = '<tr><th>Number</th><th>Invoice_Code</th><th>Invoice_Name</th><th>Tax_Code</th><th>Tax_Name</th><th>Tax_Rate</th><th>Exempt_Flag</th><th>CRC32</th></tr>';
+                                var head = '<tr><th>Number</th><th>Tax Code</th><th>Tax Name</th><th>Tax Rate</th></tr>';
+                                $("#thead").html(head);
+                                var html;
+                                for (var i = 0; i < jsonArray.length; i++) {
+                                    html += '<tr><td>' + jsonArray[i].value1 + '</td>'
+//                                        + '<td>' + jsonArray[i].value2 + '</td>'
+//                                        + '<td>' + jsonArray[i].value3 + '</td>'
+                                        + '<td>' + jsonArray[i].value4 + '</td>'
+                                        + '<td>' + jsonArray[i].value5 + '</td>'
+                                        + '<td>' + (parseFloat(jsonArray[i].value6) / 100).toFixed(2) + '%</td>'
+//                                        + '<td>' + jsonArray[i].value7 + '</td>'
+//                                        + '<td>' + jsonArray[i].value8 + '</td>'
+                                        + '</tr>';
+                                }
+                                $("#tbody").html(html);
+//                                    console.log(jsonArray.length);
+//                                    console.log(jsonArray.toString());
+//                                    console.log(html);
+                                // 手动初始化工具提示
+                                $('[data-toggle="tooltip"]').tooltip();
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        $("#modal-content").html("The operation failed, please try again. Possible causes:" + jqXHR.status + "！");
+                        $("#myModal").modal();
+                    }
+                });
+            }
+            /*******************************************************************************************/
+        });
+    </script>
+    <style>
+        html,body {
+            padding: 0;
+            margin: 0;
+            font-family: Arial;
+            font-size: 14px;
+            /*min-height: 500px;*/
+            /*min-width: 500px;*/
+            width: 100%;
+            height:100%;
+            overflow: auto;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<!--税率-->
+<div>
+    <div style="margin-top: 10px;width: 100%;height: 40px;">
+        <span class="label label-badge label-primary label-define"
+              style="float: left; margin-left: 20px;margin-top: 10px">Fiscal Information</span>
+        <!--<button id="submit2" class="btn btn-primary" type="button"-->
+                <!--style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i> Refresh-->
+        <!--</button>-->
+    </div>
+    <div style="background-color: white;"
+         class="table-responsive">
+        <!--height: 400px;overflow: scroll; overflow-x: hidden-->
+        <table id="table2_1" class="table table-striped table-hover table-bordered">
+            <thead id="thead">
+            </thead>
+            <tbody id="tbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--对话框-->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Messages</h4>
+            </div>
+            <div class="modal-body">
+                <p id="modal-content" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
