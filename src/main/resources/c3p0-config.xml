@@ -22,8 +22,8 @@
         <!--用户名-->
         <property name="user">root</property>
         <!--部署在阿里云上用到以下密码-->
-        <!--<property name="password">1236547</property>-->
-        <property name="password"></property>
+        <property name="password">1236547</property>
+        <!--<property name="password"></property>-->
         <!--以下为sqlite的连接方式-->
         <!-- 	<property name="driverClass">org.sqlite.JDBC</property> -->
         <!-- 	<property name="jdbcUrl">jdbc:sqlite:E:\\DB\\programmingDB.db</property> -->

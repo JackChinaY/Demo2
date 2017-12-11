@@ -5,7 +5,8 @@
     <title>Backstage Login</title>
     <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico"/>
     <link rel="stylesheet" href="zui/zui.css">
-    <script src="javascript/jquery-2.0.3.min.js"></script>
+    <script src="javascript/jquery-1.11.3.min.js"></script>
+    <!--<script src="javascript/jquery-2.0.3.min.js"></script>-->
     <script src="javascript/jquery.cookie.js"></script>
     <script src="zui/zui.js"></script>
     <style type="text/css">
@@ -79,6 +80,7 @@
                         success: function (data) {
                             if (data.jsonObject == "1") {
                                 $.cookie('username', data.username);
+                                $.cookie('userFlag', data.userFlag);
                                 $("#button_login").val("Login");
                                 location.href = "index_admin.html";
                             } else {

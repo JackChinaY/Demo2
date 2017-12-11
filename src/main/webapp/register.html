@@ -5,7 +5,8 @@
     <title>Register</title>
     <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico"/>
     <link rel="stylesheet" href="zui/zui.css">
-    <script src="javascript/jquery-2.0.3.min.js"></script>
+    <script src="javascript/jquery-1.11.3.min.js"></script>
+    <!--<script src="javascript/jquery-2.0.3.min.js"></script>-->
     <script src="zui/zui.js"></script>
     <style type="text/css">
         html, body {
@@ -65,7 +66,7 @@
             //验证机器编号是否为正品
             $("#machineId").blur(function () {
                 if ($("#machineId").val() == "") {
-                    new $.zui.Messager('The Machine Id can not be empty!', {
+                    new $.zui.Messager('The Machine SN can not be empty!', {
                         type: 'danger',
                         placement: 'top' // 定义显示位置
                     }).show();
@@ -92,7 +93,7 @@
                                 $("#check_flag2").hide();//叉号
                                 $("#check_info1").html(1);//0代表不存在，1代表正品
                             } else if (data.jsonObject == "0") {
-                                new $.zui.Messager('This Machine ID does not exist, please re-enter it !', {
+                                new $.zui.Messager('This Machine SN does not exist, please re-enter it !', {
                                     type: 'danger',
                                     placement: 'top' // 定义显示位置
                                 }).show();
@@ -168,14 +169,14 @@
             //注册
             $("#submituser").click(function () {
                 if ($("#machineId").val() == "") {
-                    new $.zui.Messager('The Machine Id can not be empty!', {
+                    new $.zui.Messager('The Machine SN can not be empty!', {
                         type: 'danger',
                         placement: 'top' // 定义显示位置
                     }).show();
                     $("#check_flag1").hide();//对号
                     $("#check_flag2").show();//叉号
                 } else if ($("#check_info1").text() == "0") {
-                    new $.zui.Messager('This Machine ID does not exist, please re-enter it ！', {
+                    new $.zui.Messager('This Machine SN does not exist, please re-enter it ！', {
                         type: 'danger',
                         placement: 'center'
                     }).show();
@@ -288,7 +289,13 @@
             // 将name=login的文本框清空，以便重新输入
             function clearAll() {
                 $(".form-control").val("");
-            };
+                $("#check_flag1").hide();//对号
+                $("#check_flag2").hide();//叉号
+                $("#check_flag3").hide();//对号
+                $("#check_flag4").hide();//叉号
+                $("#check_info1").html("");
+                $("#check_info2").html("");
+            }
         })
     </script>
 </head>
@@ -313,7 +320,7 @@
             <div class="form-group">
                 <label class="col-sm-3">Machine SN</label>
                 <div class="col-sm-6">
-                    <input id="machineId" type="text" class="form-control" placeholder="please enter the Machine Id">
+                    <input id="machineId" type="text" class="form-control" placeholder="please enter the Machine SN">
                 </div>
                 <strong>*</strong>
                 <label style="padding-left: 10px"><i id="check_flag1" class="icon icon-check"
@@ -322,7 +329,7 @@
                                                                                                   style="color: red"
                                                                                                   hidden="hidden"></i></label>
                 <label id="check_info1" hidden="hidden"></label>
-                <span id="checkinfo1"></span>
+                <!--<span id="checkinfo1"></span>-->
             </div>
             <div class="form-group">
                 <label class="col-sm-3">Username</label>
@@ -336,7 +343,7 @@
                                                                                                   style="color: red"
                                                                                                   hidden="hidden"></i></label>
                 <label id="check_info2" hidden="hidden"></label>
-                <span id="checkinfo2"></span>
+                <!--<span id="checkinfo2"></span>-->
             </div>
             <div class="form-group">
                 <label class="col-sm-3">Password</label>

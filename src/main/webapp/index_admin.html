@@ -5,7 +5,8 @@
     <title>Backstage</title>
     <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico"/>
     <link rel="stylesheet" href="zui/zui.css">
-    <script src="javascript/jquery-2.0.3.min.js"></script>
+    <script src="javascript/jquery-1.11.3.min.js"></script>
+    <!--<script src="javascript/jquery-2.0.3.min.js"></script>-->
     <script src="javascript/jquery.cookie.js"></script>
     <script src="zui/zui.js"></script>
     <script type="text/javascript">
@@ -52,7 +53,7 @@
 
             //成功登陆后加载用户信息
             function loginsuccess() {
-                if ($.cookie("username") != null) {
+                if ($.cookie("username") != null && $.cookie("userFlag") != null) {
                     $("#successlogin").html('  ' + $.cookie("username") + '  ');
                 } else {
                     location.href = "login_admin.html";

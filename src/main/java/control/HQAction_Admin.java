@@ -46,6 +46,7 @@ public class HQAction_Admin extends BaseAction {
         if (result != null) {
             flag = "1";// 登录成功
             this.getSession().setAttribute("userId", result);// 在session中保存用户的id
+            this.getSession().setAttribute("userFlag", "admin");// 在session中保存用户的身份是管理员
         } else {
             flag = "0";// 登录失败
         }
@@ -53,6 +54,7 @@ public class HQAction_Admin extends BaseAction {
         JSONObject jo = new JSONObject();
         jo.put("jsonObject", flag);
         jo.put("username", username);
+        jo.put("userFlag", "1");
         this.getResponse().setContentType("text/html;charset=UTF-8");// 设置响应数据类型
         this.getResponse().getWriter().print(jo);// 向前台发送json数据
     }
@@ -67,6 +69,7 @@ public class HQAction_Admin extends BaseAction {
             this.getResponse().getWriter().print("1");// 向前台发送json数据
         } else {
             session.removeAttribute("userId");
+            session.removeAttribute("userFlag");
             session.invalidate();//清除session
             this.getResponse().setContentType("text/html;charset=UTF-8");// 设置响应数据类型
             this.getResponse().getWriter().print("1");// 向前台发送json数据
