@@ -372,7 +372,8 @@
                         <label class="col-sm-3">E-mail</label>
                         <div class="col-sm-6">
                             <input id="email2" type="email" class="form-control" maxlength="50"
-                                   placeholder="0-50 characters">
+                                   placeholder="0-50 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\da-zA-Z@\.]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -380,15 +381,17 @@
                         <label class="col-sm-3">Telephone</label>
                         <div class="col-sm-6">
                             <input id="tel2" type="tel" class="form-control" maxlength="18"
-                                   placeholder="0-18 characters"
-                                   onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-18 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()+-]/g,'')">
+                            <!--onchange onkeyup onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)"-->
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3">Address</label>
                         <div class="col-sm-6">
                             <input id="address2" type="text" class="form-control" maxlength="100"
-                                   placeholder="0-100 characters">
+                                   placeholder="0-100 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                     </div>
                 </form>
@@ -419,7 +422,8 @@
                         <label class="col-sm-3">Old Password</label>
                         <div class="col-sm-6">
                             <input id="password" type="password" class="form-control" maxlength="50"
-                                   placeholder="old password">
+                                   placeholder="old password" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -427,7 +431,8 @@
                         <label class="col-sm-3">New Password</label>
                         <div class="col-sm-6">
                             <input id="new_password" type="password" class="form-control" maxlength="20"
-                                   placeholder="0-20 characters">
+                                   placeholder="0-20 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -435,7 +440,8 @@
                         <label class="col-sm-3">Password Again</label>
                         <div class="col-sm-6">
                             <input id="re_new_password" type="password" class="form-control" maxlength="20"
-                                   placeholder="0-20 characters">
+                                   placeholder="0-20 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>

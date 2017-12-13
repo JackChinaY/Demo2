@@ -20,7 +20,7 @@
 
             $("#submit2").click(function () {
                 $("#myModal1").modal({
-                    moveable:true
+                    moveable: true
                 });
 
             });
@@ -44,13 +44,19 @@
     </script>
 </head>
 <body>
-<button id="submit2" class="btn btn-primary" type="button" style="margin-left: 100px;margin-top: 100px"><i
-        class="icon icon-plus"></i> 弹出
-</button>
-<div class="switch text-left">
-    <input id="check" type="checkbox">
-    <label>夜间模式</label>
-</div>
+<input id="tel" type="text" class="form-control" maxlength="18"
+       placeholder="0-18 characters" style="ime-mode: disabled"
+       onkeyup="this.value=this.value.replace(/[^\d\s()+-]/g,'')">
+       <!--onchange onkeyup onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)"-->
+
+
+<!--<button id="submit2" class="btn btn-primary" type="button" style="margin-left: 100px;margin-top: 100px"><i-->
+<!--class="icon icon-plus"></i> 弹出-->
+<!--</button>-->
+<!--<div class="switch text-left">-->
+<!--<input id="check" type="checkbox">-->
+<!--<label>夜间模式</label>-->
+<!--</div>-->
 <!--对话框 新增-->
 <div class="modal fade" id="myModal1">
     <div class="modal-dialog">

@@ -1099,7 +1099,8 @@
                         <label class="col-sm-3">Name</label>
                         <div class="col-sm-6">
                             <input id="name" type="text" class="form-control" maxlength="30"
-                                   placeholder="1-30 characters">
+                                   placeholder="1-30 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -1107,8 +1108,9 @@
                         <label class="col-sm-3">Barcode</label>
                         <div class="col-sm-6">
                             <input id="barcode" type="tel" class="form-control" maxlength="13"
-                                   placeholder="0-13 characters"
-                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-13 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
+                                   <!--onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <!--<strong>*</strong>-->
                         <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check"
@@ -1121,8 +1123,9 @@
                         <label class="col-sm-3">Price</label>
                         <div class="col-sm-6">
                             <input id="price" type="tel" class="form-control" maxlength="9"
-                                   placeholder="0-999999.99"
-                                   onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-999999.99" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
+                                   <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <strong>*</strong>
                     </div>
@@ -1140,8 +1143,9 @@
                         <label class="col-sm-3">RRP</label>
                         <div class="col-sm-6">
                             <input id="rrp" type="tel" class="form-control" maxlength="9"
-                                   placeholder="0-999999.99"
-                                   onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-999999.99" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
+                                   <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <strong>*</strong>
                     </div>
@@ -1159,8 +1163,9 @@
                         <label class="col-sm-3">Stock Amount</label>
                         <div class="col-sm-6">
                             <input id="stock_amount" type="tel" class="form-control" maxlength="9"
-                                   placeholder="0-9999.9999"
-                                   onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-9999.9999" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
+                                   <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <strong id="stock_amount_info"></strong>
                     </div>
@@ -1200,7 +1205,8 @@
                         <label class="col-sm-3">Name</label>
                         <div class="col-sm-6">
                             <input id="name2" type="text" class="form-control" maxlength="30"
-                                   placeholder="1-30 characters">
+                                   placeholder="1-30 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -1208,8 +1214,9 @@
                         <label class="col-sm-3">Barcode</label>
                         <div class="col-sm-6">
                             <input id="barcode2" type="tel" class="form-control" maxlength="13"
-                                   placeholder="0-13 characters"
-                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-13 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
+                            <!--onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">-->
                             <input id="barcode2_copy" type="text" class="form-control" style="display: none">
                         </div>
                         <label style="padding-left: 10px"><i id="code_flag3" class="icon icon-check"
@@ -1222,8 +1229,8 @@
                         <label class="col-sm-3">Price</label>
                         <div class="col-sm-6">
                             <input id="price2" type="tel" class="form-control" maxlength="9"
-                                   placeholder="0-999999.99"
-                                   onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-999999.99" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -1241,8 +1248,8 @@
                         <label class="col-sm-3">RRP</label>
                         <div class="col-sm-6">
                             <input id="rrp2" type="tel" class="form-control" maxlength="9"
-                                   placeholder="0-999999.99"
-                                   onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-999999.99" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -1260,8 +1267,8 @@
                         <label class="col-sm-3">Stock Amount</label>
                         <div class="col-sm-6">
                             <input id="stock_amount2" type="tel" class="form-control" maxlength="9"
-                                   placeholder="0-9999.9999"
-                                   onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-9999.9999" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
                         </div>
                         <strong id="stock_amount_info2"></strong>
                     </div>

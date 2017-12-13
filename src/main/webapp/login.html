@@ -123,13 +123,14 @@
         <div class="input-group">
             <span class="input-group-addon"><i class="icon icon-user"></i></span>
             <input id="username" name="login" type="text" class="form-control" placeholder="Username"
-                   style="width: 100%">
+                   style="width: 100%;ime-mode: disabled"
+                   onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
         </div>
         <br>
         <div class="input-group">
             <span class="input-group-addon"><i class="icon icon-key"></i></span>
             <input id="password" name="login" type="password" class="form-control" placeholder="Password"
-                   style="width: 100%">
+                   style="width: 100%;ime-mode: disabled" onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
         </div>
         <br>
         <input id="button_login" class="btn btn-primary" type="button" style="width: 100%" value="Login">

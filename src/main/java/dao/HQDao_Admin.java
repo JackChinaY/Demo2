@@ -35,7 +35,7 @@ public class HQDao_Admin extends BaseDAO {
 	 * @return json数组
 	 */
 	public String findAllMachine() throws Exception {
-		String sql = " SELECT Id AS value1, machineType AS value2,machineId AS value3, AddDateTime AS value4 FROM machine_table ORDER BY Id";
+		String sql = " SELECT Id AS value1, machineType AS value2,machineId AS value3, AddDateTime AS value4 FROM machine_table ORDER BY machineType , machineId";
 		return this.getForJson(sql);
 	}
 

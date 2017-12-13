@@ -6,7 +6,6 @@
     <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico"/>
     <link rel="stylesheet" href="zui/zui.css">
     <script src="javascript/jquery-1.11.3.min.js"></script>
-    <!--<script src="javascript/jquery-2.0.3.min.js"></script>-->
     <script src="zui/zui.js"></script>
     <style type="text/css">
         html, body {
@@ -127,6 +126,13 @@
                     }).show();
                     $("#check_flag3").hide();//对号
                     $("#check_flag4").show();//叉号
+                } else if ($("#username").val().length < 6) {
+                    new $.zui.Messager('The length of Username must be more than or equal to 6 !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                    $("#check_flag3").hide();//对号
+                    $("#check_flag4").show();//叉号
                 } else {
                     $.ajax({
                         type: "POST",
@@ -194,6 +200,13 @@
                     }).show();
                     $("#check_flag3").hide();//对号
                     $("#check_flag4").show();//叉号
+                } else if ($("#username").val().length < 6) {
+                    new $.zui.Messager('The length of Username must be more than or equal to 6 !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                    $("#check_flag3").hide();//对号
+                    $("#check_flag4").show();//叉号
                 } else if ($("#check_info2").text() == "1") {
                     new $.zui.Messager('The Username already exists, please re-enter it ！', {
                         type: 'danger',
@@ -206,6 +219,11 @@
                     }).show();
                 } else if ($("#password").val().indexOf(" ") != -1) {
                     new $.zui.Messager('The Password can not contain space!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                }  else if ($("#password").val().length < 6) {
+                    new $.zui.Messager('The length of Password must be more than or equal to 6 !', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
@@ -313,14 +331,16 @@
                 <label class="col-sm-3">Machine Type</label>
                 <div class="col-sm-6">
                     <select id="machineType" class="form-control">
-                        <option value="IP-200" selected="selected">IP-200</option>
+                        <option value="IP-100" selected="selected">IP-100</option>
+                        <option value="IP-200">IP-200</option>
                     </select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3">Machine SN</label>
                 <div class="col-sm-6">
-                    <input id="machineId" type="text" class="form-control" placeholder="please enter the Machine SN">
+                    <input id="machineId" type="text" class="form-control" placeholder="please enter the Machine SN"
+                           style="ime-mode: disabled" onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                 </div>
                 <strong>*</strong>
                 <label style="padding-left: 10px"><i id="check_flag1" class="icon icon-check"
@@ -334,7 +354,9 @@
             <div class="form-group">
                 <label class="col-sm-3">Username</label>
                 <div class="col-sm-6">
-                    <input id="username" type="text" class="form-control" placeholder="please enter the Username">
+                    <input id="username" type="text" class="form-control" placeholder="please enter the Username"
+                           style="ime-mode: disabled"
+                           onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                 </div>
                 <strong>*</strong>
                 <label style="padding-left: 10px"><i id="check_flag3" class="icon icon-check"
@@ -348,7 +370,9 @@
             <div class="form-group">
                 <label class="col-sm-3">Password</label>
                 <div class="col-sm-6">
-                    <input id="password" type="password" class="form-control" placeholder="please enter the Password">
+                    <input id="password" type="password" class="form-control" placeholder="please enter the Password"
+                           style="ime-mode: disabled"
+                           onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                 </div>
                 <strong>*</strong>
             </div>
@@ -356,14 +380,17 @@
                 <label class="col-sm-3">RePassword</label>
                 <div class="col-sm-6">
                     <input id="confirm_password" type="password" class="form-control"
-                           placeholder="please re-enter the Password">
+                           placeholder="please re-enter the Password" style="ime-mode: disabled"
+                           onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                 </div>
                 <strong>*</strong>
             </div>
             <div class="form-group">
                 <label class="col-sm-3">E-mail</label>
                 <div class="col-sm-6">
-                    <input id="email" type="text" class="form-control" placeholder="please enter the E-mail">
+                    <input id="email" type="text" class="form-control" placeholder="please enter the E-mail"
+                           style="ime-mode: disabled"
+                           onkeyup="this.value=this.value.replace(/[^\da-zA-Z@\.]/g,'')">
                 </div>
                 <strong>*</strong>
             </div>
@@ -371,14 +398,17 @@
                 <label class="col-sm-3">Telephone</label>
                 <div class="col-sm-6">
                     <input id="tel" type="text" class="form-control" maxlength="18"
-                           placeholder="0-18 characters"
-                           onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)">
+                           placeholder="0-18 characters" style="ime-mode: disabled"
+                           onkeyup="this.value=this.value.replace(/[^\d\s()+-]/g,'')">
+                    <!--onchange onkeyup onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)"-->
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3">Address</label>
                 <div class="col-sm-6">
-                    <input id="address" type="text" class="form-control" placeholder="please enter the Address">
+                    <input id="address" type="text" class="form-control" placeholder="please enter the Address"
+                           style="ime-mode: disabled"
+                           onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                 </div>
             </div>
         </form>
@@ -406,7 +436,7 @@
                 <button type="button" class="btn btn-success" data-dismiss="modal" onclick="location.href='login.html'">
                     Return to login
                 </button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

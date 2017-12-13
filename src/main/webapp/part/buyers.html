@@ -783,7 +783,8 @@
                         <label class="col-sm-3">Name</label>
                         <div class="col-sm-6">
                             <input id="name" type="text" class="form-control" maxlength="50"
-                                   placeholder="1-50 characters">
+                                   placeholder="1-50 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -791,8 +792,8 @@
                         <label class="col-sm-3">TPIN</label>
                         <div class="col-sm-6">
                             <input id="tpin" type="tel" class="form-control" maxlength="10"
-                                   placeholder="fixed 10 digits number"
-                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="fixed 10 digits number" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                         </div>
                         <strong>*</strong>
                         <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check"
@@ -806,7 +807,8 @@
                         <label class="col-sm-3">TAX ACC NAME</label>
                         <div class="col-sm-6">
                             <input id="vat" type="text" class="form-control" maxlength="50"
-                                   placeholder="0-50 characters">
+                                   placeholder="0-50 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -814,15 +816,17 @@
                         <label class="col-sm-3">Telephone</label>
                         <div class="col-sm-6">
                             <input id="tel" type="text" class="form-control" maxlength="18"
-                                   placeholder="0-18 characters"
-                                   onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-18 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()+-]/g,'')">
+                            <!--onchange onkeyup onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)"-->
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3">Address</label>
                         <div class="col-sm-6">
                             <input id="address" type="text" class="form-control" maxlength="100"
-                                   placeholder="0-100 characters">
+                                   placeholder="0-100 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                     </div>
                 </form>
@@ -856,7 +860,8 @@
                         <label class="col-sm-3">Name</label>
                         <div class="col-sm-6">
                             <input id="name2" type="text" class="form-control" maxlength="50"
-                                   placeholder="1-50 characters">
+                                   placeholder="1-50 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -864,8 +869,8 @@
                         <label class="col-sm-3">TPIN</label>
                         <div class="col-sm-6">
                             <input id="tpin2" type="tel" class="form-control" maxlength="10"
-                                   placeholder="fixed 10 digits number"
-                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="fixed 10 digits number" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                             <!--隐藏，用于和自身验证-->
                             <input id="tpin2_copy" type="tel" hidden="hidden">
                         </div>
@@ -881,7 +886,8 @@
                         <label class="col-sm-3">TAX ACC NAME</label>
                         <div class="col-sm-6">
                             <input id="vat2" type="text" class="form-control" maxlength="50"
-                                   placeholder="0-50 characters">
+                                   placeholder="0-50 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -889,15 +895,17 @@
                         <label class="col-sm-3">Telephone</label>
                         <div class="col-sm-6">
                             <input id="tel2" type="text" class="form-control" maxlength="18"
-                                   placeholder="0-18 characters"
-                                   onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="0-18 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()+-]/g,'')">
+                            <!--onchange onkeyup onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)"-->
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3">Address</label>
                         <div class="col-sm-6">
                             <input id="address2" type="text" class="form-control" maxlength="100"
-                                   placeholder="0-100 characters">
+                                   placeholder="0-100 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                     </div>
                 </form>

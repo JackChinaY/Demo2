@@ -667,7 +667,8 @@
                         <label class="col-sm-3">Code</label>
                         <div class="col-sm-6">
                             <input id="code" type="tel" class="form-control" maxlength="3"
-                                   placeholder="fixed 3 digits number">
+                                   placeholder="fixed 3 digits number" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                         </div>
                         <strong>*</strong>
                         <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check"
@@ -680,7 +681,8 @@
                         <label class="col-sm-3">Name</label>
                         <div class="col-sm-6">
                             <input id="name" type="text" class="form-control" maxlength="15"
-                                   placeholder="1-15 characters">
+                                   placeholder="1-15 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -688,8 +690,9 @@
                         <label class="col-sm-3">Password</label>
                         <div class="col-sm-6">
                             <input id="password" type="password" class="form-control" maxlength="6"
-                                   placeholder="fixed 6 digits number"
-                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="fixed 6 digits number" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
+                                   <!--onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <strong>*</strong>
                     </div>
@@ -697,8 +700,8 @@
                         <label class="col-sm-3">Re-Password</label>
                         <div class="col-sm-6">
                             <input id="re_password" type="password" class="form-control" maxlength="6"
-                                   placeholder="fixed 6 digits number"
-                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="fixed 6 digits number" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -737,7 +740,8 @@
                         <label class="col-sm-3">Name</label>
                         <div class="col-sm-6">
                             <input id="name2" type="text" class="form-control" maxlength="15"
-                                   placeholder="1-15 characters">
+                                   placeholder="1-15 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -745,8 +749,8 @@
                         <label class="col-sm-3">Password</label>
                         <div class="col-sm-6">
                             <input id="password2" type="password" class="form-control" maxlength="6"
-                                   placeholder="fixed 6 digits number"
-                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="fixed 6 digits number" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
@@ -754,8 +758,8 @@
                         <label class="col-sm-3">Re-Password</label>
                         <div class="col-sm-6">
                             <input id="re_password2" type="password" class="form-control" maxlength="6"
-                                   placeholder="fixed 6 digits number"
-                                   onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">
+                                   placeholder="fixed 6 digits number" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>

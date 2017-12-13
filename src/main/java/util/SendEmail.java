@@ -118,13 +118,13 @@ public class SendEmail {
         // 3. 创建一封邮件
         MimeMessage message = new MimeMessage(session);
         // 3.1 From: 发件人
-        message.setFrom(new InternetAddress(myEmailAccount, "Houge Technology", "UTF-8"));
+        message.setFrom(new InternetAddress(myEmailAccount, "INSPUR", "UTF-8"));
         // 3.2 To: 收件人（可以增加多个收件人、抄送、密送）
         message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(user.getEmail(), "", "UTF-8"));
         // 3.3 Subject: 邮件主题
-        message.setSubject("Tax control PC password retrieval", "UTF-8");
+        message.setSubject("IP-200 password retrieval", "UTF-8");
         // 3.4 Content: 邮件正文（可以使用html标签）
-        message.setContent("Dear <strong>"+ user.getUsername()+"</strong>, your password has been reset, the new password is: <strong>"+user.getNewPassword()+"</strong> , please remember it。<br/>Thank you for using the Houge products !", "text/html;charset=UTF-8");
+        message.setContent("Dear <strong>"+ user.getUsername()+"</strong>, your password has been reset, the new password is: <strong>"+user.getNewPassword()+"</strong>, please remember it。<br/>Thank you for using the INSPUR products !", "text/html;charset=UTF-8");
         // 3.5 设置发件时间
         message.setSentDate(new Date());
         // 3.6 保存设置

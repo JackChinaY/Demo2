@@ -46,6 +46,7 @@
     <orderEntry type="library" name="Maven: org.xerial:sqlite-jdbc:3.21.0" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20171018" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.11" level="project" />
-    <orderEntry type="library" name="Maven: javax.mail:javax.mail-api:1.6.0" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.mail:javax.mail:1.6.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
   </component>
 </module>

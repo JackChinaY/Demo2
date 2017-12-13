@@ -575,7 +575,8 @@
                         <label class="col-sm-3">Exchange Rate</label>
                         <div class="col-sm-6">
                             <input id="rate" type="tel" class="form-control" maxlength="10"
-                                   placeholder="0.0001 - 99999.9999">
+                                   placeholder="0.0001 - 99999.9999" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>
