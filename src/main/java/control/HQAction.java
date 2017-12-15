@@ -44,8 +44,6 @@ public class HQAction extends BaseAction {
 
     /**
      * 方法序号：1_1 登录
-     *
-     * @throws NoSuchAlgorithmException
      */
     public void login() throws IOException, JSONException {
         String username = this.getRequest().getParameter("username");

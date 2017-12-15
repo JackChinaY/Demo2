@@ -6,7 +6,6 @@
     <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
     <link rel="stylesheet" href="../zui/zui.css">
     <script src="../javascript/jquery-1.11.3.min.js"></script>
-    <!--<script src="../javascript/jquery-2.0.3.min.js"></script>-->
     <script src="../javascript/jquery.cookie.js"></script>
     <script src="../zui/zui.js"></script>
     <script type="text/javascript">
@@ -244,15 +243,8 @@
                     $("#code_flag1").hide();//对号
                     $("#code_flag2").hide();//叉号
                     $("#code_info").html(1);
-                } else if ($("#barcode").val().trim() == "" && $("#barcode").val().length != 0) {
-                    new $.zui.Messager('The Barcode can not be all spaces!', {
-                        type: 'danger',
-                        placement: 'top'
-                    }).show();
-                    $("#code_flag1").hide();//对号
-                    $("#code_flag2").show();//叉号
-                } else if ($("#barcode").val().indexOf(" ") != -1) {
-                    new $.zui.Messager('The Barcode can not contain space!', {
+                } else if ($("#barcode").val().length < 8) {
+                    new $.zui.Messager('The length of Barcode can not be less than 8 !', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
@@ -386,17 +378,19 @@
                 $("#tax_code").val($(this).parents("tr").find(".Code").text());
                 if ($("#tax_code").val() == "B") {
                     $("#RRP_DIV").show();
+                    $("#barcode_info").text("*");
                 } else {
                     $("#RRP_DIV").hide();
+                    $("#barcode_info").text("");
                 }
                 $("#choose").popover('hide');//关闭对话框
             });
             //若Stock_Control=1，则为Stock_Amount必填项，若Stock_Control=0，Stock_Amount可不填，默认为0
             $("#stock_control").change(function () {
-                if ($("#stock_control").val() == "0") {
-                    $("#stock_amount_info").text("");
-                } else if ($("#stock_control").val() == "1") {
+                if ($("#stock_control").is(':checked')) {
                     $("#stock_amount_info").text("*");
+                } else {
+                    $("#stock_amount_info").text("");
                 }
             });
             //新增商品 提交
@@ -408,16 +402,6 @@
                     }).show();
                 } else if ($("#name").val().trim() == "") {
                     new $.zui.Messager('The Name can not be all spaces!', {
-                        type: 'danger',
-                        placement: 'top'
-                    }).show();
-                } else if ($("#barcode").val().trim() == "" && $("#barcode").val().length != 0) {
-                    new $.zui.Messager('The Barcode can not be all spaces!', {
-                        type: 'danger',
-                        placement: 'top'
-                    }).show();
-                } else if ($("#barcode").val().indexOf(" ") != -1) {
-                    new $.zui.Messager('The Barcode can not contain space!', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
@@ -443,13 +427,23 @@
                         type: 'danger',
                         placement: 'top'
                     }).show();
+                } else if ($("#tax_code").val() == "B" && $("#barcode").val() == "") {
+                    new $.zui.Messager('The Barcode can not be empty when you choose the Tax Code "B" !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#barcode").val() != "" && $("#barcode").val().length < 8) {
+                    new $.zui.Messager('The length of Barcode can not be less than 8 when you input the Barcode !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
                 } else if ($("#tax_code").val() == "B" && $("#rrp").val() == "") {
                     new $.zui.Messager('The RRP can not be empty when you choose the Tax Code "B" !', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
-                } else if ($("#stock_control").val() == "1" && $("#stock_amount").val() == "") {
-                    new $.zui.Messager('The Stock Amount can not be empty when stock control is "1" !', {
+                } else if ($("#stock_control").is(':checked') && $("#stock_amount").val() == "") {
+                    new $.zui.Messager('The Stock Amount can not be empty when stock control is "YES" !', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
@@ -463,9 +457,16 @@
                     if ($("#tax_code").val() != "B") {
                         $("#rrp").val(0)
                     }
-                    //在库存标志为0的且库存不填的情况下情况下将库存置零
-                    if ($("#stock_control").val() == "0" && $("#stock_amount").val() == "") {
-                        $("#stock_amount").val(0)
+                    //设置库存变量
+                    var stockcontrol;//库存标志
+                    if ($("#stock_control").is(':checked')) {
+                        stockcontrol = 1;
+                    } else {
+                        stockcontrol = 0;
+                        //在库存标志为0的且库存不填的情况下情况下将库存置零
+                        if ($("#stock_amount").val() == "") {
+                            $("#stock_amount").val(0)
+                        }
                     }
                     $.ajax({
                         type: "POST",
@@ -478,7 +479,7 @@
                             "value4": parseFloat($("#price").val()) * 100,
                             "value5": parseFloat($("#rrp").val()) * 100,
                             "value6": $("#tax_index").val(),
-                            "value7": $("#stock_control").val(),
+                            "value7": stockcontrol,
                             "value8": parseFloat($("#stock_amount").val()) * 10000
                         },
                         dataType: "json",
@@ -561,12 +562,20 @@
                 $("#rrp2").val($(this).parents("tr").find(".RRP").text());
                 if ($(this).parents("tr").find(".Tax_Code").text() == "B") {
                     $("#RRP_DIV2").show();
+                    $("#barcode_info2").text("*");
+                } else {
+                    $("#RRP_DIV2").hide();
+                    $("#barcode_info2").text("");
                 }
-                $("#stock_control2").val($(this).parents("tr").find(".Stock_Control").text());//设置库存默认选中项
-                $("#stock_amount2").val($(this).parents("tr").find(".Stock_Amount").text());
+                //设置库存默认选中项
                 if ($(this).parents("tr").find(".Stock_Control").text() == "1") {
+                    $("#stock_control2").prop("checked", true);
                     $("#stock_amount_info2").text("*");
+                } else {
+                    $("#stock_control2").prop("checked", false);
+                    $("#stock_amount_info2").text("");
                 }
+                $("#stock_amount2").val($(this).parents("tr").find(".Stock_Amount").text());
                 $("#myModal3").modal({moveable: true});
             });
             //验证验证商品条形码是否存在
@@ -575,20 +584,6 @@
                     $("#code_flag3").hide();//对号
                     $("#code_flag4").hide();//叉号
                     $("#code_info2").html(1);
-                } else if ($("#barcode2").val().trim() == "" && $("#barcode2").val().length != 0) {
-                    new $.zui.Messager('The Barcode can not be all spaces!', {
-                        type: 'danger',
-                        placement: 'top'
-                    }).show();
-                    $("#code_flag3").hide();//对号
-                    $("#code_flag4").show();//叉号
-                } else if ($("#barcode2").val().indexOf(" ") != -1) {
-                    new $.zui.Messager('The Barcode can not contain space!', {
-                        type: 'danger',
-                        placement: 'top'
-                    }).show();
-                    $("#code_flag3").hide();//对号
-                    $("#code_flag4").show();//叉号
                 } else if ($("#barcode2").val() == $("#barcode2_copy").val()) {
                     new $.zui.Messager('The barcode is not modified!', {
                         type: 'warning',
@@ -596,6 +591,13 @@
                     }).show();
                     $("#code_flag3").show();//对号
                     $("#code_flag4").hide();//叉号
+                } else if ($("#barcode2").val().length < 8) {
+                    new $.zui.Messager('The length of Barcode can not be less than 8 !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                    $("#code_flag1").hide();//对号
+                    $("#code_flag2").show();//叉号
                 } else {
                     $.ajax({
                         type: "POST",
@@ -724,17 +726,19 @@
                 $("#tax_code2").val($(this).parents("tr").find(".Code").text());
                 if ($("#tax_code2").val() == "B") {
                     $("#RRP_DIV2").show();
+                    $("#barcode_info2").text("*");
                 } else {
                     $("#RRP_DIV2").hide();
+                    $("#barcode_info2").text("");
                 }
                 $("#choose2").popover('hide');//关闭对话框
             });
             //若Stock_Control=1，则为Stock_Amount必填项，若Stock_Control=0，Stock_Amount可不填，默认为0
             $("#stock_control2").change(function () {
-                if ($("#stock_control2").val() == "0") {
-                    $("#stock_amount_info2").text("");
-                } else if ($("#stock_control2").val() == "1") {
+                if ($("#stock_control2").is(':checked')) {
                     $("#stock_amount_info2").text("*");
+                } else {
+                    $("#stock_amount_info2").text("");
                 }
             });
             //修改商品信息 提交
@@ -746,16 +750,6 @@
                     }).show();
                 } else if ($("#name2").val().trim() == "") {
                     new $.zui.Messager('The Name can not be all spaces!', {
-                        type: 'danger',
-                        placement: 'top'
-                    }).show();
-                } else if ($("#barcode2").val().trim() == "" && $("#barcode2").val().length != 0) {
-                    new $.zui.Messager('The Barcode can not be all spaces!', {
-                        type: 'danger',
-                        placement: 'top'
-                    }).show();
-                } else if ($("#barcode2").val().indexOf(" ") != -1) {
-                    new $.zui.Messager('The Barcode can not contain space!', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
@@ -781,12 +775,22 @@
                         type: 'danger',
                         placement: 'top'
                     }).show();
+                } else if ($("#tax_code2").val() == "B" && $("#barcode2").val() == "") {
+                    new $.zui.Messager('The Barcode can not be empty when you choose the Tax Code "B" !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#barcode2").val() != "" && $("#barcode2").val().length < 8) {
+                    new $.zui.Messager('The length of Barcode can not be less than 8 when you input the Barcode !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
                 } else if ($("#tax_code2").val() == "B" && $("#rrp2").val() == "") {
                     new $.zui.Messager('The RRP can not be empty when you choose the Tax Code "B" !', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
-                } else if ($("#stock_control2").val() == "1" && $("#stock_amount2").val() == "") {
+                } else if ($("#stock_control2").is(':checked') && $("#stock_amount2").val() == "") {
                     new $.zui.Messager('The Stock Amount can not be empty when stock control is "1" !', {
                         type: 'danger',
                         placement: 'top'
@@ -801,9 +805,16 @@
                     if ($("#tax_code2").val() != "B") {
                         $("#rrp2").val(0)
                     }
-                    //在库存标志为0的且库存不填的情况下情况下将库存置零
-                    if ($("#stock_control2").val() == "0" && $("#stock_amount2").val() == "") {
-                        $("#stock_amount2").val(0)
+                    //设置库存变量
+                    var stockcontrol;//库存标志
+                    if ($("#stock_control2").is(':checked')) {
+                        stockcontrol = 1;
+                    } else {
+                        stockcontrol = 0;
+                        //在库存标志为0的且库存不填的情况下情况下将库存置零
+                        if ($("#stock_amount2").val() == "") {
+                            $("#stock_amount2").val(0)
+                        }
                     }
                     $.ajax({
                         type: "POST",
@@ -816,7 +827,7 @@
                             "value4": parseFloat($("#price2").val()) * 100,
                             "value5": parseFloat($("#rrp2").val()) * 100,
                             "value6": $("#tax_index2").val(),
-                            "value7": $("#stock_control2").val(),
+                            "value7": stockcontrol,
                             "value8": parseFloat($("#stock_amount2").val()) * 10000
                         },
                         dataType: "json",
@@ -938,59 +949,59 @@
             });
             //删除商品 提交
             $("#submit4").click(function () {
-                    $.ajax({
-                        type: "POST",
-                        url: "ActionPart2_deleteOneGoods.action",
-                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
-                        data: {
-                            "value1": $("#deleteGoodsNumber").val(),
-                            "value2": $("#deleteGoodsFlag").val()
-                        },
-                        dataType: "json",
-                        cache: false,
-                        success: function (data) {
-                            //登录超时，请重新登录
-                            if (data.jsonObject == "-3") {
-                                new $.zui.Messager(loginTimeout, {
-                                    type: 'danger',
-                                    placement: 'top' // 定义显示位置
-                                }).show();
-                                setTimeout(function () {
-                                    top.location.href = "../login.html";//重定向
-                                }, 2000);
-                            }
-                            //服务器出错
-                            else if (data.jsonObject == "-1") {
-                                new $.zui.Messager(serverError, {
-                                    type: 'danger',
-                                    placement: 'top' // 定义显示位置
-                                }).show();
-                            }
-                            //正确传输过来数据
-                            else {
-                                if (data.jsonObject == "0") {
-                                    new $.zui.Messager('Submission failure. Please re-enter it !', {
-                                        type: 'danger',
-                                        placement: 'top' // 定义显示位置
-                                    }).show();
-                                } else if (data.jsonObject == "1") {
-                                    new $.zui.Messager('Submit successfully !', {
-                                        type: 'success',
-                                        placement: 'top' // 定义显示位置
-                                    }).show();
-                                    $("#deleteGoodsNumber").val("");
-                                    $("#myModal4").modal('hide');   //显示对话框
-                                    findAllGoods();
-                                }
-                            }
-                        },
-                        error: function (jqXHR) {
-                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                $.ajax({
+                    type: "POST",
+                    url: "ActionPart2_deleteOneGoods.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {
+                        "value1": $("#deleteGoodsNumber").val(),
+                        "value2": $("#deleteGoodsFlag").val()
+                    },
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login.html";//重定向
+                            }, 2000);
+                        }
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
                                 type: 'danger',
                                 placement: 'top' // 定义显示位置
                             }).show();
                         }
-                    });
+                        //正确传输过来数据
+                        else {
+                            if (data.jsonObject == "0") {
+                                new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            } else if (data.jsonObject == "1") {
+                                new $.zui.Messager('Submit successfully !', {
+                                    type: 'success',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                $("#deleteGoodsNumber").val("");
+                                $("#myModal4").modal('hide');   //显示对话框
+                                findAllGoods();
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                    }
+                });
             })
             /*******************************************************************************************/
             //单独查询
@@ -1052,17 +1063,22 @@
         </table>
     </div>
     <ul class="pager" style="float: right; margin-right: 20px">
-        <li id="firstPage"><a href="#">First</a></li>
-        <li id="pageUp" class="next"><a href="#">Front</a></li>
-        <li id="pageDown" class="previous"><a href="#">Next</a></li>
-        <li id="endPage"><a href="#">End</a></li>
+        <li id="firstPage"><a href="#">FIRST</a></li>
+        <li id="pageUp" class="next"><a href="#">PREV</a></li>
+        <li id="pageDown" class="previous"><a href="#">NEXT</a></li>
+        <li id="endPage"><a href="#">LAST</a></li>
     </ul>
-    <strong style="float: right; margin-right: 20px; margin-top: 27px">The current page is【<strong
-            id="pageIndex">1</strong>】，each page shows【<strong
-            id="pageSize">10</strong>】records, a total of【<strong id="pageCount"></strong>】page, a total of【<strong
-            id="totalCount"></strong>】records</strong>
+    <!--<strong style="float: right; margin-right: 20px; margin-top: 27px">The current page is【<strong-->
+    <!--id="pageIndex">1</strong>】，each page shows【<strong-->
+    <!--id="pageSize">10</strong>】records, a total of【<strong id="pageCount"></strong>】page, a total of【<strong-->
+    <!--id="totalCount"></strong>】records</strong>-->
+    <div style="float: right; margin-right: 20px; margin-top: 27px">
+        PER PAGE:&nbsp;<strong id="pageSize">2</strong>
+        &nbsp;&nbsp;ALL:&nbsp;<strong id="totalCount"></strong>
+        &nbsp;&nbsp;PAGE:&nbsp;<strong id="pageIndex">1</strong>/<strong id="pageCount"></strong>
+    </div>
 </div>
-<!--对话框-->
+<!--提示用语对话框-->
 <div class="modal fade" id="myModal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -1110,9 +1126,9 @@
                             <input id="barcode" type="tel" class="form-control" maxlength="13"
                                    placeholder="0-13 characters" style="ime-mode: disabled"
                                    onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
-                                   <!--onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">-->
+                            <!--onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
-                        <!--<strong>*</strong>-->
+                        <strong id="barcode_info"></strong>
                         <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check"
                                                              style="color: green" hidden="hidden"></i>
                             <i id="code_flag2" class="icon icon-times"
@@ -1125,7 +1141,7 @@
                             <input id="price" type="tel" class="form-control" maxlength="9"
                                    placeholder="0-999999.99" style="ime-mode: disabled"
                                    onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
-                                   <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
+                            <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <strong>*</strong>
                     </div>
@@ -1145,19 +1161,28 @@
                             <input id="rrp" type="tel" class="form-control" maxlength="9"
                                    placeholder="0-999999.99" style="ime-mode: disabled"
                                    onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
-                                   <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
+                            <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <strong>*</strong>
                     </div>
+                    <!--<div class="form-group">-->
+                    <!--<label class="col-sm-3">Stock Control</label>-->
+                    <!--<div class="col-sm-6">-->
+                    <!--<select id="stock_control" class="form-control">-->
+                    <!--<option value="0" selected="selected">0</option>-->
+                    <!--<option value="1">1</option>-->
+                    <!--</select>-->
+                    <!--</div>-->
+                    <!--<span class="label label-badge">1 / YES ,  0 / NO</span>-->
+                    <!--</div>-->
                     <div class="form-group">
                         <label class="col-sm-3">Stock Control</label>
                         <div class="col-sm-6">
-                            <select id="stock_control" class="form-control">
-                                <option value="0" selected="selected">0</option>
-                                <option value="1">1</option>
-                            </select>
+                            <div class="switch">
+                                <input id="stock_control" type="checkbox">
+                                <label>NO/YES</label>
+                            </div>
                         </div>
-                        <span class="label label-badge">1 expresses enabled</span>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3">Stock Amount</label>
@@ -1165,7 +1190,7 @@
                             <input id="stock_amount" type="tel" class="form-control" maxlength="9"
                                    placeholder="0-9999.9999" style="ime-mode: disabled"
                                    onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
-                                   <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
+                            <!--onkeypress="return (event.keyCode == 46 || event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <strong id="stock_amount_info"></strong>
                     </div>
@@ -1219,6 +1244,7 @@
                             <!--onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">-->
                             <input id="barcode2_copy" type="text" class="form-control" style="display: none">
                         </div>
+                        <strong id="barcode_info2"></strong>
                         <label style="padding-left: 10px"><i id="code_flag3" class="icon icon-check"
                                                              style="color: green" hidden="hidden"></i>
                             <i id="code_flag4" class="icon icon-times"
@@ -1253,15 +1279,24 @@
                         </div>
                         <strong>*</strong>
                     </div>
+                    <!--<div class="form-group">-->
+                    <!--<label class="col-sm-3">Stock Control</label>-->
+                    <!--<div class="col-sm-6">-->
+                    <!--<select id="stock_control2" class="form-control">-->
+                    <!--<option value="0" selected="selected">0</option>-->
+                    <!--<option value="1">1</option>-->
+                    <!--</select>-->
+                    <!--</div>-->
+                    <!--<span class="label label-badge">1 / YES ,  0 / NO</span>-->
+                    <!--</div>-->
                     <div class="form-group">
                         <label class="col-sm-3">Stock Control</label>
                         <div class="col-sm-6">
-                            <select id="stock_control2" class="form-control">
-                                <option value="0" selected="selected">0</option>
-                                <option value="1">1</option>
-                            </select>
+                            <div class="switch">
+                                <input id="stock_control2" type="checkbox">
+                                <label>NO/YES</label>
+                            </div>
                         </div>
-                        <span class="label label-badge">1 expresses enabled</span>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3">Stock Amount</label>

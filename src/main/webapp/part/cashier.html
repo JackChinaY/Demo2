@@ -6,7 +6,6 @@
     <link rel="shortcut icon" type="image/x-icon" href="../image/favicon.ico"/>
     <link rel="stylesheet" href="../zui/zui.css">
     <script src="../javascript/jquery-1.11.3.min.js"></script>
-    <!--<script src="../javascript/jquery-2.0.3.min.js"></script>-->
     <script src="../javascript/jquery.cookie.js"></script>
     <script src="../zui/zui.js"></script>
     <script type="text/javascript">
@@ -388,17 +387,16 @@
                                             + '<td>&nbsp;&nbsp;<a name="update" href="#" data-toggle="tooltip" data-tip-class="tooltip-primary" title="Modify"><i class="icon icon-edit"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="delete" href="#" data-toggle="tooltip" data-tip-class="tooltip-danger" title="Delete" style="color: #ea644a"><i class="icon icon-trash"></i></a></td></tr>';
                                     }
                                     $("#tbody").html(html);
-//                                    console.log(jsonArray.length);
-//                                    console.log(jsonArray.toString());
-//                                    console.log(html);
                                     // 手动初始化工具提示
                                     $('[data-toggle="tooltip"]').tooltip();
                                 }
                             }
                         },
                         error: function (jqXHR) {
-                            $("#modal-content").html("The operation failed, please try again. Possible causes:" + jqXHR.status + "！");
-                            $("#myModal").modal();
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
                         }
                     });
                 }

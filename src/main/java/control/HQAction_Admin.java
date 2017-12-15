@@ -157,6 +157,27 @@ public class HQAction_Admin extends BaseAction {
     }
 
     /**
+     * 方法序号：2_2 根据用户的id查询用户名
+     */
+    public void findUsername() throws IOException, JSONException {
+        String id = this.getRequest().getParameter("value1");
+        String result = hqService_Admin.findUsername(id);
+        String flag;
+        if (result != null) {
+            flag = "1";//登录成功
+//            this.getSession().setAttribute("userId", result);//在session中保存用户的id
+        } else {
+            flag = "0";//登录失败
+        }
+//		System.out.println(this.getSession().getAttribute("userId"));
+        JSONObject jo = new JSONObject();
+        jo.put("jsonObject", flag);
+        jo.put("username", result);
+        this.getResponse().setContentType("text/html;charset=UTF-8");// 设置响应数据类型
+        this.getResponse().getWriter().print(jo);// 向前台发送json数据
+    }
+
+    /**
      * 方法序号：1_7 文件 上传
      *
      * @throws Exception

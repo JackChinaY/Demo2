@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../image/favicon.ico"/>
+    <link rel="stylesheet" href="../zui/zui.css">
+    <script src="../javascript/jquery-1.11.3.min.js"></script>
+    <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../zui/zui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            // 或者在初始化时指定弹出方向
+
+            $("#submit2").click(function () {
+                console.log(getURLParameter("id"))
+            });
+            function getURLParameter(key) {
+                var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+                var result = window.location.search.substr(1).match(reg);
+                return result ? decodeURIComponent(result[2]) : null;
+            }
+        })
+    </script>
+</head>
+<body>
+<input id="submit2" type="submit" class="form-control">
+</body>
+</html>

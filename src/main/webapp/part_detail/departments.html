@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>machineSN</title>
+    <title>Title</title>
     <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
     <link rel="stylesheet" href="../zui/zui.css">
     <script src="../javascript/jquery-1.11.3.min.js"></script>
@@ -16,15 +16,15 @@
             var loginTimeout = "Login timeout, please login again !";
             var serverError = "possible reasons：server error !";
             /*******************************************************************************************/
-            //页面加载时自动执行的函数，生成表格
-            findAllMachine();
-
-            //查询所有机器编号 无参
-            function findAllMachine() {
+            //查询所有部门信息
+            function findAllDept() {
                 $.ajax({
                     type: "POST",
-                    url: "ActionAdmin_findAllUsers.action",
+                    url: "ActionDetail_findAllDept.action",
                     contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {
+                        "value1": getURLParameter("id")
+                    },
                     dataType: "json",
                     cache: false,
                     success: function (data) {
@@ -56,26 +56,16 @@
                             }
                             //当数组为不为空时
                             else if (jsonArray.length != 0) {
-                                var head = '<tr><th>ID</th><th>Username</th><th>E-mail</th><th>Telephone</th><th>Address</th><th>Machine Type</th><th>Machine SN</th><th>Register DateTime</th><th>Operation</th></tr>';
+                                var head = '<tr><th>Id</th><th>Dept_No</th><th>PLU_No</th></tr>';
                                 $("#thead").html(head);
-                                var html;
+                                var html = "";
                                 for (var i = 0; i < jsonArray.length; i++) {
-                                    html += '<tr><td class="Id" style="display: none">' + jsonArray[i].value1 + '</td>'
-                                        + '<td>' + (i + 1) + '</td>'
-                                        + '<td>' + jsonArray[i].value2 + '</td>'
-                                        + '<td>' + jsonArray[i].value3 + '</td>'
-                                        + '<td>' + jsonArray[i].value4 + '</td>'
-                                        + '<td>' + jsonArray[i].value5 + '</td>'
-                                        + '<td>' + jsonArray[i].value6 + '</td>'
-                                        + '<td>' + jsonArray[i].value7 + '</td>'
-                                        + '<td>' + jsonArray[i].value8.substr(0, 19) + '</td>'
-                                        + '<td>&nbsp;&nbsp;<a name="detail" href="#" data-toggle="tooltip" data-tip-class="tooltip-primary" title="see details"><i class="icon icon-folder-open"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;</td>'
-                                        // + '<td>&nbsp;&nbsp;<a name="update" href="#" data-toggle="tooltip" data-tip-class="tooltip-primary" title="modify"><i class="icon icon-edit"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;<a name="delete" href="#" data-toggle="tooltip" data-tip-class="tooltip-danger" title="delete" style="color: #ea644a"><i class="icon icon-trash"></i></a></td>'
+                                    html += '<tr><td class="Id">' + jsonArray[i].value1 + '</td>'
+                                        + '<td class="Dept_No">' + jsonArray[i].value2 + '</td>'
+                                        + '<td class="PLU_No">' + jsonArray[i].value3 + '</td>'
                                         + '</tr>';
                                 }
                                 $("#tbody").html(html);
-                                // 手动初始化工具提示
-                                $('[data-toggle="tooltip"]').tooltip();
                             }
                         }
                     },
@@ -88,13 +78,16 @@
                 });
             }
             /*******************************************************************************************/
-            //查看用户详细信息
-            $("#tbody").on("click", "a[name='detail']", function () {
-                window.open("../detial.html?id=" + $(this).parents("tr").find(".Id").text());//在新页面打开文档
-                // top.location.href = "../detial.html?id=" + $(this).parents("tr").find(".Id").text();//在本页面跳转
-            });
+            //查询所有部门信息 自动加载
+            findAllDept();
+            //获取URL中参数 key:要获取的的参数名
+            function getURLParameter(key) {
+                var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+                var result = top.window.location.search.substr(1).match(reg);//因为是内嵌iframe框架中，所以用top
+                return result ? decodeURIComponent(result[2]) : null;
+            }
             /*******************************************************************************************/
-        })
+        });
     </script>
     <style>
         html, body {
@@ -102,8 +95,6 @@
             margin: 0;
             font-family: Arial;
             font-size: 14px;
-            /*min-height: 500px;*/
-            /*min-width: 500px;*/
             width: 100%;
             height: 100%;
             overflow: auto;
@@ -112,38 +103,20 @@
     </style>
 </head>
 <body>
-<!--用户统计-->
+<!--部类-->
 <div>
     <div style="margin-top: 10px;width: 100%;height: 40px;">
-        <span class="label label-badge label-primary label-define"
-              style="float: left; margin-left: 20px;margin-top: 10px">Users Statistics</span>
-    </div>
-    <div style="background-color: white" class="table-responsive">
-        <table class="table table-striped table-hover table-bordered">
-            <thead id="thead">
-            </thead>
-            <tbody id="tbody">
-            </tbody>
-        </table>
+    <span class="label label-badge label-primary label-define"
+          style="float: left; margin-left: 20px;margin-top: 10px">Departments Information</span>
     </div>
 </div>
-<!--提示用语对话框-->
-<div class="modal fade" id="myModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
-                        class="sr-only">Close</span></button>
-                <h4 class="modal-title">Messages</h4>
-            </div>
-            <div class="modal-body">
-                <p id="modal-content" style="font-weight: 800"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
+<div style="background-color: white " class="table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+        <thead id="thead">
+        </thead>
+        <tbody id="tbody">
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

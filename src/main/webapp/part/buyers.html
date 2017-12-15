@@ -6,7 +6,6 @@
     <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
     <link rel="stylesheet" href="../zui/zui.css">
     <script src="../javascript/jquery-1.11.3.min.js"></script>
-    <!--<script src="../javascript/jquery-2.0.3.min.js"></script>-->
     <script src="../javascript/jquery.cookie.js"></script>
     <script src="../zui/zui.js"></script>
     <script type="text/javascript">
@@ -736,15 +735,20 @@
         </table>
     </div>
     <ul class="pager" style="float: right; margin-right: 20px">
-        <li id="firstPage"><a href="#">First</a></li>
-        <li id="pageUp" class="next"><a href="#">Front</a></li>
-        <li id="pageDown" class="previous"><a href="#">Next</a></li>
-        <li id="endPage"><a href="#">End</a></li>
+        <li id="firstPage"><a href="#">FIRST</a></li>
+        <li id="pageUp" class="next"><a href="#">PREV</a></li>
+        <li id="pageDown" class="previous"><a href="#">NEXT</a></li>
+        <li id="endPage"><a href="#">LAST</a></li>
     </ul>
-    <strong style="float: right; margin-right: 20px; margin-top: 27px">The current page is【<strong
-            id="pageIndex">1</strong>】，each page shows【<strong
-            id="pageSize">10</strong>】records, a total of【<strong id="pageCount"></strong>】page, a total of【<strong
-            id="totalCount"></strong>】records</strong>
+    <!--<strong style="float: right; margin-right: 20px; margin-top: 27px">The current page is【<strong-->
+    <!--id="pageIndex">1</strong>】，each page shows【<strong-->
+    <!--id="pageSize">10</strong>】records, a total of【<strong id="pageCount"></strong>】page, a total of【<strong-->
+    <!--id="totalCount"></strong>】records</strong>-->
+    <div style="float: right; margin-right: 20px; margin-top: 27px">
+        PER PAGE:&nbsp;<strong id="pageSize">2</strong>
+        &nbsp;&nbsp;ALL:&nbsp;<strong id="totalCount"></strong>
+        &nbsp;&nbsp;PAGE:&nbsp;<strong id="pageIndex">1</strong>/<strong id="pageCount"></strong>
+    </div>
 </div>
 <!--对话框-->
 <div class="modal fade" id="myModal">

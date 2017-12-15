@@ -36,5 +36,8 @@
         <!--管理员的请求 -->
         <action name="ActionAdmin_*" class="control.HQAction_Admin" method="{1}">
         </action>
+        <!--管理员的请求 -->
+        <action name="ActionDetail_*" class="control.HQAction_Detail" method="{1}">
+        </action>
     </package>
 </struts>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Management System</title>
+    <title>details</title>
     <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico"/>
     <link rel="stylesheet" href="zui/zui.css">
     <script src="javascript/jquery-1.11.3.min.js"></script>
@@ -55,57 +55,85 @@
 
             // 手动初始化工具提示
             $('[data-toggle="tooltip"]').tooltip();
-            //查询所有商品
-//            $("#left2_1").click(function () {
-//                setTimeout(function() {
-//                    findAllGoods();
-//                },100);
-//            });
             /*******************************************************************************************/
 
             //成功登陆后加载用户信息
             function loginsuccess() {
-                if ($.cookie("username") != null) {
-                    $("#successlogin").html('  ' + $.cookie("username") + '  ');
+                if ($.cookie("username") != null && $.cookie("userFlag") != null) {
+                    // $("#successlogin").html('  ' + $.cookie("username") + '  ');
                 } else {
-                    location.href = "login.html";
+                    location.href = "login_admin.html";
                 }
             }
 
             loginsuccess();
+            /*******************************************************************************************/
 
-            //注销
-            $("#loginout").click(function () {
-                if ($.cookie("username") != null) {
-                    $.ajax({
-                        type: "POST",
-                        url: "Action_loginOut.action",
-                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
-                        dataType: "json",
-                        cache: false,
-                        success: function (data) {
-                            location.href = "login.html";
-                            $.cookie("username", null, {expires: -1});//删除cookie信息
-                        },
-                        error: function (jqXHR) {
-                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+            //根据用户的id查询用户名
+            function findUsername() {
+                $.ajax({
+                    type: "GET",
+                    url: "ActionAdmin_findUsername.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {
+                        "value1": getURLParameter("id")
+                    },
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
                                 type: 'danger',
                                 placement: 'top' // 定义显示位置
                             }).show();
-                            location.href = "login.html";
+                            setTimeout(function () {
+                                top.location.href = "../login_admin.html";//重定向
+                            }, 2000);
                         }
-                    });
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                        //正确传输过来数据
+                        else {
+                            if (data.jsonObject == "1") {
+                                $("#successlogin").html('  ' + data.username + '  ');
+                                $.cookie('username', data.username);
+//
+                            } else {
+                                new $.zui.Messager("The user you query does not exist,you may be inquiring illegally!", {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    $.cookie("username", null, {expires: -1});//删除cookie信息
+                                    location.href = "login_admin.html";//重定向
+                                }, 2000);
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                    }
+                });
+            }
 
-                } else {
-                    location.href = "login.html";
-                }
-            });
+            findUsername();
+
             /*******************************************************************************************/
 
-            //登陆超时后返回登录页面
-            function returnToLeginPage() {
-                location.href = "login.html";
-                $.cookie("username", null, {expires: -1});//删除cookie信息
+            //获取URL中参数 key:要获取的的参数名
+            function getURLParameter(key) {
+                var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+                var result = top.window.location.search.substr(1).match(reg);//因为是内嵌iframe框架中，所以用top
+                return result ? decodeURIComponent(result[2]) : null;
             }
 
             /*******************************************************************************************/
@@ -224,28 +252,16 @@
 </head>
 <body>
 <div class="title">
-    <span class="title_context">
-        <a style="font-family: Arial;" href="index.html" data-toggle="tooltip" data-tip-class="tooltip-default"
-           data-placement="bottom"
-           title="Refresh">Management System</a>
-    </span>
+    <span class="title_context" style="font-family: Arial"><a>User's Data Details</a></span>
     <div class="login">
         <div id="p1">
             <button class="btn btn-link" type="button"
                     style="font-weight: 800"><i class="icon icon-user"></i>
             </button>
-            <span id="successlogin" class="label label-badge " style="font-size: 16px;"></span>
+            <span id="successlogin" class="label label-badge " style="font-size: 16px"></span>
             <button id="loginout" class="btn btn-link" type="button"
-                    style="float: right;font-weight: 800"><i class="icon icon-off"></i> Log off
+                    style="float: right;font-weight: 800" onclick="window.close()"><i class="icon icon-signout"></i> CLOSE
             </button>
-            <!--<div class="dropdown" style="float: right">-->
-            <!--<button class="btn" type="button" data-toggle="dropdown">language&nbsp;<span class="caret"></span>-->
-            <!--</button>-->
-            <!--<ul class="dropdown-menu pull-right">-->
-            <!--<li><a href="">English</a></li>-->
-            <!--&lt;!&ndash;<li><a href="">简体中文</a></li>&ndash;&gt;-->
-            <!--</ul>-->
-            <!--</div>-->
         </div>
     </div>
 </div>
@@ -253,50 +269,37 @@
     <div class="left">
         <nav class="menu" data-ride="menu">
             <ul id="treeMenu" class="tree tree-menu" data-ride="tree">
-                <li class="open"><a href="#"><i class="icon icon-cogs"></i>System Management</a>
+                <li class="open"><a href="#"><i class="icon icon-cogs"></i>System Information</a>
                     <ul>
-                        <li><a href="part/cashier.html" target="mainbox"><i class="icon icon-circle-blank"></i>Cashier
-                            Management</a></li>
-                        <li><a href="part/fiscal.html" target="mainbox"><i class="icon icon-circle-blank"></i>Fiscal
+                        <li><a href="part_detail/cashier.html" target="mainbox"><i class="icon icon-circle-blank"></i>Cashier
                             Information</a></li>
-                        <li><a href="part/currency.html" target="mainbox"><i class="icon icon-circle-blank"></i>Foreign
+                        <li><a href="part_detail/fiscal.html" target="mainbox"><i class="icon icon-circle-blank"></i>Fiscal
+                            Information</a></li>
+                        <li><a href="part_detail/currency.html" target="mainbox"><i class="icon icon-circle-blank"></i>Foreign
                             Currency</a></li>
                     </ul>
                 </li>
-                <li class="open"><a href="#"><i class="icon icon-cubes"></i>Stock Management</a>
+                <li class="open"><a href="#"><i class="icon icon-cubes"></i>Stock Information</a>
                     <ul>
-                        <li id="left2_1"><a href="part/goods.html" target="mainbox"><i
-                                class="icon icon-circle-blank"></i>Goods Management</a></li>
-                        <li id="left2_2"><a href="part/departments.html" target="mainbox"><i
-                                class="icon icon-circle-blank"></i>Departments Setting</a></li>
+                        <li id="left2_1"><a href="part_detail/goods.html" target="mainbox"><i
+                                class="icon icon-circle-blank"></i>Goods Information</a></li>
+                        <li id="left2_2"><a href="part_detail/departments.html" target="mainbox"><i
+                                class="icon icon-circle-blank"></i>Departments Information</a></li>
                     </ul>
                 </li>
                 <!--class="open" class="on"-->
-                <li class="open"><a href="#"><i class="icon icon-group"></i>Buyers Management</a>
+                <li class="open"><a href="#"><i class="icon icon-group"></i>Buyers Information</a>
                     <ul>
-                        <li><a href="part/buyers.html" target="mainbox"><i class="icon icon-circle-blank"></i>Buyers
-                            Management</a></li>
-                    </ul>
-                </li>
-                <li class="open"><a href="#"><i class="icon icon-user"></i>User Center</a>
-                    <ul>
-                        <li><a href="part/user.html" target="mainbox"><i class="icon icon-circle-blank"></i>User
+                        <li><a href="part_detail/buyers.html" target="mainbox"><i class="icon icon-circle-blank"></i>Buyers
                             Information</a></li>
                     </ul>
                 </li>
             </ul>
         </nav>
-        <!--<div style="margin-top: 45px;margin-bottom: 1000px;"></div>-->
     </div>
     <div class="right">
-        <!--<div class="context">-->
         <iframe name="mainbox" width="100%" height="99%" frameborder="0">
-            <!--<div>-->
-            <!--<h1 style="font-style: italic">-->
-            <!--&nbsp;欢迎使用税控收款软件系统！</h1>-->
-            <!--</div>-->
         </iframe>
-        <!--</div>-->
     </div>
 </div>
 <!--对话框-->

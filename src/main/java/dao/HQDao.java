@@ -14,7 +14,7 @@ public class HQDao extends BaseDAO {
      * 方法序号：1 登录
      */
     public String login(String username, String password) throws Exception {
-        String sql = " SELECT Id FROM User_Table WHERE Username=? AND Password=?";
+        String sql = " SELECT Id FROM user_table WHERE Username=? AND Password=?";
         return this.getOneRecard(sql, username, password);
     }
 
@@ -22,7 +22,7 @@ public class HQDao extends BaseDAO {
      * 方法序号：1_2验证用户名是否存在
      */
     public String verifyUsername(String id) throws Exception {
-        String sql = "SELECT count(*) AS count FROM User_Table WHERE Username=?";
+        String sql = "SELECT count(*) AS count FROM user_table WHERE Username=?";
         return Integer.toString(this.getCount(sql, id));
     }
 

@@ -72,10 +72,16 @@ public class HQDao_Admin extends BaseDAO {
 	 * @return json数组
 	 */
 	public String findAllUsers() throws Exception {
-		String sql = " SELECT Username AS value2, Email AS value3, Telephone AS value4, Address AS value5, MachineType AS value6, MachineId AS value7, AddDateTime AS value8 FROM user_table ORDER BY MachineId";
+		String sql = " SELECT Id AS value1,Username AS value2, Email AS value3, Telephone AS value4, Address AS value5, MachineType AS value6, MachineId AS value7, AddDateTime AS value8 FROM user_table ORDER BY MachineId";
 		return this.getForJson(sql);
 	}
-
+	/**
+	 * 方法序号：2_2 根据用户的id查询用户名
+	 */
+	public String findUsername(String id) throws Exception {
+		String sql = " SELECT Username FROM user_table WHERE Id=? ";
+		return this.getOneRecard(sql, id);
+	}
 	/**
 	 * 方法序号： 1_7 添加上传的文件信息到数据库
 	 * 

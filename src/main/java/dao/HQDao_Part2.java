@@ -9,8 +9,6 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
     /**
      * 方法序号： 4_1 查询所有商品
      * Id,Number,Name,Barcode,Price,Tax_Index,Stock_Control,Stock_Amount
-     *
-     * @return json数组
      */
     public String findAllGoods(String databaseUrl, Page page) throws Exception {
         String sql = "SELECT Number AS value1, Name AS value2, Barcode AS value3, Price AS value4, RRP AS value5,Tax_Index AS value6, Stock_Control AS value7, Stock_Amount AS value8, Currency AS value12 "
