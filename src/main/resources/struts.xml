@@ -10,6 +10,7 @@
     <!--<constant name="struts.devMode" value="true"/>-->
     <!-- 	配置扩展名为action ? -->
     <constant name="struts.action.extension" value="action"/>
+    <!--<constant name="struts.action.extension" value="action"/>-->
     <!--<constant name="struts.multipart.saveDir" value="/temp/"/>-->
     <!--<constant name="struts.enable.DynamicMethodInvocation" value="true"/>-->
     <!-- 配置文件上传 -->
@@ -24,19 +25,23 @@
     </package>
     <!--2.5以上的版本需要主动设置strict-method-invocation="false"，以便可以使用通配符-->
     <package name="control" namespace="/" extends="struts-default" strict-method-invocation="false">
-        <!-- 用户的请求 -->
+        <!--管理员登录的请求 -->
+        <action name="admin">
+            <result>/login_admin.html</result>
+        </action>
+        <!-- 用户登录、注册、找回密码、个人中心的请求 -->
         <action name="Action_*" class="control.HQAction" method="{1}">
         </action>
-        <!--第一、三部分的请求-->
+        <!--第一、三部分：系统设置、客户管理的请求-->
         <action name="ActionPart1_*" class="control.HQAction_Part1" method="{1}">
         </action>
-        <!--第二部分的请求-->
+        <!--第二部分：商品库存管理的请求-->
         <action name="ActionPart2_*" class="control.HQAction_Part2" method="{1}">
         </action>
         <!--管理员的请求 -->
         <action name="ActionAdmin_*" class="control.HQAction_Admin" method="{1}">
         </action>
-        <!--管理员的请求 -->
+        <!--管理员查看用户明细的请求 -->
         <action name="ActionDetail_*" class="control.HQAction_Detail" method="{1}">
         </action>
     </package>
