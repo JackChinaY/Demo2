@@ -29,7 +29,7 @@
                 //查询收银员最大编号，并填充加1后的数值
                 function getCashiersMaxNumber() {
                     $.ajax({
-                        type: "POST",
+                        type: "GET",
                         url: "ActionPart1_getCashiersMaxNumber.action",
                         contentType: "application/x-www-form-urlencoded; charset=utf-8",
                         dataType: "json",
@@ -72,7 +72,7 @@
                 //查询收银员最大代码，并填充加1后的数值
                 function getCashiersMaxCode() {
                     $.ajax({
-                        type: "POST",
+                        type: "GET",
                         url: "ActionPart1_getCashiersMaxCode.action",
                         contentType: "application/x-www-form-urlencoded; charset=utf-8",
                         dataType: "json",
@@ -103,10 +103,28 @@
                                 $("#code_flag2").hide();//叉号
                                 $("#code_info").html(1);//0代表已存在，1代表可用
                             } else {
-                                $("#code").val(buquan(parseInt(data.jsonObject) + 1, 3));//code最大值加1,并保留三位数据，如1，保留为001
-                                $("#code_flag1").show();//对号
-                                $("#code_flag2").hide();//叉号
-                                $("#code_info").html(1);//0代表已存在，1代表可用
+                                //如果数据库中有数据
+                                if (parseInt(data.jsonObject) <= 996) {
+                                    $("#code").val(buquan(parseInt(data.jsonObject) + 1, 3));//code最大值加1,并保留三位数据，如1，保留为001
+                                    $("#code_flag1").show();//对号
+                                    $("#code_flag2").hide();//叉号
+                                    $("#code_info").html(1);//0代表已存在，1代表可用
+                                }else if(parseInt(data.jsonObject) == 997){
+                                    $("#code").val(999);//code最大值加1,并保留三位数据，如1，保留为001
+                                    $("#code_flag1").show();//对号
+                                    $("#code_flag2").hide();//叉号
+                                    $("#code_info").html(1);//0代表已存在，1代表可用
+                                }else if(parseInt(data.jsonObject) == 999){
+                                    $("#code").val(999);//code最大值加1,并保留三位数据，如1，保留为001
+                                    $("#code_flag1").hide();//对号
+                                    $("#code_flag2").show();//叉号
+                                    $("#code_info").html(0);//0代表已存在，1代表可用
+                                    new $.zui.Messager("The code must between 001-999, and the 999 is already existed in the database.", {
+                                        type: 'danger',
+                                        placement: 'top', // 定义显示位置
+                                        time:'10000'
+                                    }).show();
+                                }
                             }
                         },
                         error: function (jqXHR) {
@@ -130,6 +148,13 @@
                         $("#code_flag2").show();//叉号
                     } else if ($("#code").val() == "000") {
                         new $.zui.Messager('The Code can not be "000"!', {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else if ($("#code").val() == "998") {
+                        new $.zui.Messager('The Code can not be "998"!', {
                             type: 'danger',
                             placement: 'top' // 定义显示位置
                         }).show();
@@ -207,6 +232,13 @@
                         $("#code_flag2").show();//叉号
                     } else if ($("#code").val() == "000") {
                         new $.zui.Messager('The Code can not be "000"!', {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                        $("#code_flag1").hide();//对号
+                        $("#code_flag2").show();//叉号
+                    } else if ($("#code").val() == "998") {
+                        new $.zui.Messager('The Code can not be "998"!', {
                             type: 'danger',
                             placement: 'top' // 定义显示位置
                         }).show();
@@ -611,7 +643,7 @@
         <span class="label label-badge label-primary label-define"
               style="float: left; margin-left: 20px;margin-top: 10px">Cashier Management</span>
         <!--<button id="submit2" class="btn btn-primary" type="button"-->
-                <!--style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i> Refresh-->
+        <!--style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i> Refresh-->
         <!--</button>-->
         <button id="submit1" class="btn btn-primary" type="button"
                 style="float: right; margin-right: 20px"><i class="icon icon-plus"></i> Add
@@ -690,7 +722,7 @@
                             <input id="password" type="password" class="form-control" maxlength="6"
                                    placeholder="fixed 6 digits number" style="ime-mode: disabled"
                                    onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
-                                   <!--onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">-->
+                            <!--onkeypress="return (event.keyCode >= 48 && event.keyCode <= 57)">-->
                         </div>
                         <strong>*</strong>
                     </div>

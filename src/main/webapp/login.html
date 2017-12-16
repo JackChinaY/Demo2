@@ -14,18 +14,21 @@
             margin: 0;
             font-family: Arial;
             font-size: 14px;
+            color: white;
             width: 100%;
             height: 100%;
             overflow: auto;
-            overflow-x: auto;
-            filter: progid:DXImageTransform.Microsoft.Gradient(startColorStr='#f5f5f5', endColorStr='#4682B4', gradientType=0); /* IE < 10 */
-            background: -ms-linear-gradient(top, #f5f5f5, #4682B4); /* IE 10 */
-            background: -webkit-gradient(linear, 0 0, 0 bottom, from(#f5f5f5), to(#4682B4)); /* Webkit: Safari 5.1+, Chrome 10+ */
+            background: #000000;
+            /*overflow-x: auto;*/
+            /*filter: progid:DXImageTransform.Microsoft.Gradient(startColorStr='#f5f5f5', endColorStr='#4682B4', gradientType=0); !* IE < 10 *!*/
+            /*background: -ms-linear-gradient(top, #f5f5f5, #4682B4); !* IE 10 *!*/
+            /*background: -webkit-gradient(linear, 0 0, 0 bottom, from(#f5f5f5), to(#4682B4)); !* Webkit: Safari 5.1+, Chrome 10+ *!*/
         }
 
         .box {
             width: 100%;
             height: 100%;
+            position: absolute;
             /*以下为控制位于此div中的模块垂直和水平居中*/
             display: flex;
             justify-content: center;
@@ -33,13 +36,16 @@
         }
 
         .box-content {
-            width: 380px;
-            padding: 80px 50px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
+            width: 400px;
+            /*上右下左*/
+            padding: 30px 60px 70px 60px;
+            background: rgba(0, 0, 0, 0.4);
+            /*background: rgba(255, 255, 255, 0.2);*/
+            border-radius: 25px;
         }
+
         a {
-            color: #000000;
+            color: #C0C0C0;
             text-decoration: underline;
             cursor: pointer;
         }
@@ -112,27 +118,41 @@
 </head>
 <body>
 <!--标题-->
-<div style="height: 50px;width: 100%;position: absolute;">
-    <h1 style="font-family: Arial;">&nbsp;Fiscal cash host computer system, please login!</h1>
+<!--<div style="height: 50px;width: 100%;position: absolute;">-->
+<!--<h1 style="font-family: Arial;">&nbsp;Fiscal cash host computer system, please login!</h1>-->
+<!--</div>-->
+<!--动画背景-->
+<div style="height: 100%;width: 100%;position: fixed; background: black">
+    <video style="height: 100%;width: 100%;object-fit: fill" autoplay="autoplay" loop="loop">
+        <source src="image/video.mp4" type="video/mp4">
+    </video>
 </div>
 <!--box为蓝色渐变区-->
 <div class="box">
     <!--输入框区-->
     <div class="box-content">
+        <div style="text-align: center">
+            <h2>PLEASE&nbsp;&nbsp;LOGIN</h2>
+        </div>
+        <br>
         <div class="input-group">
-            <span class="input-group-addon"><i class="icon icon-user"></i></span>
-            <input id="username" name="login" type="text" class="form-control" placeholder="Username"
-                   style="width: 100%;ime-mode: disabled"
+            <span class="input-group-addon">
+                <i class="icon icon-user"></i>
+            </span>
+            <input id="username" name="login" type="text" class="form-control" placeholder="username"
+                   style="ime-mode: disabled"
                    onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
         </div>
         <br>
         <div class="input-group">
-            <span class="input-group-addon"><i class="icon icon-key"></i></span>
-            <input id="password" name="login" type="password" class="form-control" placeholder="Password"
+            <span class="input-group-addon">
+                <i class="icon icon-key"></i>
+            </span>
+            <input id="password" name="login" type="password" class="form-control" placeholder="password"
                    style="width: 100%;ime-mode: disabled" onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
         </div>
         <br>
-        <input id="button_login" class="btn btn-primary" type="button" style="width: 100%" value="Login">
+        <input id="button_login" class="btn btn-primary" type="button" style="width: 100%" value="LOGIN">
         <!--<input id="button_login_clear" class="btn btn-danger" type="button" style="margin-left: 50px" value="Reset">-->
         <br>
         <br>

@@ -63,7 +63,7 @@
 
             //注销
             $("#loginout").click(function () {
-                if ($.cookie("username") != null) {
+                if ($.cookie("username") != null || $.cookie("userFlag") != null) {
                     $.ajax({
                         type: "POST",
                         url: "ActionAdmin_loginOut.action",
@@ -72,6 +72,7 @@
                         cache: false,
                         success: function (data) {
                             $.cookie("username", null, {expires: -1});//删除cookie信息
+                            $.cookie("userFlag", null, {expires: -1});//删除cookie信息
                             location.href = "login_admin.html";
                         },
                         error: function (jqXHR) {
@@ -79,6 +80,8 @@
                                 type: 'danger',
                                 placement: 'top' // 定义显示位置
                             }).show();
+                            $.cookie("username", null, {expires: -1});//删除cookie信息
+                            $.cookie("userFlag", null, {expires: -1});//删除cookie信息
                             location.href = "login_admin.html";
                         }
                     });
@@ -225,12 +228,14 @@
             <ul id="treeMenu" class="tree tree-menu" data-ride="tree">
                 <li class="open"><a href="#"><i class="icon icon-cubes"></i>Machine Management</a>
                     <ul>
-                        <li><a href="part_admin/machineSN.html" target="mainbox"><i class="icon icon-circle-blank"></i>Machine SN</a></li>
+                        <li><a href="part_admin/machineSN.html" target="mainbox"><i class="icon icon-circle-blank"></i>Machine
+                            SN</a></li>
                     </ul>
                 </li>
                 <li class="open"><a href="#"><i class="icon icon-group"></i>Users Management</a>
                     <ul>
-                        <li><a href="part_admin/usersStatistics.html" target="mainbox"><i class="icon icon-circle-blank"></i>Users
+                        <li><a href="part_admin/usersStatistics.html" target="mainbox"><i
+                                class="icon icon-circle-blank"></i>Users
                             Statistics</a></li>
                     </ul>
                 </li>
