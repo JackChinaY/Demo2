@@ -85,8 +85,10 @@
                         }
                     },
                     error: function (jqXHR) {
-                        $("#modal-content").html("The operation failed, please try again. Possible causes:" + jqXHR.status + "！");
-                        $("#myModal").modal();
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
                     }
                 });
             }

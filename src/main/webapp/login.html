@@ -71,7 +71,7 @@
                     }).show();
                 }
                 else {
-                    $("#button_login").val("Login...");
+                    $("#button_login").val("LOGIN...");
                     $.ajax({
                         type: "POST",
                         url: "Action_login.action",
@@ -85,17 +85,18 @@
                         success: function (data) {
                             if (data.jsonObject == "1") {
                                 $.cookie('username', data.username);
+                                $.cookie('userFlag', "comm");
 //                                setTimeout(function() {
 //                                    $("#button_login").val("登录成功");
 //                                },2000);
-                                $("#button_login").val("Login");
+                                $("#button_login").val("LOGIN");
                                 location.href = "index.html";
                             } else {
                                 new $.zui.Messager("Username or Password error !", {
                                     type: 'danger',
                                     placement: 'top'
                                 }).show();
-                                $("#button_login").val("Login");
+                                $("#button_login").val("LOGIN");
                             }
                         },
                         error: function (jqXHR) {
@@ -103,7 +104,7 @@
                                 type: 'danger',
                                 placement: 'top'
                             }).show();
-                            $("#button_login").val("Login");
+                            $("#button_login").val("LOGIN");
                         }
                     });
                 }

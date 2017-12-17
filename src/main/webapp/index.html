@@ -39,33 +39,13 @@
                 $(this).closest('li').addClass('active');
             });
 
-            //手动点击某个菜单选项，在就右侧显示对应的内容，其他内容就隐藏掉
-            function tabs(tabCon) {
-                $(tabCon).each(function () {
-                    $(this).children().hide();
-                    $(this).children().eq(15).show();//0代表第一个
-                });
-                $('#treeMenu ul').children().click(function () {
-                    var index = $('#treeMenu ul').children().index(this);
-                    $(tabCon).children().eq(index).show().siblings().hide();
-                });
-            }
-
-//            tabs(".context");
-
             // 手动初始化工具提示
             $('[data-toggle="tooltip"]').tooltip();
-            //查询所有商品
-//            $("#left2_1").click(function () {
-//                setTimeout(function() {
-//                    findAllGoods();
-//                },100);
-//            });
-            /*******************************************************************************************/
 
+            /*******************************************************************************************/
             //成功登陆后加载用户信息
             function loginsuccess() {
-                if ($.cookie("username") != null) {
+                if ($.cookie("username") != null && $.cookie("userFlag") == "comm") {
                     $("#successlogin").html('  ' + $.cookie("username") + '  ');
                 } else {
                     location.href = "login.html";
@@ -86,12 +66,15 @@
                         success: function (data) {
                             location.href = "login.html";
                             $.cookie("username", null, {expires: -1});//删除cookie信息
+                            $.cookie("userFlag", null, {expires: -1});//删除cookie信息
                         },
                         error: function (jqXHR) {
                             new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
                                 type: 'danger',
                                 placement: 'top' // 定义显示位置
                             }).show();
+                            $.cookie("username", null, {expires: -1});//删除cookie信息
+                            $.cookie("userFlag", null, {expires: -1});//删除cookie信息
                             location.href = "login.html";
                         }
                     });
@@ -101,14 +84,6 @@
                 }
             });
             /*******************************************************************************************/
-
-            //登陆超时后返回登录页面
-            function returnToLeginPage() {
-                location.href = "login.html";
-                $.cookie("username", null, {expires: -1});//删除cookie信息
-            }
-
-            /*******************************************************************************************/
         })
     </script>
     <style>
@@ -117,8 +92,6 @@
             margin: 0;
             font-family: Arial;
             font-size: 14px;
-            /*min-height: 500px;*/
-            /*min-width: 500px;*/
             width: 100%;
             height: 100%;
             overflow: auto;
@@ -178,7 +151,7 @@
         }
 
         .login div {
-            margin-top: 0px;
+            margin-top: 0;
         }
 
         h3 {
@@ -197,7 +170,7 @@
 
         .left {
             float: left;
-            width: 18%;
+            width: 17%;
             height: 100%;
             border-right: #ffffff 2px solid;
         }
@@ -207,7 +180,7 @@
         /*右侧--开始*/
         .right {
             float: right;
-            width: 82%;
+            width: 83%;
             height: 100%;
             background-color: #F5F5F5;
         }
@@ -228,8 +201,7 @@
 <div class="title">
     <span class="title_context">
         <a style="font-family: Arial;" href="index.html" data-toggle="tooltip" data-tip-class="tooltip-default"
-           data-placement="bottom"
-           title="Refresh">Management System</a>
+           data-placement="bottom" title="Refresh">Management System</a>
     </span>
     <div class="login">
         <div id="p1">
@@ -288,17 +260,10 @@
                 </li>
             </ul>
         </nav>
-        <!--<div style="margin-top: 45px;margin-bottom: 1000px;"></div>-->
     </div>
     <div class="right">
-        <!--<div class="context">-->
         <iframe name="mainbox" width="100%" height="99%" frameborder="0">
-            <!--<div>-->
-            <!--<h1 style="font-style: italic">-->
-            <!--&nbsp;欢迎使用税控收款软件系统！</h1>-->
-            <!--</div>-->
         </iframe>
-        <!--</div>-->
     </div>
 </div>
 <!--对话框-->

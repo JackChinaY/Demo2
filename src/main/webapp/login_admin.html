@@ -68,7 +68,7 @@
                     }).show();
                 }
                 else {
-                    $("#button_login").val("Login...");
+                    $("#button_login").val("LOGIN...");
                     $.ajax({
                         type: "POST",
                         url: "ActionAdmin_login.action",
@@ -83,14 +83,14 @@
                             if (data.jsonObject == "1") {
                                 $.cookie('username', data.username);
                                 $.cookie('userFlag', data.userFlag);
-                                $("#button_login").val("Login");
+                                $("#button_login").val("LOGIN");
                                 location.href = "index_admin.html";
                             } else {
                                 new $.zui.Messager("Username or Password error !", {
                                     type: 'danger',
                                     placement: 'top'
                                 }).show();
-                                $("#button_login").val("Login");
+                                $("#button_login").val("LOGIN");
                             }
                         },
                         error: function (jqXHR) {
@@ -98,7 +98,7 @@
                                 type: 'danger',
                                 placement: 'top'
                             }).show();
-                            $("#button_login").val("Login");
+                            $("#button_login").val("LOGIN");
                         }
                     });
                 }

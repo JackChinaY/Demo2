@@ -20,12 +20,16 @@
     </script>
 </head>
 <body>
-<input id="tel" type="text" class="form-control" maxlength="18"
-       placeholder="0-18 characters" style="ime-mode: disabled"
-       onkeyup="this.value=this.value.replace(/[^\d\s()+-]/g,'')">
-       <!--onchange onkeyup onkeypress="return (event.keyCode == 40 ||event.keyCode == 41 ||event.keyCode == 43 ||event.keyCode == 45 || event.keyCode >= 48 && event.keyCode <= 57)"-->
-
-
+<p>
+    <button type="button" class="btn" data-toggle="collapse" data-target="#collapseExample"><i class="icon icon-circle-blank"></i></button>
+    <!--<a href="#collapseExample" data-toggle="collapse" class="btn btn-link">直接使用 href 属性</a>-->
+</p>
+<div class="collapse in" id="collapseExample">
+    <div class="bg-primary with-padding">
+        <p>被折叠元素内容。</p>
+        <p>多个触发元素可以指向同一个折叠内容。</p>
+    </div>
+</div>
 <!--<button id="submit2" class="btn btn-primary" type="button" style="margin-left: 100px;margin-top: 100px"><i-->
 <!--class="icon icon-plus"></i> 弹出-->
 <!--</button>-->
@@ -34,68 +38,6 @@
 <!--<label>夜间模式</label>-->
 <!--</div>-->
 <!--对话框 新增-->
-<div class="modal fade" id="myModal1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
-                        class="sr-only">Close</span></button>
-                <h4 class="modal-title">Add A New Cashier</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label class="col-sm-3">Number</label>
-                        <label id="number" class="col-sm-6" style="text-align: center"></label>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Code</label>
-                        <div class="col-sm-6">
-                            <input id="code" type="tel" class="form-control" maxlength="3"
-                                   placeholder="fixed 3 digits number">
-                        </div>
-                        <strong>*</strong>
-                        <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check"
-                                                             style="color: green"></i> <i id="code_flag2"
-                                                                                          class="icon icon-times"
-                                                                                          style="color: red"></i></label>
-                        <label id="code_info" hidden="hidden"></label>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Name</label>
-                        <div class="col-sm-6">
-                            <input id="name" type="text" class="form-control" maxlength="15"
-                                   placeholder="1-15 characters">
-                        </div>
-                        <strong>*</strong>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Password</label>
-                        <div class="col-sm-6">
-                            <input id="password" type="password" class="form-control" maxlength="6"
-                                   placeholder="fixed 6 digits number">
-                        </div>
-                        <strong>*</strong>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Re-Password</label>
-                        <div class="col-sm-6">
-                            <input id="re_password" type="password" class="form-control" maxlength="6"
-                                   placeholder="fixed 6 digits number">
-                        </div>
-                        <strong>*</strong>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
-                </button>
-                <button id="submit1_1" class="btn btn-primary" type="button">
-                    Submit
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+
 </body>
 </html>
