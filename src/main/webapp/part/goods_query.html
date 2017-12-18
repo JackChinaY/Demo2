@@ -8,6 +8,8 @@
     <script src="../javascript/jquery-1.11.3.min.js"></script>
     <script src="../javascript/jquery.cookie.js"></script>
     <script src="../zui/zui.js"></script>
+    <link href="../zui/chosen.css" rel="stylesheet">
+    <script src="../zui/chosen.js"></script>
     <script type="text/javascript">
         $(function () {
             /**
@@ -17,6 +19,13 @@
             var serverError = "possible reasons：server error !";
             // 手动初始化工具提示
             $('[data-toggle="tooltip"]').tooltip();
+            // 下拉框样式，自动加载
+            $("#query_option").chosen({
+                search_contains: true,        // 从任意位置开始检索
+                disable_search_threshold: 10,// 10 个以下的选择项则不显示检索框
+                no_results_text: "Oops, nothing found!", // 当检索时没有找到匹配项时显示的提示文本
+                width: "100%"
+            });
             /*******************************************************************************************/
             //查询功能 点击事件
             $("#submit_goods").click(function () {
@@ -570,12 +579,9 @@
             margin: 0;
             font-family: Arial;
             font-size: 14px;
-            /*min-height: 500px;*/
-            /*min-width: 500px;*/
             width: 100%;
             height: 100%;
             overflow: auto;
-            overflow-x: auto;
         }
 
         .popover {
@@ -589,30 +595,58 @@
 <body>
 <!--商品管理-->
 <div>
-    <div style="margin-top: 10px;width: 100%;height: 40px;">
-        <span class="label label-badge label-primary label-define"
-              style="float: left; margin-left: 20px;margin-right: 20px ;margin-top: 7px">Goods Query</span>
-        <div class="input-group" style="width: 450px;">
-            <span class="input-group-addon">OPTION</span>
-            <select id="query_option" class="form-control">
-                <option value="number" selected="selected">Number</option>
-                <option value="name">Name</option>
-                <option value="barcode">Barcode</option>
-            </select>
-            <span class="input-group-addon fix-border fix-padding"></span>
-            <input id="query_key" type="text" class="form-control" maxlength="15"
-                   placeholder="1-15 characters" style="ime-mode: disabled"
-                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
-            <span class="input-group-btn">
+    <!--<div style="margin-top: 10px;width: 100%;height: 40px;">-->
+        <!--<span class="label label-badge label-primary label-define"-->
+              <!--style="float: left; margin-left: 20px;margin-right: 20px ;margin-top: 7px">Goods Query</span>-->
+        <!--<div class="input-group" style="width: 450px;">-->
+            <!--<span class="input-group-addon">OPTION</span>-->
+            <!--<select id="query_option" class="form-control">-->
+                <!--<option value="number" selected="selected">Number</option>-->
+                <!--<option value="name">Name</option>-->
+                <!--<option value="barcode">Barcode</option>-->
+            <!--</select>-->
+            <!--<span class="input-group-addon fix-border fix-padding"></span>-->
+            <!--<input id="query_key" type="text" class="form-control" maxlength="15"-->
+                   <!--placeholder="1-15 characters" style="ime-mode: disabled"-->
+                   <!--onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">-->
+            <!--<span class="input-group-btn">-->
+                <!--<button id="submit_goods" class="btn btn-primary" type="button" style="width: 50px"><i-->
+                        <!--class="icon icon-search"></i>-->
+                <!--</button>-->
+            <!--</span>-->
+        <!--</div>-->
+        <!--<button id="submit_back" class="btn btn-primary" type="button" data-toggle="tooltip"-->
+                <!--data-tip-class="tooltip-default" title="return to goods management" data-placement="left"-->
+                <!--style="float: right; margin-right: 20px;margin-top: -35px"><i class="icon icon-reply"></i>-->
+        <!--</button>-->
+    <!--</div>-->
+    <div style="margin-top: 10px">
+        <form class="form-horizontal">
+            <div class="form-group">
+            <span class="label label-badge label-primary label-define"
+                  style="float: left; margin-left: 30px;margin-top: 7px">Goods Query</span>
+                <label class="col-sm-2">OPTION</label>
+                <div class="col-sm-2" style="width: 130px">
+                    <select id="query_option" class="form-control">
+                        <option value="number" selected="selected">Number</option>
+                        <option value="name">Name</option>
+                        <option value="barcode">Barcode</option>
+                    </select>
+                </div>
+                <div class="col-sm-2">
+                    <input id="query_key" type="text" class="form-control" maxlength="15"
+                           placeholder="1-15 characters" style="ime-mode: disabled"
+                           onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
+                </div>
                 <button id="submit_goods" class="btn btn-primary" type="button" style="width: 50px"><i
                         class="icon icon-search"></i>
                 </button>
-            </span>
-        </div>
-        <button id="submit_back" class="btn btn-primary" type="button" data-toggle="tooltip"
-                data-tip-class="tooltip-default" title="return to goods management" data-placement="left"
-                style="float: right; margin-right: 20px;margin-top: -35px"><i class="icon icon-reply"></i>
-        </button>
+                <button id="submit_back" class="btn btn-primary" type="button" data-toggle="tooltip"
+                        data-tip-class="tooltip-default" title="return to buyers management" data-placement="left"
+                        style="float: right; margin-right: 20px;"><i class="icon icon-reply"></i>
+                </button>
+            </div>
+        </form>
     </div>
     <div style="background-color: white;"
          class="table-responsive">

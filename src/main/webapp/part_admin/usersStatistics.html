@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <title>machineSN</title>
     <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
+    <link rel="stylesheet" href="../javascript/theme.default.css"/>
     <link rel="stylesheet" href="../zui/zui.css">
     <script src="../javascript/jquery-1.11.3.min.js"></script>
     <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../javascript/jquery.tablesorter.js"></script>
     <script src="../zui/zui.js"></script>
     <script type="text/javascript">
         $(function () {
@@ -15,6 +17,7 @@
              */
             var loginTimeout = "Login timeout, please login again !";
             var serverError = "possible reasons：server error !";
+            var flag = 0;//用于首次排序的标志
             /*******************************************************************************************/
             //页面加载时自动执行的函数，生成表格
             findAllMachine();
@@ -56,9 +59,9 @@
                             }
                             //当数组为不为空时
                             else if (jsonArray.length != 0) {
-                                var head = '<tr><th>ID</th><th>Username</th><th>E-mail</th><th>Telephone</th><th>Address</th><th>Machine Type</th><th>Machine SN</th><th>Register DateTime</th><th>Operation</th></tr>';
-                                $("#thead").html(head);
-                                var html;
+                                // var head = '<tr><th style="display:none">Id</th><th>ID</th><th>Username</th><th>E-mail</th><th>Telephone</th><th>Address</th><th>Machine Type</th><th>Machine SN</th><th>Register DateTime</th><th>Operation</th></tr>';
+                                // $("#thead").html(head);
+                                var html = "";
                                 for (var i = 0; i < jsonArray.length; i++) {
                                     html += '<tr><td class="Id" style="display: none">' + jsonArray[i].value1 + '</td>'
                                         + '<td>' + (i + 1) + '</td>'
@@ -76,6 +79,22 @@
                                 $("#tbody").html(html);
                                 // 手动初始化工具提示
                                 $('[data-toggle="tooltip"]').tooltip();
+                                //使用datatable排序的时候用
+                                // if (flag === 0) {
+                                //     $('table').tablesorter({
+                                //         widgets: ['zebra', 'columns'],
+                                //         usNumberFormat: false,
+                                //         sortReset: true,
+                                //         sortRestart: true,
+                                //         headers: {
+                                //             1: {sorter: "integer"}, //表格的第二列按照integer数据类型进行排序
+                                //             9: {sorter: false}//第六列不参与排序
+                                //         }
+                                //     });
+                                //     flag = 1;
+                                // } else {
+                                //     $('table').trigger("update");//动态刷新表格后需要更新排序功能
+                                // }
                             }
                         }
                     },
@@ -87,6 +106,7 @@
                     }
                 });
             }
+
             /*******************************************************************************************/
             //查看用户详细信息
             $("#tbody").on("click", "a[name='detail']", function () {
@@ -102,12 +122,9 @@
             margin: 0;
             font-family: Arial;
             font-size: 14px;
-            /*min-height: 500px;*/
-            /*min-width: 500px;*/
             width: 100%;
             height: 100%;
             overflow: auto;
-            overflow-x: auto;
         }
     </style>
 </head>
@@ -119,8 +136,20 @@
               style="float: left; margin-left: 20px;margin-top: 10px">Users Statistics</span>
     </div>
     <div style="background-color: white" class="table-responsive">
-        <table class="table table-striped table-hover table-bordered">
+        <table class="table table-striped table-hover table-bordered tablesorter">
             <thead id="thead">
+            <tr>
+                <th style="display:none">Id</th>
+                <th>ID</th>
+                <th>Username</th>
+                <th>E-mail</th>
+                <th>Telephone</th>
+                <th>Address</th>
+                <th>Machine Type</th>
+                <th>Machine SN</th>
+                <th>Register DateTime</th>
+                <th>Operation</th>
+            </tr>
             </thead>
             <tbody id="tbody">
             </tbody>

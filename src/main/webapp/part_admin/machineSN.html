@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <title>machineSN</title>
     <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
+    <link rel="stylesheet" href="../javascript/theme.default.css"/>
     <link rel="stylesheet" href="../zui/zui.css">
     <script src="../javascript/jquery-1.11.3.min.js"></script>
     <script src="../javascript/jquery.cookie.js"></script>
+    <script src="../javascript/jquery.tablesorter.js"></script>
     <script src="../zui/zui.js"></script>
-    <link href="../zui/zui.datatable.css" rel="stylesheet">
-    <script src="../zui/zui.datatable.js"></script>
+    <link href="../zui/chosen.css" rel="stylesheet">
+    <script src="../zui/chosen.js"></script>
     <script type="text/javascript">
         $(function () {
             /**
@@ -17,9 +19,17 @@
              */
             var loginTimeout = "Login timeout, please login again !";
             var serverError = "possible reasons：server error !";
+            var flag = 0;//用于首次排序的标志
             /*******************************************************************************************/
             //页面加载时自动执行的函数，生成表格
             findAllMachine();
+            //下拉框样式，自动加载
+            $("#type").chosen({
+                search_contains: true,        // 从任意位置开始检索
+                disable_search_threshold: 10,// 10 个以下的选择项则不显示检索框
+                no_results_text: "Oops, nothing found!", // 当检索时没有找到匹配项时显示的提示文本
+                width: "100%"
+            });
             /*******************************************************************************************/
 
             //查询所有机器编号 无参
@@ -59,9 +69,9 @@
                             }
                             //当数组为不为空时
                             else if (jsonArray.length != 0) {
-                                var head = '<tr><th style="display:none">Id</th><th data-type="number">ID</th><th >Machine Type</th><th data-type="number">Machine SN</th><th>Entry time</th><th data-sort="false">Operation</th></tr>';
-                                $("#thead").html(head);
-                                var html;
+                                // var head = '<tr><th style="display:none">Id</th><th>ID</th><th >Machine Type</th><th>Machine SN</th><th>Entry time</th><th>Operation</th></tr>';
+                                // $("#thead").html(head);
+                                var html = "";
                                 for (var i = 0; i < jsonArray.length; i++) {
                                     html += '<tr><td class="Id" style="display:none">' + jsonArray[i].value1 + '</td>'
                                         + '<td>' + (i + 1) + '</td>'
@@ -73,8 +83,22 @@
                                 $("#tbody").html(html);
                                 // 手动初始化工具提示
                                 $('[data-toggle="tooltip"]').tooltip();
-                                //使用datatable的时候用
-                                // $('table.datatable').datatable({checkable: true,sortable: true});
+                                //使用datatable排序的时候用
+                                // if (flag == 0) {
+                                //     $('table').tablesorter({
+                                //         widgets: ['zebra', 'columns'],
+                                //         usNumberFormat: false,
+                                //         sortReset: true,
+                                //         sortRestart: true,
+                                //         headers: {
+                                //             1: {sorter: "integer"}, //表格的第二列按照integer数据类型进行排序
+                                //             5: {sorter: false}//第六列不参与排序
+                                //         }
+                                //     });
+                                //     flag = 1;
+                                // } else {
+                                //     $('table').trigger("update");//动态刷新表格后需要更新排序功能
+                                // }
                             }
                         }
                     },
@@ -261,14 +285,34 @@
         </button>
     </div>
     <div style="background-color: white" class="table-responsive">
-        <!--datatable-->
-        <table class="table table-striped table-hover table-bordered">
+        <table class="table table-striped table-hover table-bordered tablesorter">
             <thead id="thead">
+            <tr>
+                <th style="display:none">Id</th>
+                <th>ID</th>
+                <th>Machine Type</th>
+                <th>Machine SN</th>
+                <th>Entry time</th>
+                <th>Operation</th>
+            </tr>
             </thead>
             <tbody id="tbody">
             </tbody>
+            <tfoot>
+            </tfoot>
         </table>
     </div>
+    <!--<ul class="pager" style=" float: right; margin-right: 20px">-->
+        <!--<li id="firstPage"><a href="#">FIRST</a></li>-->
+        <!--<li id="pageUp" class="next"><a href="#">PREV</a></li>-->
+        <!--<li id="pageDown" class="previous"><a href="#">NEXT</a></li>-->
+        <!--<li id="endPage"><a href="#">LAST</a></li>-->
+    <!--</ul>-->
+    <!--<div style="float: right; margin-right: 20px; margin-top: 27px">-->
+        <!--PER PAGE:&nbsp;<strong id="pageSize">15</strong>-->
+        <!--&nbsp;&nbsp;ALL:&nbsp;<strong id="totalCount">0</strong>-->
+        <!--&nbsp;&nbsp;PAGE:&nbsp;<strong id="pageIndex">1</strong>/<strong id="pageCount">1</strong>-->
+    <!--</div>-->
 </div>
 <!--对话框-->
 <div class="modal fade" id="myModal">
@@ -302,7 +346,7 @@
                     <div class="form-group">
                         <label class="col-sm-3">Machine Type</label>
                         <div class="col-sm-6">
-                            <select id="type" class="form-control">
+                            <select id="type" class="chosen-select form-control">
                                 <option value="IP-100" selected="selected">IP-100</option>
                                 <option value="IP-200">IP-200</option>
                             </select>

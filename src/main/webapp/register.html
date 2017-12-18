@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="zui/zui.css">
     <script src="javascript/jquery-1.11.3.min.js"></script>
     <script src="zui/zui.js"></script>
+    <link href="zui/chosen.css" rel="stylesheet">
+    <script src="zui/chosen.js"></script>
     <style type="text/css">
         html, body {
             padding: 0;
@@ -64,6 +66,13 @@
              */
             var loginTimeout = "Login timeout, please login again !";
             var serverError = "possible reasons：server error !";
+            //下拉框样式，自动加载
+            $("#machineType").chosen({
+                search_contains: true,        // 从任意位置开始检索
+                disable_search_threshold: 10,// 10 个以下的选择项则不显示检索框
+                no_results_text: "Oops, nothing found!", // 当检索时没有找到匹配项时显示的提示文本
+                width: "100%"
+            });
             /*******************************************************************************************/
             //验证机器编号是否为正品
             $("#machineId").blur(function () {
