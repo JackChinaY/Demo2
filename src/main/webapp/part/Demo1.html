@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>machineSN</title>
+    <title>Demo1</title>
     <link rel="shortcut icon" type="image/x-icon" href="/image/favicon.ico"/>
     <link rel="stylesheet" href="../javascript/theme.default.css"/>
     <link rel="stylesheet" href="../zui/zui.css">
@@ -28,67 +28,111 @@
                 });
 
             });
+            var doc = $(document), dl = $("div.left"), dr = $("div.right");
+            var sum = dl.width() + dr.width() +
+                // 当鼠标指针移动到元素上方，并按下鼠标按键时，会发生 mousedown 事件
+                $("div.handler").mousedown(function (e) {
+                    // clientX 事件属性返回当事件被触发时鼠标指针向对于浏览器页面（或客户区）的水平坐标
+                    var me = $(this);
+                    var deltaX = e.clientX - (parseFloat(me.css("left")) || parseFloat(me.prop("clientLeft")));
+                    // 当鼠标指针在指定的元素中移动时，就会发生 mousemove 事件
+                    doc.mousemove(function (e) {
+                        var lt = e.clientX - deltaX;
+                        lt = lt < 0 ? 0 : lt;
+                        lt = lt > sum - me.width() ? sum - me.width() : lt;
+                        me.css("left", lt + "px");
+                        dl.width(lt);
+                        dr.width(sum - lt - me.width());
+                        // dr.width(sum - lt - me.width());
+                    });
+                }).width();
+
+            doc.mouseup(function () {
+                doc.unbind("mousemove");
+            });
+            doc[0].ondragstart
+                = doc[0].onselectstart
+                = function () {
+                return false;
+            };
         })
     </script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            font-family: Arial;
+            font-size: 14px;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+
+        /*div {*/
+        /*!*position: absolute;*!*/
+        /*float: left;*/
+        /*height: 500px;*/
+        /*}*/
+        .center {
+            width: 100%;
+            height: 100%;
+            background: aqua;
+            /*padding-left:203px;*/
+            /*padding-top: 47px;*/
+            /*以下为控制位于此div中的模块垂直和水平居中*/
+            /*display: flex;*/
+            /*justify-content: center;*/
+            /*align-items: center;*/
+        }
+
+        div.left {
+            display:inline;
+            /*margin-left:-200px;*/
+            float: left;
+            width: 200px;
+            height: 100%;
+            background-color: red;
+        }
+
+        div.handler {
+            /*display:inline;*/
+            /*margin-left:-203px;*/
+            float: left;
+            height: 100%;
+            width: 3px;
+            cursor: col-resize;
+            background-color: blue;
+            left: 200px;
+            /*z-index: 1;*/
+        }
+
+        div.right {
+            /*display:inline;*/
+            /*position: absolute;*/
+            background-color: yellow;
+            /*min-width: 1200px;*/
+            height: 100%;
+            right: 0px;
+            /*float: left;*/
+        }
+
+    </style>
 </head>
 <body>
-<div>
-    <div style="margin-top: 10px;width: 100%;height: 40px;">
-        <span class="label label-badge label-primary label-define"
-              style="float: left; margin-left: 20px;margin-right: 20px ;margin-top: 7px">Buyers Query</span>
-        <div class="input-group" style="width: 450px;">
-            <span class="input-group-addon">OPTION</span>
-            <select id="query_option" class="form-control">
-                <option value="number" selected="selected">Number</option>
-                <option value="name">Name</option>
-                <option value="tpin">TPIN</option>
-            </select>
-            <span class="input-group-addon fix-border fix-padding"></span>
-            <input id="query_key" type="text" class="form-control" maxlength="50"
-                   placeholder="1-50 characters" style="ime-mode: disabled"
-                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
-            <span class="input-group-btn">
-                <button id="submit2" class="btn btn-primary" type="button" style="width: 50px"><i
-                        class="icon icon-search"></i>
-                </button>
-            </span>
-
-        </div>
-        <button id="submit1" class="btn btn-primary" type="button" data-toggle="tooltip"
-                data-tip-class="tooltip-default" title="return to buyers management" data-placement="left"
-                style="float: right; margin-right: 20px;margin-top: -35px"><i class="icon icon-reply"></i>
-        </button>
+<div class="center">
+    <div class="left">
+        同时在线人数：1000
+        点击刷新
     </div>
-    <hr>
-</div>
-<div>
-    <form class="form-horizontal">
-        <div class="form-group">
-            <span class="label label-badge label-primary label-define"
-                  style="float: left; margin-left: 30px;margin-top: 7px">Buyers Query</span>
-            <label class="col-sm-1">OPTION</label>
-            <div class="col-sm-2">
-                <select id="query_option" class="form-control">
-                    <option value="number" selected="selected">Number</option>
-                    <option value="name">Name</option>
-                    <option value="tpin">TPIN</option>
-                </select>
-            </div>
-            <div class="col-sm-2">
-                <input id="query_key" type="text" class="form-control" maxlength="50"
-                       placeholder="1-50 characters" style="ime-mode: disabled"
-                       onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
-            </div>
-            <button id="submit2" class="btn btn-primary" type="button" style="width: 50px"><i
-                    class="icon icon-search"></i>
-            </button>
-            <button id="submit1" class="btn btn-primary" type="button" data-toggle="tooltip"
-                    data-tip-class="tooltip-default" title="return to buyers management" data-placement="left"
-                    style="float: right; margin-right: 20px;"><i class="icon icon-reply"></i>
-            </button>
-        </div>
-    </form>
-</div>
+    <div class="handler">
+    </div>
+    <!--<div>-->
+    <div class="right">
+        sss
+    </div>
+    <!--</div>-->
 
+
+</div>
 </body>
 </html>
