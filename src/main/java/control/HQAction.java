@@ -161,8 +161,13 @@ public class HQAction extends BaseAction {
     public void verifyMachine() throws IOException, JSONException {
         String machineType = this.getRequest().getParameter("machineType");
         String machineId = this.getRequest().getParameter("machineId");
-        String result = hqService.verifyMachine(machineType, machineId);//1表示正品。0表示赝品
-        returnJsonObject(result);//可能的返回值：-1，0,1
+        String flag1 = hqService.verifyMachine(machineType, machineId);//1表示正品，0表示赝品 是否为正品
+        String flag2 = hqService.verifyMachineIsExist(machineType, machineId);//1表示已被注册，0表示未被注册 是否已被注册
+        JSONObject jo = new JSONObject();
+        jo.put("flag1", flag1);
+        jo.put("flag2", flag2);
+        this.getResponse().setContentType("text/html;charset=UTF-8");// 设置响应数据类型
+        this.getResponse().getWriter().print(jo);// 向前台发送json数据
     }
 
     /**

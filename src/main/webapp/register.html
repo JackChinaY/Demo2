@@ -74,16 +74,10 @@
                 width: "100%"
             });
             /*******************************************************************************************/
-            //验证机器编号是否为正品
-            $("#machineId").blur(function () {
-                if ($("#machineId").val() == "") {
-                    new $.zui.Messager('The Machine SN can not be empty!', {
-                        type: 'danger',
-                        placement: 'top' // 定义显示位置
-                    }).show();
-                    $("#check_flag1").hide();//对号
-                    $("#check_flag2").show();//叉号
-                } else {
+            //当SN已填写完整的情况下，如果用户再次重新选择type时，也要在验证SN一次
+            $("#machineType").change(function () {
+                if ($("#machineId").val().length === 12) {
+                    // 验证机器编号是否为正品
                     $.ajax({
                         type: "POST",
                         url: "Action_verifyMachine.action",
@@ -95,15 +89,7 @@
                         dataType: "json",
                         cache: false,
                         success: function (data) {
-                            if (data.jsonObject == "1") {
-                                new $.zui.Messager('This machine is genuine!', {
-                                    type: 'success',
-                                    placement: 'top' // 定义显示位置
-                                }).show();
-                                $("#check_flag1").show();//对号
-                                $("#check_flag2").hide();//叉号
-                                $("#check_info1").html(1);//0代表不存在，1代表正品
-                            } else if (data.jsonObject == "0") {
+                            if (data.flag1 == "0") {
                                 new $.zui.Messager('This Machine SN does not exist, please re-enter it !', {
                                     type: 'danger',
                                     placement: 'top' // 定义显示位置
@@ -111,6 +97,23 @@
                                 $("#check_flag1").hide();//对号
                                 $("#check_flag2").show();//叉号
                                 $("#check_info1").html(0);//0代表不存在，1代表正品
+                            } else if (data.flag2 == "1") {
+                                new $.zui.Messager('This Machine SN has been registered, please enter the correct one !', {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                $("#check_flag1").hide();//对号
+                                $("#check_flag2").show();//叉号
+                                $("#check_info1_2").html(1);//0代表未被注册，1代表已被注册
+                            } else if (data.flag1 == "1" && data.flag2 == "0") {
+                                new $.zui.Messager('This machine is genuine!', {
+                                    type: 'success',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                $("#check_flag1").show();//对号
+                                $("#check_flag2").hide();//叉号
+                                $("#check_info1").html(1);//0代表不存在，1代表正品
+                                $("#check_info1_2").html(0);//0代表未被注册，1代表已被注册
                             }
                         },
                         error: function (jqXHR) {
@@ -120,6 +123,73 @@
                             }).show();
                         }
                     });
+                    //验证机器编号是否已被注册
+                }
+            });
+            //验证机器编号是否为正品和是否已被注册
+            $("#machineId").blur(function () {
+                if ($("#machineId").val() == "") {
+                    new $.zui.Messager('The Machine SN can not be empty!', {
+                        type: 'danger',
+                        placement: 'top' // 定义显示位置
+                    }).show();
+                    $("#check_flag1").hide();//对号
+                    $("#check_flag2").show();//叉号
+                } else if ($("#machineId").val().length != 12) {
+                    new $.zui.Messager('The length of the Machine SN is fixed 12 numbers !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                    $("#check_flag1").hide();//对号
+                    $("#check_flag2").show();//叉号
+                } else {
+                    // 验证机器编号是否为正品和是否已被注册
+                    $.ajax({
+                        type: "POST",
+                        url: "Action_verifyMachine.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "machineType": $("#machineType").val(),
+                            "machineId": $("#machineId").val()
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            if (data.flag1 == "0") {
+                                new $.zui.Messager('This Machine SN does not exist, please re-enter it !', {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                $("#check_flag1").hide();//对号
+                                $("#check_flag2").show();//叉号
+                                $("#check_info1").html(0);//0代表不存在，1代表正品
+                            } else if (data.flag2 == "1") {
+                                new $.zui.Messager('This Machine SN has been registered, please enter the correct one !', {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                $("#check_flag1").hide();//对号
+                                $("#check_flag2").show();//叉号
+                                $("#check_info1_2").html(1);//0代表未被注册，1代表已被注册
+                            } else if (data.flag1 == "1" && data.flag2 == "0") {
+                                new $.zui.Messager('This machine is genuine!', {
+                                    type: 'success',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                $("#check_flag1").show();//对号
+                                $("#check_flag2").hide();//叉号
+                                $("#check_info1").html(1);//0代表不存在，1代表正品
+                                $("#check_info1_2").html(0);//0代表未被注册，1代表已被注册
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                    //验证机器编号是否已被注册
                 }
             });
             //验证用户名是否存在
@@ -193,10 +263,22 @@
                     }).show();
                     $("#check_flag1").hide();//对号
                     $("#check_flag2").show();//叉号
+                } else if ($("#machineId").val().length != 12) {
+                    new $.zui.Messager('The length of the Machine SN is fixed 12 numbers !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                    $("#check_flag1").hide();//对号
+                    $("#check_flag2").show();//叉号
                 } else if ($("#check_info1").text() == "0") {
                     new $.zui.Messager('This Machine SN does not exist, please re-enter it ！', {
                         type: 'danger',
-                        placement: 'center'
+                        placement: 'top'
+                    }).show();
+                } else if ($("#check_info1_2").text() == "1") {
+                    new $.zui.Messager('This Machine SN has been registered, please enter the correct one ！', {
+                        type: 'danger',
+                        placement: 'top'
                     }).show();
                 } else if ($("#username").val() == "") {
                     new $.zui.Messager('The Username can not be empty!', {
@@ -222,12 +304,12 @@
                 } else if ($("#check_info2").text() == "1") {
                     new $.zui.Messager('The Username already exists, please re-enter it ！', {
                         type: 'danger',
-                        placement: 'center'
+                        placement: 'top'
                     }).show();
                 } else if ($("#password").val() == "") {
                     new $.zui.Messager('Password cannot be empty！', {
                         type: 'danger',
-                        placement: 'center'
+                        placement: 'top'
                     }).show();
                 } else if ($("#password").val().indexOf(" ") != -1) {
                     new $.zui.Messager('The Password can not contain space!', {
@@ -242,7 +324,7 @@
                 } else if ($("#confirm_password").val() == "") {
                     new $.zui.Messager('RePassword cannot be empty！', {
                         type: 'danger',
-                        placement: 'center'
+                        placement: 'top'
                     }).show();
                 } else if ($("#confirm_password").val().indexOf(" ") != -1) {
                     new $.zui.Messager('The RePassword can not contain space!', {
@@ -252,13 +334,13 @@
                 } else if ($("#password").val() != $("#confirm_password").val()) {
                     new $.zui.Messager('The Password and Confirm Password are inconsistent！', {
                         type: 'danger',
-                        placement: 'center'
+                        placement: 'top'
                     }).show();
                 }
                 else if ($("#email").val() == "") {
                     new $.zui.Messager('E-mail cannot be empty！', {
                         type: 'danger',
-                        placement: 'center'
+                        placement: 'top'
                     }).show();
                 } else if ($("#email").val().indexOf(" ") != -1) {
                     new $.zui.Messager('The E-mail can not contain space!', {
@@ -318,12 +400,19 @@
 
             // 将name=login的文本框清空，以便重新输入
             function clearAll() {
-                $(".form-control").val("");
+                $("#machineId").val("");
+                $("#username").val("");
+                $("#password").val("");
+                $("#confirm_password").val("");
+                $("#email").val("");
+                $("#tel").val("");
+                $("#address").val("");
                 $("#check_flag1").hide();//对号
                 $("#check_flag2").hide();//叉号
                 $("#check_flag3").hide();//对号
                 $("#check_flag4").hide();//叉号
                 $("#check_info1").html("");
+                $("#check_info1_2").html("");
                 $("#check_info2").html("");
             }
         })
@@ -356,6 +445,7 @@
                 <label class="col-sm-3">Machine SN</label>
                 <div class="col-sm-6">
                     <input id="machineId" type="text" class="form-control" placeholder="please enter the Machine SN"
+                           maxlength="12"
                            style="ime-mode: disabled" onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                 </div>
                 <strong>*</strong>
@@ -364,14 +454,15 @@
                                                                                                   class="icon icon-times"
                                                                                                   style="color: red"
                                                                                                   hidden="hidden"></i></label>
-                <label id="check_info1" hidden="hidden"></label>
-                <!--<span id="checkinfo1"></span>-->
+                <!--<label id="check_info1" hidden="hidden"></label>-->
+                <span id="check_info1" hidden="hidden"></span>
+                <span id="check_info1_2" hidden="hidden"></span>
             </div>
             <div class="form-group">
                 <label class="col-sm-3">Username</label>
                 <div class="col-sm-6">
                     <input id="username" type="text" class="form-control" placeholder="please enter the Username"
-                           style="ime-mode: disabled"
+                           style="ime-mode: disabled" maxlength="30"
                            onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                 </div>
                 <strong>*</strong>
@@ -387,7 +478,7 @@
                 <label class="col-sm-3">Password</label>
                 <div class="col-sm-6">
                     <input id="password" type="password" class="form-control" placeholder="please enter the Password"
-                           style="ime-mode: disabled"
+                           style="ime-mode: disabled" maxlength="30"
                            onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                 </div>
                 <strong>*</strong>
@@ -396,7 +487,7 @@
                 <label class="col-sm-3">RePassword</label>
                 <div class="col-sm-6">
                     <input id="confirm_password" type="password" class="form-control"
-                           placeholder="please re-enter the Password" style="ime-mode: disabled"
+                           placeholder="please re-enter the Password" style="ime-mode: disabled" maxlength="30"
                            onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                 </div>
                 <strong>*</strong>
@@ -405,7 +496,7 @@
                 <label class="col-sm-3">E-mail</label>
                 <div class="col-sm-6">
                     <input id="email" type="text" class="form-control" placeholder="please enter the E-mail"
-                           style="ime-mode: disabled"
+                           style="ime-mode: disabled" maxlength="30"
                            onkeyup="this.value=this.value.replace(/[^\da-zA-Z@\.]/g,'')">
                 </div>
                 <strong>*</strong>
@@ -423,13 +514,13 @@
                 <label class="col-sm-3">Address</label>
                 <div class="col-sm-6">
                     <input id="address" type="text" class="form-control" placeholder="please enter the Address"
-                           style="ime-mode: disabled"
+                           style="ime-mode: disabled" maxlength="55"
                            onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
                 </div>
             </div>
         </form>
         <div style="text-align:center">
-            <input class="btn btn-primary" style=" width: 250px;" id="submituser"
+            <input class="btn btn-primary" style=" width: 250px" id="submituser"
                    type="submit" value="SUBMIT">
         </div>
         <!--<input id="button_login_clear" class="btn btn-danger" type="button" style="margin-left: 50px" value="重置">-->

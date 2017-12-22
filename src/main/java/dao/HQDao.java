@@ -59,16 +59,23 @@ public class HQDao extends BaseDAO {
     /**
      * 方法序号：1_6 验证验证机器是否为正品
      */
-    public String verifyMachine(String machineType, String machineId)
-            throws Exception {
-        String sql = " SELECT count(*) AS count FROM machine_table WHERE MachineType=? AND MachineId=?";
+    public String verifyMachine(String machineType, String machineId) {
+        String sql = " SELECT count(*) AS COUNTS FROM machine_table WHERE MachineType=? AND MachineId=?";
+        return Integer.toString(this.getCount(sql, machineType, machineId));
+    }
+
+    /**
+     * 方法序号：1_7  验证验证机器是否是否已被注册
+     */
+    public String verifyMachineIsExist(String machineType, String machineId) {
+        String sql = " SELECT count(*) AS COUNTS FROM user_table WHERE MachineType=? AND MachineId=?";
         return Integer.toString(this.getCount(sql, machineType, machineId));
     }
 
     /**
      * 方法序号： 5_1 查询用户个人信息
      */
-    public String findUserInfo(String id) throws Exception {
+    public String findUserInfo(String id) {
         String sql = "SELECT MachineType AS value1,MachineId AS value2,Username AS value3,Email AS value4,Telephone AS value5,Address AS value6 FROM user_table WHERE Id=?";
         return this.getForJson(sql, id);
     }
@@ -76,14 +83,15 @@ public class HQDao extends BaseDAO {
     /**
      * 方法序号： 5_2 保存修改后用户个人信息
      */
-    public String saveUserInfo(User user) throws Exception {
+    public String saveUserInfo(User user) {
         String sql = "UPDATE user_table SET Email=?,Telephone=?,Address=? WHERE Id=?";
         return Integer.toString(this.saveOrUpdateOrDelete(sql, user.getEmail(), user.getTel(), user.getAddress(), user.getId()));
     }
+
     /**
      * 方法序号： 5_3 保存修改后用户密码
      */
-    public String saveNewPassword(User user) throws Exception {
+    public String saveNewPassword(User user) {
         String sql = "UPDATE user_table SET Password=? WHERE Password=? AND Id=?";
         return Integer.toString(this.saveOrUpdateOrDelete(sql, user.getNewPassword(), user.getPassword(), user.getId()));
     }

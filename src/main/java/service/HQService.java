@@ -83,7 +83,20 @@ public class HQService extends BaseService {
         try {
             return this.hqDao.verifyMachine(machineType, machineId);
         } catch (Exception e) {
-            System.out.println("2_1 验证验证机器是否为正品时出错！");
+            System.out.println("1_6  验证验证机器是否为正品时出错！");
+            e.printStackTrace();
+            return "-1";
+        }
+    }
+
+    /**
+     * 方法序号：1_7  验证验证机器是否是否已被注册
+     */
+    public String verifyMachineIsExist(String machineType, String machineId) {
+        try {
+            return this.hqDao.verifyMachineIsExist(machineType, machineId);
+        } catch (Exception e) {
+            System.out.println("1_7  验证验证机器是否是否已被注册时出错！");
             e.printStackTrace();
             return "-1";
         }
