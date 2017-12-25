@@ -357,7 +357,7 @@
                         <label class="col-sm-3">Machine SN</label>
                         <div class="col-sm-6">
                             <input id="number" type="tel" class="form-control" maxlength="12"
-                                   placeholder="the length of SN is fixed to 12 numbers">
+                                   placeholder="the length of SN is fixed to 12 numbers" style="ime-mode: disabled" onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
                         </div>
                         <strong>*</strong>
                     </div>

@@ -21,13 +21,47 @@
                 no_results_text: "Oops, nothing found!", // 当检索时没有找到匹配项时显示的提示文本
                 width: "100%"
             });
-            $('#myTable').tablesorter();
-            $("#submit2").click(function () {
-                $("#myModal1").modal({
-                    moveable: true
-                });
-
+            $("#big").click(function () {
+                var w = $("body");
+                var width = parseInt(w.width());
+                var i = width;
+                var count = 0;
+                // console.log(width);
+                var timer = setInterval(function () {
+                    count++;
+                    i = i + 0.1;
+                    $("body").width(i + "%");
+                    if (count === 50) {
+                        clearInterval(timer);
+                    }
+                    // else if (i > 50) {
+                    //     $("#pic").onclick = function (e) {
+                    //         $("#pic").onclick = null;
+                    //     };
+                    // }
+                }, 500);
             });
+            $("#small").click(function () {
+                var w = $("#pic");
+                var width = parseInt(w.width());
+                var count = 0;
+                if (width === 10) {
+                    alert("图片已最小!!");
+                    return false;
+                }
+                console.log(width);
+                var timer2 = setInterval(function () {
+                    count++;
+                    width--;
+                    pic.style.width = width + "%";
+                    if (count == 10) {
+                        clearInterval(timer2);
+                    } else if (width < 10) {
+                        $("#small").onclick = null;
+                    }
+                }, 13);
+            });
+
             var doc = $(document), dl = $("div.left"), dr = $("div.right");
             var sum = dl.width() + dr.width() +
                 // 当鼠标指针移动到元素上方，并按下鼠标按键时，会发生 mousedown 事件
@@ -65,7 +99,15 @@
             font-size: 14px;
             width: 100%;
             height: 100%;
-            overflow: auto;
+            overflow: hidden;
+            /*background-image: url("../image/bg1.jpg");*/
+            /*background-size: cover;*/
+            /*transform: scale(1.1);*/
+            /*transition: all 4s;*/
+        }
+
+        #pic {
+            width: 20%;
         }
 
         /*div {*/
@@ -86,7 +128,7 @@
         }
 
         div.left {
-            display:inline;
+            display: inline;
             /*margin-left:-200px;*/
             float: left;
             width: 200px;
@@ -116,23 +158,41 @@
             /*float: left;*/
         }
 
+        div img {
+            cursor: pointer;
+            transition: all 1.5s;
+        }
+
+        div img:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
-<div class="center">
-    <div class="left">
-        同时在线人数：1000
-        点击刷新
-    </div>
-    <div class="handler">
-    </div>
-    <!--<div>-->
-    <div class="right">
-        sss
-    </div>
-    <!--</div>-->
+<!--<div class="center">-->
+<!--<div class="left">-->
+<!--同时在线人数：1000-->
+<!--点击刷新-->
+<!--</div>-->
+<!--<div class="handler">-->
+<!--</div>-->
+<!--&lt;!&ndash;<div>&ndash;&gt;-->
+<!--<div class="right">-->
+<!--sss-->
+<!--</div>-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
 
 
+<!--</div>-->
+<div id="pic" style="width: 40%">
+    <img src="../image/bg1.jpg" style="width:100%;">
 </div>
+<!--<div>-->
+<!--<img src="../image/bg1.jpg" />-->
+<!--</div>-->
+<!--<div class="scale">-->
+<!--<button id="big">放大</button>-->
+<!--<button id="small">缩小</button>-->
+<!--</div>-->
 </body>
 </html>
