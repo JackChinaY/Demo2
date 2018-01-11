@@ -116,7 +116,55 @@ public class HQService_Part1 extends BaseService {
             return "-1";//程序运行出错，服务器出错
         }
     }
+    /**
+     * 方法序号： 2_2 查询税率最大编号
+     */
+    public String getFiscalsMaxNumber(String databaseUrl) {
+        try {
+            return this.hqDao_part1.getFiscalsMaxNumber(databaseUrl);
+        } catch (Exception e) {
+            System.out.println("2_2 查询税率最大编号时出错！");
+            e.printStackTrace();
+            return "-1";
+        }
+    }
+    /**
+     * 方法序号： 2_4 保存税率
+     */
+    public String saveFiscal(String databaseUrl, Tax tax) {
+        try {
+            return this.hqDao_part1.saveFiscal(databaseUrl, tax);
+        } catch (Exception e) {
+            System.out.println("2_4 保存税率时出错！");
+            e.printStackTrace();
+        }
+        return "-1";
+    }
+    /**
+     * 方法序号： 2_5 保存修改后的税率
+     */
+    public String Fiscal(String databaseUrl, Tax tax) {
+        try {
+            return this.hqDao_part1.Fiscal(databaseUrl, tax);
+        } catch (Exception e) {
+            System.out.println("2_5 保存修改后的税率时出错！");
+            e.printStackTrace();
+        }
+        return "-1";
+    }
 
+    /**
+     * 方法序号： 2_6 删除一条税率
+     */
+    public String deleteOneFiscal(String databaseUrl, Tax tax) {
+        try {
+            return this.hqDao_part1.deleteOneFiscal(databaseUrl, tax);
+        } catch (Exception e) {
+            System.out.println("2_6 删除一条税率时出错！");
+            e.printStackTrace();
+        }
+        return "-1";
+    }
     /**
      * 方法序号：3_1 查询所有外汇
      */

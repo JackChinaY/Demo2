@@ -21,74 +21,14 @@
                 no_results_text: "Oops, nothing found!", // 当检索时没有找到匹配项时显示的提示文本
                 width: "100%"
             });
-            $("#big").click(function () {
-                var w = $("body");
-                var width = parseInt(w.width());
-                var i = width;
-                var count = 0;
-                // console.log(width);
-                var timer = setInterval(function () {
-                    count++;
-                    i = i + 0.1;
-                    $("body").width(i + "%");
-                    if (count === 50) {
-                        clearInterval(timer);
-                    }
-                    // else if (i > 50) {
-                    //     $("#pic").onclick = function (e) {
-                    //         $("#pic").onclick = null;
-                    //     };
-                    // }
-                }, 500);
-            });
-            $("#small").click(function () {
-                var w = $("#pic");
-                var width = parseInt(w.width());
-                var count = 0;
-                if (width === 10) {
-                    alert("图片已最小!!");
-                    return false;
-                }
-                console.log(width);
-                var timer2 = setInterval(function () {
-                    count++;
-                    width--;
-                    pic.style.width = width + "%";
-                    if (count == 10) {
-                        clearInterval(timer2);
-                    } else if (width < 10) {
-                        $("#small").onclick = null;
-                    }
-                }, 13);
-            });
 
-            var doc = $(document), dl = $("div.left"), dr = $("div.right");
-            var sum = dl.width() + dr.width() +
-                // 当鼠标指针移动到元素上方，并按下鼠标按键时，会发生 mousedown 事件
-                $("div.handler").mousedown(function (e) {
-                    // clientX 事件属性返回当事件被触发时鼠标指针向对于浏览器页面（或客户区）的水平坐标
-                    var me = $(this);
-                    var deltaX = e.clientX - (parseFloat(me.css("left")) || parseFloat(me.prop("clientLeft")));
-                    // 当鼠标指针在指定的元素中移动时，就会发生 mousemove 事件
-                    doc.mousemove(function (e) {
-                        var lt = e.clientX - deltaX;
-                        lt = lt < 0 ? 0 : lt;
-                        lt = lt > sum - me.width() ? sum - me.width() : lt;
-                        me.css("left", lt + "px");
-                        dl.width(lt);
-                        dr.width(sum - lt - me.width());
-                        // dr.width(sum - lt - me.width());
-                    });
-                }).width();
+            function a() {
+                alert(parseFloat("11%"));
+            }
 
-            doc.mouseup(function () {
-                doc.unbind("mousemove");
-            });
-            doc[0].ondragstart
-                = doc[0].onselectstart
-                = function () {
-                return false;
-            };
+            // a();
+
+
         })
     </script>
     <style>
@@ -105,94 +45,25 @@
             /*transform: scale(1.1);*/
             /*transition: all 4s;*/
         }
-
-        #pic {
-            width: 20%;
-        }
-
-        /*div {*/
-        /*!*position: absolute;*!*/
-        /*float: left;*/
-        /*height: 500px;*/
-        /*}*/
-        .center {
-            width: 100%;
-            height: 100%;
-            background: aqua;
-            /*padding-left:203px;*/
-            /*padding-top: 47px;*/
-            /*以下为控制位于此div中的模块垂直和水平居中*/
-            /*display: flex;*/
-            /*justify-content: center;*/
-            /*align-items: center;*/
-        }
-
-        div.left {
-            display: inline;
-            /*margin-left:-200px;*/
-            float: left;
-            width: 200px;
-            height: 100%;
-            background-color: red;
-        }
-
-        div.handler {
-            /*display:inline;*/
-            /*margin-left:-203px;*/
-            float: left;
-            height: 100%;
-            width: 3px;
-            cursor: col-resize;
-            background-color: blue;
-            left: 200px;
-            /*z-index: 1;*/
-        }
-
-        div.right {
-            /*display:inline;*/
-            /*position: absolute;*/
-            background-color: yellow;
-            /*min-width: 1200px;*/
-            height: 100%;
-            right: 0px;
-            /*float: left;*/
-        }
-
-        div img {
-            cursor: pointer;
-            transition: all 1.5s;
-        }
-
-        div img:hover {
-            transform: scale(1.1);
-        }
     </style>
 </head>
 <body>
-<!--<div class="center">-->
-<!--<div class="left">-->
-<!--同时在线人数：1000-->
-<!--点击刷新-->
-<!--</div>-->
-<!--<div class="handler">-->
-<!--</div>-->
-<!--&lt;!&ndash;<div>&ndash;&gt;-->
-<!--<div class="right">-->
-<!--sss-->
-<!--</div>-->
-<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<div>
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tax Code</th>
+            <th>Tax Name</th>
+            <th>Tax Rate</th>
+            <th>Selection</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-
-<!--</div>-->
-<div id="pic" style="width: 40%">
-    <img src="../image/bg1.jpg" style="width:100%;">
 </div>
-<!--<div>-->
-<!--<img src="../image/bg1.jpg" />-->
-<!--</div>-->
-<!--<div class="scale">-->
-<!--<button id="big">放大</button>-->
-<!--<button id="small">缩小</button>-->
-<!--</div>-->
+<br>
+<a href="fiscal.html">Add A New Fiscal</a>
 </body>
 </html>

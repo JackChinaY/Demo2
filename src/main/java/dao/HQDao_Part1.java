@@ -75,6 +75,38 @@ public class HQDao_Part1 extends BaseDAO_Sqlite {
     }
 
     /**
+     * 方法序号：2_2 查询税率最大编号
+     */
+    public String getFiscalsMaxNumber(String databaseUrl) throws Exception {
+        String sql = " SELECT MAX(Number) AS MAXNUM FROM Tax_Tariff";
+        return this.getOneRecard(sql, databaseUrl);
+    }
+
+    /**
+     * 方法序号：2_4 保存税率
+     */
+    public String saveFiscal(String databaseUrl, Tax tax) throws Exception {
+        String sql = "INSERT INTO Tax_Tariff (Number,Invoice_Code,Invoice_Name,Tax_Code,Tax_Name,Tax_Rate,Exempt_Flag,CRC32) VALUES (?,?,?,?,?,?,?,?)";
+        return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, tax.getNumber(), tax.getInvoice_Code(), tax.getInvoice_Name(), tax.getCode(), tax.getName(), tax.getRate(), tax.getExempt_Flag(), tax.getCRC32()));
+    }
+
+    /**
+     * 方法序号：2_5 保存修改后的税率
+     */
+    public String Fiscal(String databaseUrl, Tax tax) throws Exception {
+        String sql = "UPDATE Tax_Tariff SET Tax_Name=?,Tax_Rate=? WHERE Number=?";
+        return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, tax.getName(), tax.getRate(), tax.getNumber()));
+    }
+
+    /**
+     * 方法序号：2_6 删除一条税率
+     */
+    public String deleteOneFiscal(String databaseUrl, Tax tax) throws Exception {
+        String sql = "DELETE FROM Tax_Tariff WHERE Number=?";
+        return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, tax.getNumber()));
+    }
+
+    /**
      * 方法序号： 3_1 查询所有外汇
      */
     public String findAllCurrency(String databaseUrl) throws Exception {
@@ -87,7 +119,7 @@ public class HQDao_Part1 extends BaseDAO_Sqlite {
      */
     public String modifyAbbreviation(String databaseUrl, ForeignCurrency currency) throws Exception {
         String sql = "UPDATE Currency_Table SET Abbreviation=?,Exchange_Rate=?,Current=?,Name=?,Symbol=?,Flag=? WHERE Number=?";
-        return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, currency.getAbbreviation(), currency.getExchangeRate(),currency.getCurrent(), currency.getName(), currency.getSymbol(), currency.getFlag(), currency.getNumber()));
+        return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, currency.getAbbreviation(), currency.getExchangeRate(), currency.getCurrent(), currency.getName(), currency.getSymbol(), currency.getFlag(), currency.getNumber()));
     }
 
     /**
@@ -97,6 +129,7 @@ public class HQDao_Part1 extends BaseDAO_Sqlite {
         String sql = "SELECT Number AS value1, Name AS value2, Abbreviation AS value3, Symbol AS value4 FROM Currency_List ORDER BY Number ASC";
         return this.getForJson(sql, databaseUrl);
     }
+
     /**
      * 方法序号：3_4 将所有外币的Current设置为0
      */
@@ -104,6 +137,7 @@ public class HQDao_Part1 extends BaseDAO_Sqlite {
         String sql = "UPDATE Currency_Table SET Current=0";
         return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl));
     }
+
     /**
      * 方法序号：3_5 将商品库中的所有商品的Currency设置为当前的外币的缩写
      */
@@ -111,6 +145,7 @@ public class HQDao_Part1 extends BaseDAO_Sqlite {
         String sql = "UPDATE Goods_Info SET Currency=?";
         return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, currency.getCurrent()));
     }
+
     /**
      * 方法序号：3_6 验证外币是否已被设置过
      */
@@ -118,6 +153,7 @@ public class HQDao_Part1 extends BaseDAO_Sqlite {
         String sql = " SELECT COUNT(*) AS COUNTS FROM Currency_Table WHERE Abbreviation=?";
         return Integer.toString(this.getCount(sql, databaseUrl, abbreviation));
     }
+
     /**
      * 方法序号： 4_1 查询客户总记录数
      */

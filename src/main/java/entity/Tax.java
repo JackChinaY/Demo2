@@ -1,77 +1,115 @@
 package entity;
 
 public class Tax {
-	/**
-	 * 税率信息 number税种编号；vatrate税率值；name名字；upperlimit上限；flag标志位
-	 */
-	private String id;
-	private String number;	
-	private String name;
-	private String vatrate;
-	private String upperlimit;
-	private String flag;
-	
-	public Tax() {
-		this.id = "";
-		this.number = "";
-		this.name = "";
-		this.vatrate = "";
-		this.upperlimit = "";
-		this.flag = "";
-	}
+    /**
+     * 税率信息 number税种编号；vatrate税率值；name名字；upperlimit上限；flag标志位
+     */
+    private String id;
+    private String number;
+    private String invoice_Code;
+    private String invoice_Name;
+    private String code;
+    private String name;
+    private String rate;
+    private String exempt_Flag;
+    private String CRC32;
 
-	public String getId() {
-		return id;
-	}
+    public Tax() {
+        this.id = "";
+        this.number = "";
+        this.invoice_Code = "";
+        this.invoice_Name = "";
+        this.code = "";
+        this.name = "";
+        this.rate = "";
+        this.exempt_Flag = "";
+        this.CRC32 = "";
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public String getNumber() {
-		return number;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setNumber(String number) {
-		this.number = number;
-	}
-	
-	public String getName() {
-		return name;
-	}
+    public String getNumber() {
+        return number;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getVatrate() {
-		return vatrate;
-	}
+    public void setNumber(String number) {
+        this.number = number;
+    }
 
-	public void setVatrate(String vatrate) {
-		this.vatrate = vatrate;
-	}
+    public String getInvoice_Code() {
+        return invoice_Code;
+    }
 
-	public String getUpperlimit() {
-		return upperlimit;
-	}
+    public void setInvoice_Code(String invoice_Code) {
+        this.invoice_Code = invoice_Code;
+    }
 
-	public void setUpperlimit(String upperlimit) {
-		this.upperlimit = upperlimit;
-	}
+    public String getInvoice_Name() {
+        return invoice_Name;
+    }
 
-	public String getFlag() {
-		return flag;
-	}
+    public void setInvoice_Name(String invoice_Name) {
+        this.invoice_Name = invoice_Name;
+    }
 
-	public void setFlag(String flag) {
-		this.flag = flag;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	@Override
-	public String toString() {
-		return "Tax [id=" + id + ", number=" + number + ", name=" + name
-				+ ", vatrate=" + vatrate + ", upperlimit=" + upperlimit
-				+ ", flag=" + flag + "]";
-	}
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getRate() {
+        return rate;
+    }
+
+    public void setRate(String rate) {
+        this.rate = rate;
+    }
+
+    public String getExempt_Flag() {
+        return exempt_Flag;
+    }
+
+    public void setExempt_Flag(String exempt_Flag) {
+        this.exempt_Flag = exempt_Flag;
+    }
+
+    public String getCRC32() {
+        return CRC32;
+    }
+
+    public void setCRC32(String CRC32) {
+        this.CRC32 = CRC32;
+    }
+
+    @Override
+    public String toString() {
+        return "Tax{" +
+                "id='" + id + '\'' +
+                ", number='" + number + '\'' +
+                ", invoice_Code='" + invoice_Code + '\'' +
+                ", invoice_Name='" + invoice_Name + '\'' +
+                ", code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", rate='" + rate + '\'' +
+                ", exempt_Flag='" + exempt_Flag + '\'' +
+                ", CRC32='" + CRC32 + '\'' +
+                '}';
+    }
 }

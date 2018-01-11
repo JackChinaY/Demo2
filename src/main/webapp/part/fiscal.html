@@ -22,6 +22,7 @@
             });
             //自动加载数据
             findAllFiscals();
+
             //查询所有税率 无参
             function findAllFiscals() {
                 //查询所有税率
@@ -61,18 +62,19 @@
                             //当数组为不为空时
                             else if (jsonArray.length != 0) {
 //                                var head = '<tr><th>Number</th><th>Invoice_Code</th><th>Invoice_Name</th><th>Tax_Code</th><th>Tax_Name</th><th>Tax_Rate</th><th>Exempt_Flag</th><th>CRC32</th></tr>';
-                                var head = '<tr><th>Number</th><th>Tax Code</th><th>Tax Name</th><th>Tax Rate</th></tr>';
+                                var head = '<tr><th>Number</th><th>Tax Code</th><th>Tax Name</th><th>Tax Rate</th><th>Operation</th></tr>';
                                 $("#thead").html(head);
                                 var html;
                                 for (var i = 0; i < jsonArray.length; i++) {
-                                    html += '<tr><td>' + jsonArray[i].value1 + '</td>'
-//                                        + '<td>' + jsonArray[i].value2 + '</td>'
-//                                        + '<td>' + jsonArray[i].value3 + '</td>'
-                                        + '<td>' + jsonArray[i].value4 + '</td>'
-                                        + '<td>' + jsonArray[i].value5 + '</td>'
-                                        + '<td>' + (parseFloat(jsonArray[i].value6) / 100).toFixed(2) + '%</td>'
-//                                        + '<td>' + jsonArray[i].value7 + '</td>'
-//                                        + '<td>' + jsonArray[i].value8 + '</td>'
+                                    html += '<tr><td class="Number">' + jsonArray[i].value1 + '</td>'
+                                        //                                        + '<td>' + jsonArray[i].value2 + '</td>'
+                                        //                                        + '<td>' + jsonArray[i].value3 + '</td>'
+                                        + '<td class="Code">' + jsonArray[i].value4 + '</td>'
+                                        + '<td class="Name">' + jsonArray[i].value5 + '</td>'
+                                        + '<td class="Rate">' + (parseFloat(jsonArray[i].value6) / 100).toFixed(2) + '%</td>'
+                                        //                                        + '<td>' + jsonArray[i].value7 + '</td>'
+                                        //                                        + '<td>' + jsonArray[i].value8 + '</td>'
+                                        + '<td>&nbsp;&nbsp;<a name="update" href="#" data-toggle="tooltip" data-tip-class="tooltip-primary" title="Modify"><i class="icon icon-edit"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="delete" href="#" data-toggle="tooltip" data-tip-class="tooltip-danger" title="Delete" style="color: #ea644a"><i class="icon icon-trash"></i></a></td>'
                                         + '</tr>';
                                 }
                                 $("#tbody").html(html);
@@ -92,11 +94,311 @@
                     }
                 });
             }
+
+            /*******************************************************************************************/
+            //增加按钮，添加税率
+            $("#submit1").click(function () {
+                getFiscalsMaxNumber();
+                $("#myModal1").modal({moveable: true});   //显示对话框
+            });
+
+            //查询税率最大编号，并填充加1后的数值
+            function getFiscalsMaxNumber() {
+                $.ajax({
+                    type: "GET",
+                    url: "ActionPart1_getFiscalsMaxNumber.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    dataType: "json",
+                    cache: false,
+                    // async: false,//设置为同步
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login.html";//重定向
+                            }, 2000);
+                        }
+                        //可能原因：服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        } else if (data.jsonObject == "null") {
+                            //null代表数据表为空，编号从1开始
+                            $("#number").html(1);
+                        } else {
+                            $("#number").html(parseInt(data.jsonObject) + 1);//商品编号最大值加1
+                        }
+                    },
+                    error: function (jqXHR) {
+                        //操作失败，可能原因
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                    }
+                });
+            }
+
+            //保存新增的税率
+            $("#submit1_1").click(function () {
+                if ($("#code").val() == "") {
+                    new $.zui.Messager('The Code can not be empty!', {
+                        type: 'danger',
+                        placement: 'top' // 定义显示位置
+                    }).show();
+                    $("#code_flag1").hide();//对号
+                    $("#code_flag2").show();//叉号
+                } else if ($("#code").val() == "000") {
+                    new $.zui.Messager('The Code can not be "000"!', {
+                        type: 'danger',
+                        placement: 'top' // 定义显示位置
+                    }).show();
+                    $("#code_flag1").hide();//对号
+                    $("#code_flag2").show();//叉号
+                } else if ($("#code").val() == "998") {
+                    new $.zui.Messager('The Code can not be "998"!', {
+                        type: 'danger',
+                        placement: 'top' // 定义显示位置
+                    }).show();
+                    $("#code_flag1").hide();//对号
+                    $("#code_flag2").show();//叉号
+                } else if ($("#code_info").text() == "0") {
+                    new $.zui.Messager('The Code already existed in the database. Please re-enter it !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                    $("#code_flag1").hide();//对号
+                    $("#code_flag2").show();//叉号
+                } else if ($("#name").val() == "") {
+                    new $.zui.Messager('The Name can not be empty!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#name").val().trim() == "") {
+                    new $.zui.Messager('The Name can not be all spaces!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#rate").val() == "") {
+                    new $.zui.Messager('The Rate can not be empty!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else {
+                    if (parseFloat($("#rate").val()) == 0) {
+                        $("#rate").val(0)
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_saveFiscal.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "value1": $("#number").text(),
+                            "value2": $("#code").val(),
+                            "value3": $("#name").val(),
+                            "value4": parseFloat($("#rate").val()) * 10000
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "0") {
+                                    new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                } else if (data.jsonObject == "1") {
+                                    new $.zui.Messager('Submit successfully !', {
+                                        type: 'success',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    $("#myModal1").modal('hide');   //显示对话框
+                                    findAllFiscals();//刷新页面
+                                    //将原输入框内容置零
+                                    $("#code").val("");
+                                    $("#name").val("");
+                                    $("#rate").val("");
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+            });
+            /*******************************************************************************************/
+            //修改按钮，修改税率
+            $("#tbody").on("click", "a[name='update']", function () {
+                //数据初始化
+                $("#number2").html($(this).parents("tr").find(".Number").text());
+                $("#code2").html($(this).parents("tr").find(".Code").text());
+                $("#name2").val($(this).parents("tr").find(".Name").text());
+                $("#rate2").val((parseFloat($(this).parents("tr").find(".Rate").text()) / 100).toFixed(4));
+                $("#myModal2").modal({moveable: true});//显示对话框
+            });
+            //保存修改后的税率
+            $("#submit2_1").click(function () {
+                if ($("#name2").val() == "") {
+                    new $.zui.Messager('The Name can not be empty!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#name2").val().trim() == "") {
+                    new $.zui.Messager('The Name can not be all spaces!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_modifyFiscal.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "value1": $("#number2").text(),
+                            "value2": $("#code2").text(),
+                            "value3": $("#name2").val(),
+                            "value4": parseFloat($("#rate2").val()) * 10000
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "0") {
+                                    new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                } else if (data.jsonObject == "1") {
+                                    new $.zui.Messager('Submit successfully !', {
+                                        type: 'success',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                    $("#myModal2").modal('hide');   //显示对话框
+                                    findAllFiscals();
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+            });
+            /*******************************************************************************************/
+            //删除收银员，因为表格是自动生成的，所以只能用on函数，click事件无效
+            $("#tbody").on("click", "a[name='delete']", function () {
+                $("#deleteId").val($(this).parents("tr").find(".Number").text());
+                $("#deleteTip").html("Do you want to delete this record ( Number : " + $(this).parents("tr").find(".Number").text() + " ) ？");
+                $("#myModal3").modal({moveable: true});
+            });
+            //删除收银员 提交
+            $("#submit4").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "ActionPart1_deleteOneFiscal.action",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {
+                        "value1": $("#deleteId").val()
+                    },
+                    dataType: "json",
+                    cache: false,
+                    success: function (data) {
+                        //登录超时，请重新登录
+                        if (data.jsonObject == "-3") {
+                            new $.zui.Messager(loginTimeout, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                            setTimeout(function () {
+                                top.location.href = "../login.html";//重定向
+                            }, 2000);
+                        }
+                        //服务器出错
+                        else if (data.jsonObject == "-1") {
+                            new $.zui.Messager(serverError, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                        //正确传输过来数据
+                        else {
+                            if (data.jsonObject == "0") {
+                                new $.zui.Messager('Submission failure. Please re-enter it !', {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            } else if (data.jsonObject == "1") {
+                                new $.zui.Messager('Submit successfully !', {
+                                    type: 'success',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                $("#myModal3").modal('hide');   //显示对话框
+                                findAllFiscals();
+                            }
+                        }
+                    },
+                    error: function (jqXHR) {
+                        new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                            type: 'danger',
+                            placement: 'top' // 定义显示位置
+                        }).show();
+                    }
+                });
+            });
             /*******************************************************************************************/
         });
     </script>
     <style>
-        html,body {
+        html, body {
             padding: 0;
             margin: 0;
             font-family: Arial;
@@ -104,7 +406,7 @@
             /*min-height: 500px;*/
             /*min-width: 500px;*/
             width: 100%;
-            height:100%;
+            height: 100%;
             overflow: auto;
             overflow-x: auto;
         }
@@ -116,8 +418,11 @@
     <div style="margin-top: 10px;width: 100%;height: 40px;">
         <span class="label label-badge label-primary label-define"
               style="float: left; margin-left: 20px;margin-top: 10px">Fiscal Information</span>
+        <button id="submit1" class="btn btn-primary" type="button"
+                style="float: right; margin-right: 20px"><i class="icon icon-plus"></i> Add
+        </button>
         <!--<button id="submit2" class="btn btn-primary" type="button"-->
-                <!--style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i> Refresh-->
+        <!--style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i> Refresh-->
         <!--</button>-->
     </div>
     <div style="background-color: white;"
@@ -131,8 +436,7 @@
         </table>
     </div>
 </div>
-
-<!--对话框-->
+<!--基础对话框-->
 <div class="modal fade" id="myModal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -146,6 +450,147 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 新增-->
+<div class="modal fade" id="myModal1">
+    <div class="modal-dialog modal-moveable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Add A New Fiscal</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3">Number</label>
+                        <label id="number" class="col-sm-6" style="text-align: center"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Tax Code</label>
+                        <div class="col-sm-6">
+                            <input id="code" type="tel" class="form-control" maxlength="3"
+                                   placeholder="" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
+                        </div>
+                        <strong>*</strong>
+                        <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check" hidden
+                                                             style="color: green"></i> <i id="code_flag2"
+                                                                                          class="icon icon-times" hidden
+                                                                                          style="color: red"></i></label>
+                        <label id="code_info" hidden="hidden"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Tax Name</label>
+                        <div class="col-sm-6">
+                            <input id="name" type="text" class="form-control" maxlength="15"
+                                   placeholder="1-15 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Tax Rate</label>
+                        <div class="col-sm-6">
+                            <input id="rate" type="text" class="form-control" maxlength="6"
+                                   placeholder="0.0000-1.0000" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit1_1" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 修改-->
+<div class="modal fade" id="myModal2">
+    <div class="modal-dialog modal-moveable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Add A New Fiscal</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3">Number</label>
+                        <label id="number2" class="col-sm-6" style="text-align: center"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Tax Code</label>
+                        <label id="code2" class="col-sm-6" style="text-align: center"></label>
+                        <!--<div class="col-sm-6">-->
+                        <!--<input id="code2" type="tel" class="form-control" maxlength="3"-->
+                        <!--placeholder="" style="ime-mode: disabled"-->
+                        <!--onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">-->
+                        <!--</div>-->
+                        <!--<strong>*</strong>-->
+                        <!--<label style="padding-left: 10px"><i id="code_flag3" class="icon icon-check" hidden-->
+                        <!--style="color: green"></i> <i id="code_flag4"-->
+                        <!--class="icon icon-times" hidden-->
+                        <!--style="color: red"></i></label>-->
+                        <!--<label id="code_info2" hidden="hidden"></label>-->
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Tax Name</label>
+                        <div class="col-sm-6">
+                            <input id="name2" type="text" class="form-control" maxlength="15"
+                                   placeholder="1-15 characters" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3">Tax Rate</label>
+                        <div class="col-sm-6">
+                            <input id="rate2" type="text" class="form-control" maxlength="6"
+                                   placeholder="0.0000-1.0000" style="ime-mode: disabled"
+                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
+                        </div>
+                        <strong>*</strong>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+                </button>
+                <button id="submit2_1" class="btn btn-primary" type="button">
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--对话框 删除-->
+<div class="modal fade" id="myModal3">
+    <div class="modal-dialog modal-moveable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Delete Or Not</h4>
+            </div>
+            <div class="modal-body">
+                <div style="display: none">
+                    <input id="deleteId">
+                </div>
+                <p id="deleteTip" style="font-weight: 800"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="submit4" type="button" class="btn btn-primary">Confirm</button>
             </div>
         </div>
     </div>
