@@ -392,32 +392,6 @@
 <body>
 <!--客户管理-->
 <div>
-    <!--<div style="margin-top: 10px;width: 100%;height: 40px;">-->
-    <!--<span class="label label-badge label-primary label-define"-->
-    <!--style="float: left; margin-left: 20px;margin-right: 20px ;margin-top: 7px">Buyers Query</span>-->
-    <!--<div class="input-group" style="width: 450px;">-->
-    <!--<span class="input-group-addon">OPTION</span>-->
-    <!--<select id="query_option" class="form-control">-->
-    <!--<option value="number" selected="selected">Number</option>-->
-    <!--<option value="name">Name</option>-->
-    <!--<option value="tpin">TPIN</option>-->
-    <!--</select>-->
-    <!--<span class="input-group-addon fix-border fix-padding"></span>-->
-    <!--<input id="query_key" type="text" class="form-control" maxlength="50"-->
-    <!--placeholder="1-50 characters" style="ime-mode: disabled"-->
-    <!--onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">-->
-    <!--<span class="input-group-btn">-->
-    <!--<button id="submit2" class="btn btn-primary" type="button" style="width: 50px"><i-->
-    <!--class="icon icon-search"></i>-->
-    <!--</button>-->
-    <!--</span>-->
-
-    <!--</div>-->
-    <!--<button id="submit1" class="btn btn-primary" type="button" data-toggle="tooltip"-->
-    <!--data-tip-class="tooltip-default" title="return to buyers management" data-placement="left"-->
-    <!--style="float: right; margin-right: 20px;margin-top: -35px"><i class="icon icon-reply"></i>-->
-    <!--</button>-->
-    <!--</div>-->
     <div style="margin-top: 10px">
         <form class="form-horizontal">
             <div class="form-group">
@@ -431,14 +405,25 @@
                         <option value="tpin">TPIN</option>
                     </select>
                 </div>
-                <div class="col-sm-2">
-                    <input id="query_key" type="text" class="form-control" maxlength="15"
-                           placeholder="1-15 characters" style="ime-mode: disabled"
-                           onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
+                <div class="input-group col-sm-3" style="float: left; width: 270px">
+                    <div class="input-control search-box search-box-circle has-icon-left has-icon-right search-example">
+                        <input id="query_key" type="search" class="form-control search-input"
+                               style="ime-mode: disabled" placeholder="1-15 characters" maxlength="15"
+                               onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
+                        <label for="query_key" class="input-control-icon-left search-icon"><i
+                                class="icon icon-search"></i></label>
+                    </div>
+                    <span class="input-group-btn"><button id="submit2" class="btn btn-primary"
+                                                          type="button">GO</button></span>
                 </div>
-                <button id="submit2" class="btn btn-primary" type="button" style="width: 50px"><i
-                        class="icon icon-search"></i>
-                </button>
+                <!--<div class="col-sm-2">-->
+                    <!--<input id="query_key" type="text" class="form-control" maxlength="15"-->
+                           <!--placeholder="1-15 characters" style="ime-mode: disabled"-->
+                           <!--onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">-->
+                <!--</div>-->
+                <!--<button id="submit2" class="btn btn-primary" type="button" style="width: 50px"><i-->
+                        <!--class="icon icon-search"></i>-->
+                <!--</button>-->
                 <button id="submit1" class="btn btn-primary" type="button" data-toggle="tooltip"
                         data-tip-class="tooltip-default" title="return to buyers management" data-placement="left"
                         style="float: right; margin-right: 20px;"><i class="icon icon-reply"></i>
@@ -446,7 +431,6 @@
             </div>
         </form>
     </div>
-
     <div style="background-color: white;"
          class="table-responsive">
         <table id="table2_1" class="table table-striped table-hover table-bordered">

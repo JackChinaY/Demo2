@@ -64,7 +64,7 @@
 //                                var head = '<tr><th>Number</th><th>Invoice_Code</th><th>Invoice_Name</th><th>Tax_Code</th><th>Tax_Name</th><th>Tax_Rate</th><th>Exempt_Flag</th><th>CRC32</th></tr>';
                                 var head = '<tr><th>Number</th><th>Tax Code</th><th>Tax Name</th><th>Tax Rate</th><th>Operation</th></tr>';
                                 $("#thead").html(head);
-                                var html;
+                                var html = "";
                                 for (var i = 0; i < jsonArray.length; i++) {
                                     html += '<tr><td class="Number">' + jsonArray[i].value1 + '</td>'
                                         //                                        + '<td>' + jsonArray[i].value2 + '</td>'
@@ -145,8 +145,8 @@
                 });
             }
 
-            //保存新增的税率
-            $("#submit1_1").click(function () {
+            //验证税率code是否存在
+            $("#code").blur(function () {
                 if ($("#code").val() == "") {
                     new $.zui.Messager('The Code can not be empty!', {
                         type: 'danger',
@@ -154,15 +154,64 @@
                     }).show();
                     $("#code_flag1").hide();//对号
                     $("#code_flag2").show();//叉号
-                } else if ($("#code").val() == "000") {
-                    new $.zui.Messager('The Code can not be "000"!', {
-                        type: 'danger',
-                        placement: 'top' // 定义显示位置
-                    }).show();
-                    $("#code_flag1").hide();//对号
-                    $("#code_flag2").show();//叉号
-                } else if ($("#code").val() == "998") {
-                    new $.zui.Messager('The Code can not be "998"!', {
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "ActionPart1_verifyFiscalCode.action",
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        data: {
+                            "value1": $("#code").val()
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (data) {
+                            //登录超时，请重新登录
+                            if (data.jsonObject == "-3") {
+                                new $.zui.Messager(loginTimeout, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                                setTimeout(function () {
+                                    top.location.href = "../login.html";//重定向
+                                }, 2000);
+                            }
+                            //服务器出错
+                            else if (data.jsonObject == "-1") {
+                                new $.zui.Messager(serverError, {
+                                    type: 'danger',
+                                    placement: 'top' // 定义显示位置
+                                }).show();
+                            }
+                            //正确传输过来数据
+                            else {
+                                if (data.jsonObject == "0") {
+                                    $("#code_flag1").show();//对号
+                                    $("#code_flag2").hide();//叉号
+                                    $("#code_info").html(1);//0代表已存在，1代表可用
+                                } else if (data.jsonObject == "1") {
+                                    $("#code_flag1").hide();//对号
+                                    $("#code_flag2").show();//叉号
+                                    $("#code_info").html(0);//0代表已存在，1代表可用
+                                    new $.zui.Messager('The Code already existed in the database. Please re-enter it !', {
+                                        type: 'danger',
+                                        placement: 'top' // 定义显示位置
+                                    }).show();
+                                }
+                            }
+                        },
+                        error: function (jqXHR) {
+                            new $.zui.Messager("Operation failed, possible causes：" + jqXHR.status, {
+                                type: 'danger',
+                                placement: 'top' // 定义显示位置
+                            }).show();
+                        }
+                    });
+                }
+            });
+            //保存新增的税率
+            $("#submit1_1").click(function () {
+                if ($("#code").val() == "") {
+                    new $.zui.Messager('The Code can not be empty!', {
                         type: 'danger',
                         placement: 'top' // 定义显示位置
                     }).show();
@@ -257,12 +306,20 @@
             /*******************************************************************************************/
             //修改按钮，修改税率
             $("#tbody").on("click", "a[name='update']", function () {
-                //数据初始化
-                $("#number2").html($(this).parents("tr").find(".Number").text());
-                $("#code2").html($(this).parents("tr").find(".Code").text());
-                $("#name2").val($(this).parents("tr").find(".Name").text());
-                $("#rate2").val((parseFloat($(this).parents("tr").find(".Rate").text()) / 100).toFixed(4));
-                $("#myModal2").modal({moveable: true});//显示对话框
+                var temp = parseFloat($(this).parents("tr").find(".Number").text());
+                if (temp === 1 || temp === 2 || temp === 3 || temp === 4 || temp === 5) {
+                    new $.zui.Messager('This Fiscal can not be  modified !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                }else {
+                    //数据初始化
+                    $("#number2").html($(this).parents("tr").find(".Number").text());
+                    $("#code2").html($(this).parents("tr").find(".Code").text());
+                    $("#name2").val($(this).parents("tr").find(".Name").text());
+                    $("#rate2").val((parseFloat($(this).parents("tr").find(".Rate").text()) / 100).toFixed(4));
+                    $("#myModal2").modal({moveable: true});//显示对话框
+                }
             });
             //保存修改后的税率
             $("#submit2_1").click(function () {
@@ -273,6 +330,11 @@
                     }).show();
                 } else if ($("#name2").val().trim() == "") {
                     new $.zui.Messager('The Name can not be all spaces!', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#rate2").val() == "") {
+                    new $.zui.Messager('The Rate can not be empty!', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
@@ -336,9 +398,18 @@
             /*******************************************************************************************/
             //删除收银员，因为表格是自动生成的，所以只能用on函数，click事件无效
             $("#tbody").on("click", "a[name='delete']", function () {
-                $("#deleteId").val($(this).parents("tr").find(".Number").text());
-                $("#deleteTip").html("Do you want to delete this record ( Number : " + $(this).parents("tr").find(".Number").text() + " ) ？");
-                $("#myModal3").modal({moveable: true});
+                var temp = parseFloat($(this).parents("tr").find(".Number").text());
+                if (temp === 1 || temp === 2 || temp === 3 || temp === 4 || temp === 5) {
+                    new $.zui.Messager('This Fiscal can not be  modified !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                }else {
+                    $("#deleteId").val($(this).parents("tr").find(".Number").text());
+                    $("#deleteTip").html("Do you want to delete this record ( Number : " + $(this).parents("tr").find(".Number").text() + " ) ？");
+                    $("#myModal3").modal({moveable: true});
+                }
+
             });
             //删除收银员 提交
             $("#submit4").click(function () {
@@ -472,7 +543,7 @@
                     <div class="form-group">
                         <label class="col-sm-3">Tax Code</label>
                         <div class="col-sm-6">
-                            <input id="code" type="tel" class="form-control" maxlength="3"
+                            <input id="code" type="tel" class="form-control" maxlength="15"
                                    placeholder="" style="ime-mode: disabled"
                                    onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
                         </div>

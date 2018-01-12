@@ -83,6 +83,14 @@ public class HQDao_Part1 extends BaseDAO_Sqlite {
     }
 
     /**
+     * 方法序号：2_3 验证税率code是否存在
+     */
+    public String verifyFiscalCode(String databaseUrl, String code) throws Exception {
+        String sql = " SELECT COUNT(*) AS COUNTS FROM Tax_Tariff WHERE Tax_Code=?";
+        return Integer.toString(this.getCount(sql, databaseUrl, code));
+    }
+
+    /**
      * 方法序号：2_4 保存税率
      */
     public String saveFiscal(String databaseUrl, Tax tax) throws Exception {

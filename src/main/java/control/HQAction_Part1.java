@@ -179,6 +179,7 @@ public class HQAction_Part1 extends BaseAction {
             returnJsonObject(result);//可能的返回值：-1，[],json数组字符串
         }
     }
+
     /**
      * 方法序号：2_2 查询税率最大编号
      */
@@ -198,6 +199,24 @@ public class HQAction_Part1 extends BaseAction {
             returnJsonObject(result);//可能的返回值：-1,null
         }
     }
+
+    /**
+     * 方法序号：2_3 验证税率code是否存在
+     */
+    public void verifyFiscalCode() throws IOException, JSONException {
+        //如果用户登录超时，则需要重新登录
+        if (this.getSession().getAttribute("userId") == null) {
+            connectionTimeOut();//返回值：-3
+        }
+        //登录未超时
+        else {
+            String code = this.getRequest().getParameter("value1");
+            String userId = this.getSession().getAttribute("userId").toString();//获取用户userId
+            String result = hqService_part1.verifyFiscalCode(databaseUrl + userId + systemDB, code);// 0表示0条记录，1表示有1条记录
+            returnJsonObject(result);//可能的返回值：-1,0,1
+        }
+    }
+
     /**
      * 方法序号：2_4 保存税率
      */
@@ -219,6 +238,7 @@ public class HQAction_Part1 extends BaseAction {
             returnJsonObject(result);//可能的返回值：-1,0,1
         }
     }
+
     /**
      * 方法序号：2_5 保存修改后的税率
      */
@@ -257,6 +277,7 @@ public class HQAction_Part1 extends BaseAction {
             returnJsonObject(result);//可能的返回值：-1,0,1
         }
     }
+
     /**
      * 方法序号：3_1 查询所有外汇
      */
@@ -313,6 +334,7 @@ public class HQAction_Part1 extends BaseAction {
             returnJsonObject(result);//可能的返回值：-1，[],json数组字符串
         }
     }
+
     /**
      * 方法序号：3_4 将所有外币的Current设置为0
      */
@@ -328,6 +350,7 @@ public class HQAction_Part1 extends BaseAction {
             returnJsonObject(result);//可能的返回值：-1,0,1
         }
     }
+
     /**
      * 方法序号：3_5 将商品库中的所有商品的Currency设置为当前的外币的缩写
      */
@@ -345,6 +368,7 @@ public class HQAction_Part1 extends BaseAction {
             returnJsonObject(result);//可能的返回值：-1,0,1
         }
     }
+
     /**
      * 方法序号：3_6 验证外币是否已被设置过
      */
@@ -361,6 +385,7 @@ public class HQAction_Part1 extends BaseAction {
             returnJsonObject(result);//可能的返回值：-1,0,1
         }
     }
+
     /**
      * 方法序号：4_1 查询客户总记录数
      */

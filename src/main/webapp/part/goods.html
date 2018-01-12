@@ -349,10 +349,10 @@
                                         + '<td>' + (parseFloat(jsonArray[i].value6) / 100).toFixed(2) + '%</td>'
                                         + '<td>&nbsp;&nbsp;<a name="chooseTaxIndex" href="#" title="select this one"><i class="icon icon-tag"></i></a></td></tr>';
                                 }
-                                html += '</tbody></table></div><br><a href="fiscal.html">Add A New Fiscal</a>';
+                                html += '</tbody></table></div>';
+                            // <a href="fiscal.html">Add A New Fiscal</a>
                                 return html;
                             }
-
                         }
                     },
                     error: function (jqXHR) {

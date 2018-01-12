@@ -22,8 +22,8 @@ public class Tax {
         this.code = "";
         this.name = "";
         this.rate = "";
-        this.exempt_Flag = "";
-        this.CRC32 = "";
+        this.exempt_Flag = "0";
+        this.CRC32 = "0";
     }
 
     public String getId() {

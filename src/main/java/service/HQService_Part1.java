@@ -116,6 +116,7 @@ public class HQService_Part1 extends BaseService {
             return "-1";//程序运行出错，服务器出错
         }
     }
+
     /**
      * 方法序号： 2_2 查询税率最大编号
      */
@@ -128,6 +129,20 @@ public class HQService_Part1 extends BaseService {
             return "-1";
         }
     }
+
+    /**
+     * 方法序号： 2_3 验证税率code是否存在
+     */
+    public String verifyFiscalCode(String databaseUrl, String code) {
+        try {
+            return this.hqDao_part1.verifyFiscalCode(databaseUrl, code);
+        } catch (Exception e) {
+            System.out.println("2_3 验证税率code是否存在时出错！");
+            e.printStackTrace();
+        }
+        return "-1";
+    }
+
     /**
      * 方法序号： 2_4 保存税率
      */
@@ -140,6 +155,7 @@ public class HQService_Part1 extends BaseService {
         }
         return "-1";
     }
+
     /**
      * 方法序号： 2_5 保存修改后的税率
      */
@@ -165,6 +181,7 @@ public class HQService_Part1 extends BaseService {
         }
         return "-1";
     }
+
     /**
      * 方法序号：3_1 查询所有外汇
      */
@@ -190,6 +207,7 @@ public class HQService_Part1 extends BaseService {
         }
         return "-1";
     }
+
     /**
      * 方法序号：3_3 查询外汇列表，供用户选择用
      */
@@ -202,6 +220,7 @@ public class HQService_Part1 extends BaseService {
             return "-1";//程序运行出错，服务器出错
         }
     }
+
     /**
      * 方法序号： 3_4 将所有外币的Current设置为0
      */
@@ -214,6 +233,7 @@ public class HQService_Part1 extends BaseService {
         }
         return "-1";
     }
+
     /**
      * 方法序号： 3_5 将商品库中的所有商品的Currency设置为当前的外币的缩写
      */
@@ -226,6 +246,7 @@ public class HQService_Part1 extends BaseService {
         }
         return "-1";
     }
+
     /**
      * 方法序号： 3_6 验证外币是否已被设置过
      */
@@ -238,6 +259,7 @@ public class HQService_Part1 extends BaseService {
         }
         return "-1";
     }
+
     /**
      * 方法序号：4_1 查询客户总记录数
      */
