@@ -1,8 +1,8 @@
 /*!
- * ZUI: Standard edition - v1.7.0 - 2017-06-17
+ * ZUI: Standard edition - v1.8.0 - 2018-01-04
  * http://zui.sexy
  * GitHub: https://github.com/easysoft/zui.git 
- * Copyright (c) 2017 cnezsoft.com; Licensed MIT
+ * Copyright (c) 2018 cnezsoft.com; Licensed MIT
  */
 
 /*! Some code copy from Bootstrap v3.0.0 by @fat and @mdo. (Copyright 2013 Twitter, Inc. Licensed under http://www.apache.org/licenses/)*/
@@ -98,11 +98,25 @@
         if(model && model.options) {
             var func = model.options[shortName];
             if($.isFunction(func)) {
-                $.zui.callEvent(func, e, model);
+                e.result = $.zui.callEvent(func, e, model);
             }
         }
         $this.trigger(e);
         return e;
+    };
+
+    $.fn.callComEvent = function(component, eventName, params) {
+        if (params !== undefined && !$.isArray(params)) {
+            params = [params];
+        }
+        var $this = this;
+        var result = $this.triggerHandler(eventName, params);
+
+        var eventCallback = component.options[eventName];
+        if (eventCallback) {
+            result = eventCallback.apply(component, params);
+        }
+        return result;
     };
 }(jQuery, window, undefined));
 
@@ -350,6 +364,369 @@
     $(document).on('click.' + zuiname + '.data-api', dismiss, Alert.prototype.close)
 
 }(window.jQuery);
+
+/* ========================================================================
+ * ZUI: pager.js
+ * http://zui.sexy
+ * ========================================================================
+ * Copyright (c) 2017-2018 cnezsoft.com; Licensed MIT
+ * ======================================================================== */
+
+
+(function($) {
+    'use strict';
+
+    var NAME = 'zui.pager'; // model name
+
+    var DEFAULT_PAGER = {
+        page: 0,        // current page index
+        recTotal: 0,    // records total count
+        recPerPage: 10, // records count per page
+    };
+
+    var LANG = {
+        zh_cn: {
+            prev: '上一页',
+            next: '下一页',
+            first: '第一页',
+            last: '最后一页',
+            goto: '跳转',
+            pageOf: '第 <strong>{page}</strong> 页',
+            totalPage: '共 <strong>{totalPage}</strong> 页',
+            totalCount: '共 <strong>{recTotal}</strong> 项',
+            pageSize: '每页 <strong>{recPerPage}</strong> 项',
+            itemsRange: '第 <strong>{start}</strong> ~ <strong>{end}</strong> 项',
+            pageOfTotal: '第 <strong>{page}</strong>/<strong>{totalPage}</strong> 页'
+        },
+        zh_tw: {
+            prev: '上一頁',
+            next: '下一頁',
+            first: '第一頁',
+            last: '最後一頁',
+            goto: '跳轉',
+            pageOf: '第 <strong>{page}</strong> 頁',
+            totalPage: '共 <strong>{totalPage}</strong> 頁',
+            totalCount: '共 <strong>{recTotal}</strong> 項',
+            pageSize: '每頁 <strong>{recPerPage}</strong> 項',
+            itemsRange: '第 <strong>{start}</strong> ~ <strong>{end}</strong> 項',
+            pageOfTotal: '第 <strong>{page}</strong>/<strong>{totalPage}</strong> 頁'
+        },
+        en: {
+            prev: 'Prev',
+            next: 'Next',
+            first: 'First',
+            last: 'Last',
+            goto: 'Goto',
+            pageOf: 'Page <strong>{page}</strong>',
+            totalPage: '<strong>{totalPage}</strong> pages',
+            totalCount: '<strong>{recTotal}</strong> items',
+            pageSize: '<strong>{recPerPage}</strong> items per page',
+            itemsRange: 'From <strong>{start}</strong> to <strong>{end}</strong>',
+            pageOfTotal: 'Page <strong>{page}</strong> of <strong>{totalPage}</strong>'
+        }
+    };
+
+    // The pager model class
+    var Pager = function(element, options) {
+        var that = this;
+        that.name = NAME;
+        that.$ = $(element);
+
+        options = that.options = $.extend({}, Pager.DEFAULTS, this.$.data(), options);
+
+        var lang   = options.lang || 'zh_cn';
+        that.lang  = $.isPlainObject(lang) ? ($.extend(true, {}, LANG[lang.lang || $.zui.clientLang()], lang)) : LANG[lang];
+
+        that.state = {};
+
+        that.set(options.page, options.recTotal, options.recPerPage);
+
+        that.$.on('click', '.pager-goto-btn', function() {
+            var $goto = $(this).closest('.pager-goto');
+            var page = parseInt($goto.find('.pager-goto-input').val());
+            if (page !== NaN) {
+                that.set(page);
+            }
+        }).on('click', '.pager-item', function() {
+            var page = $(this).data('page');
+            if (typeof page === 'number' && page > 0) {
+                that.set(page);
+            }
+        }).on('click', '.pager-size-menu [data-size]', function() {
+            var size = $(this).data('size');
+            if (typeof size === 'number' && size > 0) {
+                that.set(-1, -1, size);
+            }
+        });
+    };
+
+    Pager.prototype.set = function(page, recTotal, recPerPage) {
+        var that = this;
+        if (typeof page === 'object' && page !== null) {
+            recPerPage = page.recPerPage;
+            recTotal = page.recTotal;
+            page = page.page;
+        }
+        var state = that.state;
+        if (!state) {
+            state = $.extend({}, DEFAULT_PAGER);
+        }
+        var oldState = $.extend({}, state);
+        if (typeof recPerPage === 'number' && recPerPage > 0) {
+            state.recPerPage = recPerPage;
+        }
+        if (typeof recTotal === 'number' && recTotal >= 0) {
+            state.recTotal = recTotal;
+        }
+        if (typeof page === 'number' && page >= 0) {
+            state.page = page;
+        }
+        state.totalPage = (state.recTotal && state.recPerPage) ? (Math.ceil(state.recTotal / state.recPerPage)) : 1;
+        state.page = Math.max(0, Math.min(state.page, state.totalPage));
+        // stateRecCount is items count in current page
+        state.pageRecCount = state.recTotal;
+        if (state.page && state.recTotal) {
+            if (state.page < state.totalPage) {
+                state.pageRecCount = state.recPerPage;
+            } else if (state.page > 1) {
+                state.pageRecCount = state.recTotal - (state.recPerPage * (state.page - 1));
+            }
+        }
+        state.skip  = state.page > 1 ? ((state.page - 1) * state.recPerPage) : 0;
+        state.start = state.skip + 1;
+        state.end   = state.skip + state.pageRecCount;
+        state.prev  = state.page > 1 ? (state.page - 1) : 0;
+        state.next  = state.page < state.totalPage ? (state.page + 1) : 0;
+        that.state  = state;
+        if (oldState.page !== state.page || oldState.recTotal !== state.recTotal || oldState.recPerPage !== state.recPerPage) {
+            that.$.callComEvent(that, 'onPageChange', [state, oldState]);
+        }
+        return that.render();
+    };
+
+    Pager.prototype.createLinkItem = function(page, text, asAElement) {
+        var that = this;
+        if (text === undefined) {
+            text = page;
+        }
+        var $ele = $('<a class="pager-item" data-page="' + page + '"/>').attr('href', page ? that.createLink(page, that.state) : '###').html(text);
+        if (!asAElement) {
+            $ele = $('<li />').append($ele).toggleClass('active', page === that.state.page).toggleClass('disabled', !page);
+        }
+        return $ele;
+    };
+
+    Pager.prototype.createNavItems = function(maxCount) {
+        var that = this;
+        var $nav = that.$;
+        var pager = that.state;
+        var totalPage = pager.totalPage;
+        var page = pager.page;
+        var appendItem = function(p, to) {
+            if(p === false) {
+                $nav.append(that.createLinkItem(0, to || '<i class="icon icon-ellipsis-h"></i>'));
+                return;
+            }
+            if(to === undefined) to = p;
+            for(var i = p; i <= to; ++i) {
+                $nav.append(that.createLinkItem(i));
+            }
+        };
+        if (maxCount === undefined) {
+            maxCount = that.options.maxNavCount || 10;
+        }
+        appendItem(1);
+        if(totalPage > 1) {
+            if(totalPage <= maxCount) {
+                appendItem(2, totalPage);
+            }
+            else if(page < (maxCount - 2)) {
+                appendItem(2, maxCount - 2);
+                appendItem(false);
+                appendItem(totalPage);
+            }
+            else if(page > (totalPage - maxCount + 2)) {
+                appendItem(false);
+                appendItem((totalPage - maxCount + 2), totalPage);
+            }
+            else {
+                appendItem(false);
+                appendItem(page - Math.ceil((maxCount-4)/2), page + Math.floor((maxCount-4)/2));
+                appendItem(false);
+                appendItem(totalPage);
+            }
+        }
+    };
+
+    Pager.prototype.createGoto = function() {
+        var that = this;
+        var pager = this.state;
+        var $goto = $('<div class="input-group pager-goto" style="width: ' + (35 + (pager.page + '').length * 9 + 25 + that.lang.goto.length*12) + 'px"><input value="' + pager.page + '" type="number" min="1" max="' + pager.totalPage + '" placeholder="' + pager.page + '" class="form-control pager-goto-input"><span class="input-group-btn"><button class="btn pager-goto-btn" type="button">' + that.lang.goto + '</button></span></div>');
+        return $goto;
+    };
+
+    Pager.prototype.createSizeMenu = function() {
+        var that = this;
+        var pager = this.state;
+        var $menu = $('<ul class="dropdown-menu"></ul>');
+        var options = that.options.pageSizeOptions;
+        if (typeof options === 'string') {
+            options = options.split(',');
+        }
+        for (var i = 0; i < options.length; ++i) {
+            var size = options[i];
+            if (typeof size === 'string') {
+                size = parseInt(size);
+            }
+            var $li = $('<li><a href="###" data-size="' + size + '">' + size + '</a></li>').toggleClass('active', size === pager.recPerPage);
+            $menu.append($li);
+        }
+        return $('<div class="btn-group pager-size-menu"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">' + that.lang.pageSize.format(pager) + ' <span class="caret"></span></button></div>').addClass(that.options.menuDirection).append($menu);
+    };
+
+    Pager.prototype.createElement = function(element, $pager, pager) {
+        var that = this;
+        var createLinkItem= $.proxy(that.createLinkItem, that);
+        var lang = that.lang;
+        switch (element) {
+            case 'prev':
+                return createLinkItem(pager.prev, lang.prev);
+            case 'prev_icon':
+                return createLinkItem(pager.prev, '<i class="icon ' + that.options.prevIcon + '"></i>');
+            case 'next':
+                return createLinkItem(pager.next, lang.next);
+            case 'next_icon':
+                return createLinkItem(pager.next, '<i class="icon ' + that.options.nextIcon + '"></i>');
+            case 'first':
+                return createLinkItem(1, lang.first, true);
+            case 'first_icon':
+                return createLinkItem(1, '<i class="icon ' + that.options.firstIcon + '"></i>', true);
+            case 'last':
+                return createLinkItem(pager.totalPage, lang.last, true);
+            case 'last_icon':
+                return createLinkItem(pager.totalPage, '<i class="icon ' + that.options.lastIcon + '"></i>', true);
+            case 'space':
+            case '|':
+                return $('<li class="space" />');
+            case 'nav':
+            case 'pages':
+                that.createNavItems();
+                return;
+            case 'total_text':
+                return $(('<div class="pager-label">' + lang.totalCount + '</div>').format(pager));
+            case 'page_text':
+                return $(('<div class="pager-label">' + lang.pageOf + '</div>').format(pager));
+            case 'total_page_text':
+                return $(('<div class="pager-label">' + lang.totalPage + '</div>').format(pager));
+            case 'page_of_total_text':
+                return $(('<div class="pager-label">' + lang.pageOfTotal + '</div>').format(pager));
+            case 'page_size_text':
+                return $(('<div class="pager-label">' + lang.pageSize + '</div>').format(pager));
+            case 'items_range_text':
+                return $(('<div class="pager-label">' + lang.itemsRange + '</div>').format(pager));
+            case 'goto':
+                return that.createGoto();
+            case 'size_menu':
+                return that.createSizeMenu();
+            default:
+                return $('<li/>').html(element);
+        }
+    };
+
+    Pager.prototype.createLink = function(page, pager) {
+        var linkCreator = this.options.linkCreator;
+        if (typeof linkCreator === 'string') {
+            return linkCreator.format($.extend({}, pager, {page: page}));
+        } else if ($.isFunction(linkCreator)) {
+            return linkCreator(page, pager);
+        }
+        return '#page=' + page;
+    };
+
+    Pager.prototype.render = function(elements) {
+        var that = this;
+        var state = that.state;
+        var createElement = that.options.elementCreator || that.createElement;
+        var isMapperCreator = $.isPlainObject(createElement);
+
+        elements = elements || that.elements || that.options.elements;
+        if (typeof elements == 'string') {
+            elements = elements.split(',');
+        }
+        that.elements = elements;
+
+        that.$.empty();
+
+        for(var i = 0; i < elements.length; ++i) {
+            var element  = $.trim(elements[i]);
+            var creator = isMapperCreator ? (createElement[element] || createElement) : createElement;
+            var $element = creator.call(that, element, that.$, state);
+            if ($element === false) {
+                $element = that.createElement(element, that.$, state);
+            }
+            if ($element instanceof $) {
+                if ($element[0].tagName !== 'LI') {
+                    $element = $('<li/>').append($element);
+                }
+                that.$.append($element);
+            }
+        }
+
+        // Fix page item border
+        var $lastItem = null;
+        that.$.children('li').each(function() {
+            var $li = $(this);
+            var isItem = !!$li.children('.pager-item').length;
+            if ($lastItem) {
+                $lastItem.toggleClass('pager-item-right', !isItem);
+            } else {
+                if (isItem) {
+                    $li.addClass('pager-item-left');
+                }
+            }
+            $lastItem = isItem ? $li : null;
+        });
+
+        that.$.callComEvent(that, 'onRender', [state]);
+        return that;
+    };
+
+    // default options
+    Pager.DEFAULTS = $.extend({
+        elements: ['first_icon', 'prev_icon', 'pages', 'next_icon', 'last_icon', 'page_of_total_text', 'items_range_text', 'total_text'],
+        prevIcon: 'icon-double-angle-left',
+        nextIcon: 'icon-double-angle-right',
+        firstIcon: 'icon-step-backward',
+        lastIcon: 'icon-step-forward',
+        maxNavCount: 10,
+        menuDirection: 'dropdown', // or dropup
+        pageSizeOptions: [10, 20, 30, 50, 100],
+        // onPageChange: null
+    }, DEFAULT_PAGER);
+
+    // Extense jquery element
+    $.fn.pager = function(option) {
+        return this.each(function() {
+            var $this = $(this);
+            var data = $this.data(NAME);
+            var options = typeof option == 'object' && option;
+
+            if(!data) $this.data(NAME, (data = new Pager(this, options)));
+
+            if(typeof option == 'string') data[option]();
+        });
+    };
+
+    Pager.NAME = NAME;
+
+    $.fn.pager.Constructor = Pager;
+
+    // Auto call pager after document load complete
+    $(function() {
+        $('[data-ride="pager"]').pager();
+    });
+}(jQuery));
+
 
 /* ========================================================================
  * Bootstrap: tab.js v3.0.0
@@ -756,29 +1133,39 @@
     'use strict';
     var desktopLg = 1200,
         desktop = 992,
-        tablet = 768,
-        cssNames = {
-            desktop: 'screen-desktop',
-            desktopLg: 'screen-desktop-wide',
-            tablet: 'screen-tablet',
-            phone: 'screen-phone',
-            isMobile: 'device-mobile',
-            isDesktop: 'device-desktop',
-            touch: 'is-touchable'
-        };
+        tablet = 768;
 
     var $window = $(window);
 
     var resetCssClass = function() {
         var width = $window.width();
-        $('html').toggleClass(cssNames.desktop, width >= desktop && width < desktopLg)
-            .toggleClass(cssNames.desktopLg, width >= desktopLg)
-            .toggleClass(cssNames.tablet, width >= tablet && width < desktop)
-            .toggleClass(cssNames.phone, width < tablet)
-            .toggleClass(cssNames.isMobile, width < desktop)
-            .toggleClass(cssNames.touch, 'ontouchstart' in document.documentElement)
-            .toggleClass(cssNames.isDesktop, width >= desktop);
+        $('html').toggleClass('screen-desktop', width >= desktop && width < desktopLg)
+            .toggleClass('screen-desktop-wide', width >= desktopLg)
+            .toggleClass('screen-tablet', width >= tablet && width < desktop)
+            .toggleClass('screen-phone', width < tablet)
+            .toggleClass('device-mobile', width < desktop)
+            .toggleClass('device-desktop', width >= desktop);
     };
+
+    var classNames = '';
+    var userAgent = navigator.userAgent;
+    if (userAgent.match(/(iPad|iPhone|iPod)/i)) {
+        classNames += ' os-ios';
+    } else if (userAgent.match(/android/i)) {
+        classNames += ' os-android';
+    } else if (userAgent.match(/Win/i)) {
+        classNames += ' os-windows';
+    } else if (userAgent.match(/Mac/i)) {
+        classNames += ' os-mac';
+    } else if (userAgent.match(/Linux/i)) {
+        classNames += ' os-linux';
+    } else if (userAgent.match(/X11/i)) {
+        classNames += ' os-unix';
+    }
+    if ('ontouchstart' in document.documentElement) {
+        classNames += ' is-touchable';
+    }
+    $('html').addClass(classNames);
 
     $window.resize(resetCssClass);
     resetCssClass();
@@ -1089,6 +1476,36 @@
             return this.getFullYear() === date.getFullYear();
         };
     }
+
+    /**
+     * Create an date instance with string, timestamp or date instance
+     * @param  {Date|String|Number}  date
+     * @return {Date}
+     */
+    if (!Date.create) {
+        Date.create = function(date) {
+            if (!(date instanceof Date)) {
+                if (typeof date === 'number' && date < 10000000000) {
+                    date *= 1000;
+                }
+                date = new Date(date);
+            }
+            return date;
+        };
+    }
+
+    if (!Date.timestamp) {
+        Date.timestamp = function(date) {
+            if (typeof date === 'number') {
+                if (date < 10000000000) {
+                    date *= 1000;
+                }
+            } else {
+                date = Date.create(date).getTime();
+            }
+            return date;
+        };
+    }
 }());
 
 
@@ -1149,6 +1566,31 @@
                 return(r == s) ? true : false;
             }
             return false;
+        };
+    }
+
+    if(!String.prototype.endsWith) {
+        String.prototype.endsWith = function(searchString, position) {
+            var subjectString = this.toString();
+            if(position === undefined || position > subjectString.length) {
+                position = subjectString.length;
+            }
+            position -= searchString.length;
+            var lastIndex = subjectString.indexOf(searchString, position);
+            return lastIndex !== -1 && lastIndex === position;
+        };
+    }
+
+    if(!String.prototype.startsWith) {
+        String.prototype.startsWith = function(searchString, position) {
+            position = position || 0;
+            return this.lastIndexOf(searchString, position) === position;
+        };
+    }
+
+    if(!String.prototype.includes) {
+        String.prototype.includes = function() {
+            return String.prototype.indexOf.apply(this, arguments) !== -1;
         };
     }
 
@@ -1805,6 +2247,147 @@
 
 
 /* ========================================================================
+ * ZUI: searchbox.js
+ * http://zui.sexy
+ * ========================================================================
+ * Copyright (c) 2014-2016 cnezsoft.com; Licensed MIT
+ * ======================================================================== */
+
+
+(function($) {
+    'use strict';
+
+    var NAME = 'zui.searchBox'; // modal name
+
+    // The searchbox modal class
+    var SearchBox = function(element, options) {
+        var that = this;
+        that.name = name;
+        that.$ = $(element);
+
+        that.options = options = $.extend({}, SearchBox.DEFAULTS, that.$.data(), options);
+
+        // Initialize here
+        var $input = that.$.is(options.inputSelector) ? that.$ : that.$.find(options.inputSelector);
+        if ($input.length) {
+            var clearChangeTimer = function() {
+                if (that.changeTimer) {
+                    clearTimeout(that.changeTimer);
+                    that.changeTimer = null;
+                }
+            };
+
+            var handleChange = function() {
+                clearChangeTimer();
+                var value = that.getSearch();
+                if (value !== that.lastValue) {
+                    var isEmpty = value === '';
+                    $input.toggleClass('empty', isEmpty);
+                    that.$.callComEvent(that, 'onSearchChange', [value, isEmpty]);
+                    that.lastValue = value;
+                }
+            };
+
+            that.$input = $input = $input.first();
+            that.lastValue = that.getSearch();
+
+            $input.on(options.listenEvent, function(params) {
+                that.changeTimer = setTimeout(function() {
+                    handleChange();
+                }, options.changeDelay);
+            }).on('focus', function(e) {
+                $input.addClass('focus');
+                that.$.callComEvent(that, 'onFocus', [e]);
+            }).on('blur', function(e) {
+                $input.removeClass('focus');
+                that.$.callComEvent(that, 'onBlur', [e]);
+            }).on('keydown', function(e) {
+                var handled = 0;
+                var keyCode = e.witch;
+                if (keyCode === 27 && options.escToClear) { // esc
+                    this.setSearch('', true);
+                    handleChange();
+                    handled = 1;
+                } else if (keyCode === 13 && options.onPressEnter) {
+                    handleChange();
+                    that.$.callComEvent(that, 'onPressEnter', [e]);
+                }
+                var onKeyDownResult = that.$.callComEvent(that, 'onKeyDown', [e]);
+                if (onKeyDownResult === false) {
+                    handled = 1;
+                }
+                if (handled) {
+                    e.preventDefault();
+                }
+            });
+
+            that.$.on('click', '.search-clear-btn', function(e) {
+                that.setSearch('', true);
+                handleChange();
+                e.preventDefault();
+            });
+
+            handleChange();
+        } else {
+            console.error('ZUI: search box init error, cannot find search box input element.');
+        }
+    };
+
+    // default options
+    SearchBox.DEFAULTS = {
+        inputSelector: 'input[type="search"],input[type="text"]',
+        listenEvent: 'change input paste',
+        changeDelay: 500,
+
+        // onKeyDown: null,
+        // onFocus: null,
+        // onBlur: null,
+        // onSearchChange: null,
+        // onPressEnter: null,
+        // escToClear: true
+    };
+
+    // Get current search string
+    SearchBox.prototype.getSearch = function() {
+        return this.$input && $.trim(this.$input.val());
+    };
+
+    // Set current search string
+    SearchBox.prototype.setSearch = function(value, notTriggerChange) {
+        var $input = this.$input;
+        if ($input) {
+            $input.val(value);
+            if (!notTriggerChange) {
+                $input.trigger('change');
+            }
+        }
+    };
+
+    // Focus input element
+    SearchBox.prototype.focus = function() {
+        this.$input && this.$input.focus();
+    };
+
+    // Extense jquery element
+    $.fn.searchBox = function(option) {
+        return this.each(function() {
+            var $this = $(this);
+            var data = $this.data(NAME);
+            var options = typeof option == 'object' && option;
+
+            if(!data) $this.data(NAME, (data = new SearchBox(this, options)));
+
+            if(typeof option == 'string') data[option]();
+        });
+    };
+
+    SearchBox.NAME = NAME;
+
+    $.fn.searchBox.Constructor = SearchBox;
+}(jQuery));
+
+
+/* ========================================================================
  * ZUI: draggable.js
  * http://zui.sexy
  * ========================================================================
@@ -1849,6 +2432,7 @@
             selector       = setting.selector,
             handle         = setting.handle,
             $ele           = $root,
+            isMoveFunc     = $.isFunction(setting.move),
             startPos,
             cPos,
             startOffset,
@@ -1866,7 +2450,11 @@
 
             $ele.removeClass('drag-ready').addClass('dragging');
             if(setting.move) {
-                $ele.css(dragPos);
+                if (isMoveFunc) {
+                    setting.move(dragPos, $ele);
+                } else {
+                    $ele.css(dragPos);
+                }
             }
 
             setting[DRAG] && setting[DRAG]({
@@ -1903,7 +2491,11 @@
             };
             $ele.removeClass('drag-ready dragging');
             if(setting.move) {
-                $ele.css(endPos);
+                if (isMoveFunc) {
+                    setting.move(endPos, $ele);
+                } else {
+                    $ele.css(endPos);
+                }
             }
 
             setting[FINISH] && setting[FINISH]({
@@ -1931,7 +2523,7 @@
             if(mouseButton > -1 && event.button !== mouseButton) {
                 return;
             }
-            
+
             var $mouseDownEle = $(this);
             if(selector) {
                 $ele = handle ? $mouseDownEle.closest(selector) : $mouseDownEle;
@@ -2021,8 +2613,8 @@
         target: '.droppable-target',
         deviation: 5,
         sensorOffsetX: 0,
-        sensorOffsetY: 0
-        // mouseButton: -1 // 0, 1, 2, -1, all, left,  right, middle
+        sensorOffsetY: 0,
+         // mouseButton: -1 // 0, 1, 2, -1, all, left,  right, middle
     };
     var idIncrementer = 0;
 
@@ -2054,6 +2646,7 @@
             handle         = setting.handle,
             flex           = setting.flex,
             container      = setting.container,
+            canMoveHere    = setting.canMoveHere,
             $ele           = $root,
             isMouseDown    = false,
             $container     = container ? $(setting.container).first() : (selector ? $root : $('body')),
@@ -2146,6 +2739,7 @@
                 $target.addClass('drop-to');
             }
 
+
             if(!flex) {
                 $ele.toggleClass('drop-in', isIn);
                 $shadow.toggleClass('drop-in', isIn);
@@ -2153,21 +2747,24 @@
                 isIn = true;
             }
 
-            that.trigger('drag', {
-                event: event,
-                isIn: isIn,
-                target: $target,
-                element: $ele,
-                isNew: isNew,
-                selfTarget: isSelf,
-                clickOffset: clickOffset,
-                offset: offset,
-                position: {
-                    left: offset.left - containerOffset.left,
-                    top: offset.top - containerOffset.top
-                },
-                mouseOffset: mouseOffset
-            });
+            if(!canMoveHere || canMoveHere($ele, $target) !== false) {
+                that.trigger('drag', {
+                    event: event,
+                    isIn: isIn,
+                    target: $target,
+                    element: $ele,
+                    isNew: isNew,
+                    selfTarget: isSelf,
+                    clickOffset: clickOffset,
+                    offset: offset,
+                    position: {
+                        left: offset.left - containerOffset.left,
+                        top: offset.top - containerOffset.top
+                    },
+                    mouseOffset: mouseOffset
+                });
+            }
+
             event.preventDefault();
         };
 
@@ -2352,23 +2949,24 @@
 
     var zuiname = 'zui.modal'
     var Modal = function(element, options) {
-        this.options = options
-        this.$body = $(document.body)
-        this.$element = $(element)
-        this.$backdrop =
-            this.isShown = null
-        this.scrollbarWidth = 0
+        var that = this;
+        that.options = options
+        that.$body = $(document.body)
+        that.$element = $(element)
+        that.$backdrop =
+            that.isShown = null
+        that.scrollbarWidth = 0
 
-        if(typeof this.options.moveable === 'undefined') {
-            this.options.moveable = this.$element.hasClass('modal-moveable');
+        if(options.moveable === undefined) {
+            that.options.moveable = that.$element.hasClass('modal-moveable');
         }
 
-        if(this.options.remote) {
-            this.$element
+        if(options.remote) {
+            that.$element
                 .find('.modal-content')
-                .load(this.options.remote, $.proxy(function() {
-                    this.$element.trigger('loaded.' + zuiname)
-                }, this))
+                .load(options.remote, function() {
+                    that.$element.trigger('loaded.' + zuiname)
+                })
         }
     }
 
@@ -2384,26 +2982,35 @@
         // rememberPos: false,
         // moveable: false,
         position: 'fit' // 'center' or '40px' or '10%'
-    }
+    };
+
+    var setDialogPos = function($dialog, pos) {
+        var $window = $(window);
+        pos.left = Math.max(0, Math.min(pos.left, $window.width() - $dialog.outerWidth()));
+        pos.top = Math.max(0, Math.min(pos.top, $window.height() - $dialog.outerHeight()));
+        $dialog.css(pos);
+    };
 
     Modal.prototype.toggle = function(_relatedTarget, position) {
         return this.isShown ? this.hide() : this.show(_relatedTarget, position)
     }
 
     Modal.prototype.ajustPosition = function(position) {
-        if(typeof position === 'undefined') position = this.options.position;
+        var that = this;
+        var options = that.options;
+        if(typeof position === 'undefined') position = options.position;
         if(typeof position === 'undefined') return;
-        var $dialog = this.$element.find('.modal-dialog');
+        var $dialog = that.$element.find('.modal-dialog');
         // if($dialog.hasClass('modal-dragged')) return;
 
         var half = Math.max(0, ($(window).height() - $dialog.outerHeight()) / 2);
         var topPos = position == 'fit' ? (half * 2 / 3) : (position == 'center' ? half : position);
         if($dialog.hasClass('modal-moveable')) {
             var pos = null;
-            var rememberPos = this.options.rememberPos;
+            var rememberPos = options.rememberPos;
             if(rememberPos) {
                 if(rememberPos === true) {
-                    pos = this.$element.data('modal-pos');
+                    pos = that.$element.data('modal-pos');
                 } else if($.zui.store) {
                     pos = $.zui.store.pageGet(zuiname + '.rememberPos.' + rememberPos);
                 }
@@ -2414,7 +3021,11 @@
                     top: topPos
                 };
             }
-            $dialog.css(pos);
+            if (options.moveable === 'inside') {
+                setDialogPos($dialog, pos);
+            } else {
+                $dialog.css(pos);
+            }
         } else {
             $dialog.css('margin-top', topPos);
         }
@@ -2425,7 +3036,7 @@
         var that = this;
         var options = that.options;
         var $dialog = that.$element.find('.modal-dialog').removeClass('modal-dragged');
-        $dialog.toggleClass('modal-moveable', options.moveable);
+        $dialog.toggleClass('modal-moveable', !!options.moveable);
 
         if(!that.$element.data('modal-moveable-setup')) {
             $dialog.draggable({
@@ -2442,7 +3053,10 @@
                             $.zui.store.pageSet(zuiname + '.rememberPos.' + rememberPos, e.pos);
                         }
                     }
-                }
+                },
+                move: options.moveable === 'inside' ? function (dragPos) {
+                    setDialogPos($dialog, dragPos);
+                } : true
             });
         }
     }
@@ -2732,8 +3346,6 @@
         this.$trigger = $trigger;
         this.options = options;
         this.id = $.zui.uuid();
-
-        // todo: handle when: options.show = true
     };
 
     ModalTrigger.DEFAULTS = {
@@ -2799,7 +3411,7 @@
             if($.isFunction(handleFunc)) $modal.on(eventName + ZUI_MODAL, handleFunc);
         };
         bindEvent('onShow', 'show');
-        bindEvent('shown', 'shown');
+        bindEvent('shown',  'shown');
         bindEvent('onHide', 'hide');
         bindEvent('hidden', 'hidden');
         bindEvent('loaded', 'loaded');
@@ -2828,7 +3440,7 @@
             $content = $dialog.find('.modal-content');
 
         $modal.toggleClass('fade', options.fade)
-            .addClass(options.cssClass)
+            .addClass(options.className)
             .toggleClass('modal-loading', !this.isShown);
 
         $dialog.toggleClass('modal-md', options.size === 'md')
@@ -2838,7 +3450,7 @@
 
         $header.toggle(options.showHeader);
         $header.find('.modal-icon').attr('class', 'modal-icon icon-' + options.icon);
-        $header.find('.modal-title-name').html(options.title || '');
+        $header.find('.modal-title-name').text(options.title || '');
         if(options.size && options.size === 'fullscreen') {
             options.width = '';
             options.height = '';
@@ -2894,9 +3506,10 @@
             }
         } else if(options.url) {
             var onLoadBroken = function() {
-                var brokenContent = $modal.callEvent('broken' + ZUI_MODAL, that, that);
+                var brokenContent = $modal.callComEvent(that, 'broken');
                 if(brokenContent) {
                     $body.html(brokenContent);
+                    readyToShow();
                 }
             };
 
@@ -2944,10 +3557,10 @@
                                 readyToShow();
                             };
 
-                            $modal.callEvent('loaded' + ZUI_MODAL, {
+                            $modal.callComEvent(that, 'loaded', {
                                 modalType: 'iframe',
                                 jQuery: frame$
-                            }, null);
+                            });
 
                             setTimeout(ajustFrameSize, 100);
 
@@ -2964,24 +3577,28 @@
                     }
                 };
             } else {
-                $.get(options.url, function(data) {
-                    try {
-                        var $data = $(data);
-                        if($data.hasClass('modal-dialog')) {
-                            $dialog.replaceWith($data);
-                        } else if($data.hasClass('modal-content')) {
-                            $dialog.find('.modal-content').replaceWith($data);
-                        } else {
-                            $body.wrapInner($data);
+                $.ajax($.extend({
+                    url: options.url,
+                    success: function(data) {
+                        try {
+                            var $data = $(data);
+                            if($data.hasClass('modal-dialog')) {
+                                $dialog.replaceWith($data);
+                            } else if($data.hasClass('modal-content')) {
+                                $dialog.find('.modal-content').replaceWith($data);
+                            } else {
+                                $body.wrapInner($data);
+                            }
+                        } catch(e) {
+                            $modal.html(data);
                         }
-                    } catch(e) {
-                        $modal.html(data);
-                    }
-                    $modal.callEvent('loaded' + ZUI_MODAL, {
-                        modalType: STR_AJAX
-                    }, that);
-                    readyToShow();
-                }).error(onLoadBroken);
+                        $modal.callComEvent(that, 'loaded', {
+                            modalType: STR_AJAX
+                        });
+                        readyToShow();
+                    },
+                    error: onLoadBroken
+                }, options.ajaxOptions));
             }
         }
 
@@ -3318,7 +3935,7 @@
             that.applyPlacement(calculatedOffset, placement)
             var complete = function () {
                 var prevHoverState = that.hoverState
-                that.$element.trigger('shown.bs.' + that.type)
+                that.$element.trigger('shown.zui.' + that.type)
                 that.hoverState = null
 
                 if (prevHoverState == 'out') that.leave(that)
@@ -3850,6 +4467,275 @@
         .on('keydown.' + apiName, toggle + ', [role=menu]', Dropdown.prototype.keydown)
 
 }(window.jQuery);
+
+
+/* ========================================================================
+ * ZUI: contextmenu.js
+ * http://zui.sexy
+ * ========================================================================
+ * Copyright (c) 2017-2018 cnezsoft.com; Licensed MIT
+ * ======================================================================== */
+
+
+(function($, undefined) {
+    'use strict';
+
+    var NAME = 'zui.contextmenu'; // model name
+
+    var DEFAULTS = {
+        // onShow: null,
+        // onShown: null,
+        // onHide: null,
+        // onHidden: null,
+        // itemCreator: null,
+        // x: 0,
+        // y: 0,
+        // onClickItem: null,
+        duration: 200,
+    };
+
+    var isShowingMenu = false;
+    var ContextMenu = {};
+    var targetId = 'zui-contextmenu-' + $.zui.uuid();
+    var mouseX = 0, mouseY = 0;
+    var listenMouseMove = function() {
+        $(document).off('mousemove.' + NAME).on('mousemove.' + NAME, function(e) {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        return ContextMenu;
+    };
+    var stopListenMouse = function() {
+        $(document).off('mousemove.' + NAME);
+        return ContextMenu;
+    };
+    var createMenuItem = function(item, index) {
+        if (typeof item === 'string') {
+            if (item === 'seperator' || item === 'divider' || item === '-' || item === '|') {
+                item = {type: 'seperator'};
+            } else {
+                item = {label: item, id: index};
+            }
+        }
+        if (item.type === 'seperator' || item.type === 'divider') {
+            return $('<li class="divider"></li>');
+        }
+        var $a = $('<a/>').attr({
+            href: item.url || '###',
+            'class': item.className,
+            style: item.style
+        }).data('item', item);
+        if (item.html) {
+            $a.html(item.html);
+        } else {
+            $a.text(item.label || item.text);
+        }
+        if (item.onClick) {
+            $a.on('click', item.onClick);
+        }
+        return $('<li />').toggleClass('disabled', item.disabled === true).append($a);
+    };
+
+    var animationTimer = null;
+    var hideContextMenu = function(id, callback) {
+        if (typeof id === 'function') {
+            callback = id;
+            id = null;
+        }
+
+        if (animationTimer) {
+            clearTimeout(animationTimer);
+            animationTimer = null;
+        }
+
+        var $target = $('#' + targetId);
+        if ($target.length) {
+            var options = $target.data('options');
+            if (!id || options.id === id) {
+                var afterHide = function() {
+                    $target.hide();
+                    options.onHidden && options.onHidden();
+                    callback && callback();
+                };
+                options.onHide && options.onHide();
+                var animation = options.animation;
+                $target.removeClass('in');
+                if (animation) {
+                    animationTimer = setTimeout(afterHide, options.duration);
+                } else {
+                    afterHide();
+                }
+            }
+        }
+        return ContextMenu;
+    };
+
+    var showContextMenu = function(items, options, callback) {
+        if ($.isPlainObject(items)) {
+            callback = options;
+            options = items;
+            items = options.items;
+        }
+
+        isShowingMenu = true;
+        // hideContextMenu();
+
+        options = $.extend({}, DEFAULTS, options);
+        var x = options.x;
+        var y = options.y;
+        if (x === undefined) x = (options.event || options).clientX;
+        if (x === undefined) x = mouseX;
+        if (y === undefined) y = (options.event || options).clientY;
+        if (y === undefined) y = mouseY;
+
+        var $target = $('#' + targetId);
+        if (!$target.length) {
+            $target = $('<div style="display: none; position: fixed; z-index: 2000;" class="contextmenu" id="' + targetId + '"><ul class="dropdown-menu contextmenu-menu"></ul></div>').appendTo('body');
+        }
+        var $menu = $target.find('.contextmenu-menu').off('click.' + NAME).on('click.' + NAME, 'a', function(e) {
+            var $item = $(this);
+            var clickResult = options.onClickItem && options.onClickItem($item.data('item'), $item, e);
+            if (clickResult !== false) {
+                hideContextMenu();
+            }
+        }).empty();;
+        $target.hide().attr('class', 'contextmenu');
+        var itemCreator = options.itemCreator || createMenuItem;
+        var itemsType = typeof items;
+        if (itemsType === 'string') {
+            items = items.split(',');
+        } else if (itemsType === 'function') {
+            items = items(options);
+        }
+        $.each(items, function(index, item) {
+            $menu.append(itemCreator(item, index, options));
+        });
+
+        // Show menu
+        var animation = options.animation;
+        var duration = options.duration;
+        if (animation === true) options.animation = animation = 'fade';
+        if (animationTimer) {
+            clearTimeout(animationTimer);
+            animationTimer = null;
+        }
+        var afterShow = function() {
+            $target.addClass('in');
+            options.onShown && options.onShown();
+            callback && callback();
+        };
+        options.onShow && options.onShow();
+        $target.data('options', {
+            animation: animation,
+            onHide: options.onHide,
+            onHidden: options.onHidden,
+            id: options.id,
+            duration: duration
+        });
+
+        var $w = $(window);
+        x = Math.max(0, Math.min(x, $w.width() - $menu.outerWidth()));
+        y = Math.max(0, Math.min(y, $w.height() - $menu.outerHeight()));
+        $target.css({
+            left: x,
+            top: y
+        });
+
+        if (animation) {
+            $target.addClass('open').addClass(animation).show();
+            animationTimer = setTimeout(function() {
+                afterShow();
+                isShowingMenu = false;
+            }, options.duration);
+        } else {
+            $target.addClass('open').show();
+            afterShow();
+            animationTimer = setTimeout(function() {
+                isShowingMenu = false;
+            }, 200);
+        }
+        return ContextMenu;
+    };
+
+    $(document).on('click', function(e) {
+        if (!isShowingMenu && !$(e.target).closest('.contextmenu').length) {
+            hideContextMenu();
+        }
+    });
+
+    $.extend(ContextMenu, {
+        NAME: NAME,
+        DEFAULTS: DEFAULTS,
+        show: showContextMenu,
+        hide: hideContextMenu,
+        listenMouse: listenMouseMove
+    });
+    $.zui({ContextMenu: ContextMenu});
+
+
+    // The contextmenu model class
+    var ContextListener = function(element, options) {
+        var that = this;
+        that.name = NAME;
+        that.$ = $(element);
+
+        options = that.options = $.extend({trigger: 'contextmenu'}, ContextMenu.DEFAULTS, this.$.data(), options);
+
+        var trigger = options.trigger;
+
+        that.id = $.zui.uuid();
+        var eventHandler = function(e) {
+            if (e.type === 'mousedown' && e.button !== 2) {
+                return;
+            }
+            var config = {
+                x: e.clientX,
+                y: e.clientY,
+                event: e
+            };
+            if (options.itemsCreator) {
+                config.items = options.itemsCreator.call(this, e);
+            }
+            that.show(config);
+            e.preventDefault();
+            e.returnValue = false; // 解决IE8右键弹出
+            return false;
+        };
+        var eventName = trigger + '.' + NAME;
+        if (options.selector) {
+            that.$.on(eventName, options.selector, eventHandler);
+        } else {
+            that.$.on(eventName, eventHandler);
+        }
+    };
+
+    ContextListener.prototype.destory = function () {
+        that.$.off('.' + NAME);
+    };
+
+    ContextListener.prototype.hide = function (callback) {
+        ContextMenu.hide(this.id, callback);
+    };
+
+    ContextListener.prototype.show = function (options, callback) {
+        options = $.extend({}, this.options, options);
+        ContextMenu.show(options, callback);
+    };
+
+    // Extense jquery element
+    $.fn.contextmenu = function(option) {
+        return this.each(function() {
+            var $this = $(this);
+            var data = $this.data(NAME);
+            var options = typeof option == 'object' && option;
+
+            if(!data) $this.data(NAME, (data = new ContextListener(this, options)));
+
+            if(typeof option == 'string') data[option]();
+        });
+    };
+    $.fn.contextmenu.Constructor = ContextListener;
+}(jQuery, undefined));
 
 
 /* ========================================================================
@@ -4483,7 +5369,7 @@
         });
 
         var $content = that.$.find('.messager-content').html(that.message);
-        if(options.contentClass) $content.addClass(options.cssClass);
+        if(options.contentClass) $content.addClass(options.contentClass);
 
         that.$.data('zui.messager', that);
 

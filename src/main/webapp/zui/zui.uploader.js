@@ -1,8 +1,8 @@
 /*!
- * ZUI: 文件上传 - v1.7.0 - 2017-06-17
+ * ZUI: 文件上传 - v1.8.0 - 2018-01-04
  * http://zui.sexy
  * GitHub: https://github.com/easysoft/zui.git 
- * Copyright (c) 2017 cnezsoft.com; Licensed MIT
+ * Copyright (c) 2018 cnezsoft.com; Licensed MIT
  */
 
 /*!
@@ -57,6 +57,8 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
             return code;
         };
     }
+
+    var notSupportDnd = ($.zui.browser && $.zui.browser.ie && $.zui.browser.ie < 11);
 
     var NAME = 'zui.uploader', // modal name
         FILE_TEMPLATE = '<div class="file"><div class="file-progress-bar"></div><div class="file-wrapper"><div class="file-icon"><i class="icon icon-file-o"></i></div><div class="content"><div class="file-name"></div><div class="file-size small text-muted">0KB</div></div><div class="actions"><div class="file-status" data-toggle="tooltip"><i class="icon"></i> <span class="text"></span></div><a data-toggle="tooltip" class="btn btn-link btn-download-file" target="_blank"><i class="icon icon-download-alt"></i></a><button type="button" data-toggle="tooltip" class="btn btn-link btn-reset-file" title="Repeat"><i class="icon icon-repeat"></i></button><button type="button" data-toggle="tooltip" class="btn btn-link btn-rename-file" title="Rename"><i class="icon icon-pencil"></i></button><button type="button" data-toggle="tooltip" title="Remove" class="btn btn-link btn-delete-file"><i class="icon icon-trash text-danger"></i></button></div></div></div>',
@@ -204,9 +206,13 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
         // Init drop element
         var dropElement = options.drop_element;
         var $dropElement = (dropElement == 'fileList' ? that.$list : (dropElement == 'self' ? that.$ : $(dropElement))).first().addClass('file-drag-area');
-        var dropPlaceholder = options.dropPlaceholder;
-        if(dropPlaceholder === true) dropPlaceholder = lang.dropPlaceholder;
-        if(dropPlaceholder) $dropElement.attr('data-drop-placeholder', dropPlaceholder);
+        if (!notSupportDnd) {
+            var dropPlaceholder = options.dropPlaceholder;
+            if(dropPlaceholder === true) dropPlaceholder = lang.dropPlaceholder;
+            if(dropPlaceholder) $dropElement.attr('data-drop-placeholder', dropPlaceholder);
+        } else {
+            $dropElement.attr('data-drop-placeholder', '');
+        }
         that.$dropElement = $dropElement;
 
         // Init message
@@ -233,6 +239,10 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
 
         $('body').on('dragleave.' + NAME + ' drop.' + NAME, function(e) {
             $this.removeClass('file-dragable');
+
+            // Below two lines for firefox, open a new tab after drop file
+            e.preventDefault();
+            e.stopPropagation();
         }).on('dragover.' + NAME + ' dragenter.' + NAME, function(e) {
             $this.addClass('file-dragable');
         });
@@ -316,7 +326,7 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
                         if(renameActionAble) {
                             var result = renameActionOnDoneOption.call(that, file, filename, renameFile);
                             if(result === true) {
-                                doRemoveFile();
+                                renameFile();
                             } else if(result === false) {
                                 that.showFile(file);
                             }
@@ -338,12 +348,18 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
         $list.toggleClass('file-show-delete-action-on-done', !!options.deleteActionOnDone);
 
         // Init static files
+        that.staticFilesSize = 0;
+        that.staticFilesCount = 0;
         if(options.staticFiles) {
             $.each(options.staticFiles, function(idx, file) {
                 file = $.extend({status: Plupload.DONE}, file);
                 file.static = true;
                 if(!file.id) file.id = $.zui.uuid();
                 that.showFile(file);
+                if (file.size) {
+                    that.staticFilesSize += file.size;
+                    that.staticFilesCount++;
+                }
             });
         }
 
@@ -441,7 +457,7 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
             var preloader = new Moxie.image.Image();
             preloader.onload = function() {
                 // compressImage
-                preloader.downsize(size.width, size.height); 
+                preloader.downsize(size.width, size.height);
                 var imgsrc = preloader.type == 'image/jpeg' ? preloader.getAsDataURL('image/jpeg', 80) : preloader.getAsDataURL(); // return base64 data
                 callback(imgsrc);
                 preloader.destroy();
@@ -449,7 +465,7 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
             };
             preloader.load(file.getSource());
         }
-    };  
+    };
 
     Uploader.prototype.createFileIcon = function(file) {
         var fileType = file.type;
@@ -576,14 +592,17 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
         var that = this;
         var plupload = that.plupload;
         var $status = that.$status;
-        var state = plupload.state, total = plupload.total, statusText = '', totalCount = plupload.files.length;
+        var state = plupload.state,
+            total = plupload.total,
+            statusText = '',
+            totalCount = plupload.files.length;
         if(that.options.statusCreator) {
             statusText = that.options.statusCreator(total, state, that);
         } else {
             var stateObj = {
                 uploading: Math.max(0, Math.min(totalCount, total.uploaded + 1)),
-                total: that.$list.children('.file-static').length + totalCount,
-                size: Plupload.formatSize(total.size).toUpperCase(),
+                total: that.staticFilesCount + totalCount,
+                size: Plupload.formatSize(total.size + that.staticFilesSize).toUpperCase(),
                 queue: total.queued,
                 failed: total.failed,
                 uploaded: total.uploaded,
@@ -700,15 +719,17 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
                             }
                             if(json.id !== undefined) file.remoteId = json.id;
                             if(json.url !== undefined) file.url = json.url;
+                            if(json.name !== undefined) file.name = json.name;
                         }
                     }
                     if(error) {
                         error = $.isPlainObject(error) ? error : {message: error};
-                            file.status = Plupload.FAILED;
+                        file.status = Plupload.FAILED;
                         if(error.code === undefined) error.code = Plupload.GENERIC_ERROR;
                         error.file = file;
                         error.responseObject = responseObject;
                         uploader.trigger('Error', error);
+                        file.errorMessage = error.message;
                         return;
                     }
                 }
@@ -738,20 +759,27 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
                 if(uploadedMessage) {
                     var uploadedCount = that.lastUploadedCount;
                     var failedCount = 0;
+                    var failMessages = [];
                     $.each(files, function(idx, file) {
-                        if(file.status === Plupload.FAILED) failedCount++;
+                        if(file.status === Plupload.FAILED) {
+                            failedCount++;
+                            if (file.errorMessage) {
+                                failMessages.push(file.errorMessage);
+                                delete file.errorMessage;
+                            }
+                        }
                     });
-                    var msg = '',
+                    var msg = failMessages && failMessages.length ? ('<p>' + failMessages.join(',') + '</p>') : '',
                         msgData = {
                             uploaded: uploadedCount,
                             failed: failedCount
                         };
                     if(typeof uploadedMessage === 'string') {
-                        msg = uploadedMessage.format(msgData);
+                        msg += uploadedMessage.format(msgData);
                     } else if($.isFunction(uploadedMessage)) {
-                        msg = uploadedMessage(msgData);
+                        msg += uploadedMessage(msgData);
                     } else {
-                        msg = that.lang[failedCount > 0 ? 'uploadHasFailedMessage' : (uploadedCount > 0 ? 'uploadSuccessMessage' : 'uploadEmptyMessage')].format(msgData);
+                        msg += that.lang[failedCount > 0 ? 'uploadHasFailedMessage' : (uploadedCount > 0 ? 'uploadSuccessMessage' : 'uploadEmptyMessage')].format(msgData);
                     }
                     that.showMessage(msg, failedCount > 0 ? 'danger' : (uploadedCount > 0 ? 'success' : 'warning'), 3);
                 }
@@ -772,8 +800,15 @@ else if(r instanceof a){if(r.hasBlob())if(r.getBlob().isDetached())r=d.call(s,r)
                 that.callEvent('onUploadFile', file);
             },
             BeforeUpload: function(uploader, file) {
+                var oldParams = uploader.getOption('multipart_params');
                 var multipartParamsOption = options.multipart_params;
                 var params = {};
+                if (oldParams && oldParams.key) {
+                    params.key = oldParams.key;
+                }
+                if (oldParams && oldParams.token) {
+                    params.token = oldParams.token;
+                }
                 if(options.sendFileName) params[options.sendFileName === true ? 'name' : options.sendFileName] = file.name;
                 if(options.sendFileId) params[options.sendFileId === true ? 'uuid' : options.sendFileId] = file.id;
                 params = $.extend(params, $.isFunction(multipartParamsOption) ? multipartParamsOption(file, params) : multipartParamsOption);
