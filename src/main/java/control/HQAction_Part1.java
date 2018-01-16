@@ -273,7 +273,7 @@ public class HQAction_Part1 extends BaseAction {
             Tax tax = new Tax();
             tax.setNumber(this.getRequest().getParameter("value1"));
             String userId = this.getSession().getAttribute("userId").toString();//获取用户userId
-            String result = hqService_part1.deleteOneFiscal(databaseUrl + userId + systemDB, tax);// 0表示0条记录，1表示有1条记录
+            String result = hqService_part1.deleteOneFiscal(databaseUrl + userId + goodsDB,databaseUrl + userId + systemDB, tax);// 0表示0条记录，1表示有1条记录
             returnJsonObject(result);//可能的返回值：-1,0,1
         }
     }

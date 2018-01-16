@@ -291,6 +291,8 @@
                                     $("#code").val("");
                                     $("#name").val("");
                                     $("#rate").val("");
+                                    $("#code_flag1").hide();//对号
+                                    $("#code_flag2").hide();//叉号
                                 }
                             }
                         },
@@ -383,6 +385,9 @@
                                     }).show();
                                     $("#myModal2").modal('hide');   //显示对话框
                                     findAllFiscals();
+                                    $("#code2").val("");
+                                    $("#name2").val("");
+                                    $("#rate2").val("");
                                 }
                             }
                         },

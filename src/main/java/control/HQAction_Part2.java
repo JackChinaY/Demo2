@@ -134,7 +134,7 @@ public class HQAction_Part2 extends BaseAction {
             String abbreviation = hqService_part2.getAbbreviation(databaseUrl + userId + programmingDB);
             if (abbreviation != null) {
                 plu.setCurrency(abbreviation);
-            }else {
+            } else {
                 plu.setCurrency("");
             }
             String result = hqService_part2.saveGoods(databaseUrl + userId + goodsDB, plu);

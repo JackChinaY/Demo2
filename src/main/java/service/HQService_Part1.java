@@ -172,9 +172,10 @@ public class HQService_Part1 extends BaseService {
     /**
      * 方法序号： 2_6 删除一条税率
      */
-    public String deleteOneFiscal(String databaseUrl, Tax tax) {
+    public String deleteOneFiscal(String databaseUrl_Goods, String databaseUrl_Fiscal, Tax tax) {
         try {
-            return this.hqDao_part1.deleteOneFiscal(databaseUrl, tax);
+            this.hqDao_part1.deleteGoodsFiscalNULL(databaseUrl_Goods, tax);
+            return this.hqDao_part1.deleteOneFiscal(databaseUrl_Fiscal, tax);
         } catch (Exception e) {
             System.out.println("2_6 删除一条税率时出错！");
             e.printStackTrace();
