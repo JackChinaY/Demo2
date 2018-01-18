@@ -308,13 +308,14 @@
             /*******************************************************************************************/
             //修改按钮，修改税率
             $("#tbody").on("click", "a[name='update']", function () {
-                var temp = parseFloat($(this).parents("tr").find(".Number").text());
-                if (temp === 1 || temp === 2 || temp === 3 || temp === 4 || temp === 5) {
-                    new $.zui.Messager('This Fiscal can not be  modified !', {
+                //判断是否是前6位固定不可改税率
+                var temp = parseInt($(this).parents("tr").find(".Number").text());
+                if (temp <= 6) {
+                    new $.zui.Messager('This Fiscal can not be modified !', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
-                }else {
+                } else {
                     //数据初始化
                     $("#number2").html($(this).parents("tr").find(".Number").text());
                     $("#code2").html($(this).parents("tr").find(".Code").text());
@@ -403,13 +404,14 @@
             /*******************************************************************************************/
             //删除收银员，因为表格是自动生成的，所以只能用on函数，click事件无效
             $("#tbody").on("click", "a[name='delete']", function () {
-                var temp = parseFloat($(this).parents("tr").find(".Number").text());
-                if (temp === 1 || temp === 2 || temp === 3 || temp === 4 || temp === 5) {
-                    new $.zui.Messager('This Fiscal can not be  modified !', {
+                //判断是否是前6位固定不可改税率
+                var temp = parseInt($(this).parents("tr").find(".Number").text());
+                if (temp <= 6) {
+                    new $.zui.Messager('This Fiscal can not be deleted !', {
                         type: 'danger',
                         placement: 'top'
                     }).show();
-                }else {
+                } else {
                     $("#deleteId").val($(this).parents("tr").find(".Number").text());
                     $("#deleteTip").html("Do you want to delete this record ( Number : " + $(this).parents("tr").find(".Number").text() + " ) ？");
                     $("#myModal3").modal({moveable: true});
