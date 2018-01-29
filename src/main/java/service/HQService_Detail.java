@@ -65,12 +65,33 @@ public class HQService_Detail extends BaseService {
             JSONArray goodsArray = new JSONArray(goods);
             JSONArray taxArray = new JSONArray(tax);
             for (int i = 0; i < goodsArray.length(); i++) {
-                //插入Tax Code
-                goodsArray.getJSONObject(i).put("value9", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value4"));
-                //插入Tax Name
-                goodsArray.getJSONObject(i).put("value10", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value5"));
-                //插入Tax Rate
-                goodsArray.getJSONObject(i).put("value11", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value6"));
+                //对税率进行遍历
+                for (int j = 0; j < taxArray.length(); j++) {
+                    if (goodsArray.getJSONObject(i).getString("value6").equals(taxArray.getJSONObject(j).getString("value1"))) {
+                        //插入Tax Code
+                        goodsArray.getJSONObject(i).put("value9", taxArray.getJSONObject(j).getString("value4"));
+                        //插入Tax Name
+                        goodsArray.getJSONObject(i).put("value10", taxArray.getJSONObject(j).getString("value5"));
+                        //插入Tax Rate
+                        goodsArray.getJSONObject(i).put("value11", taxArray.getJSONObject(j).getString("value6"));
+                        break;
+                    }
+                    //如果都没找到就将信息置空和0
+                    else if (j == taxArray.length() - 1) {
+                        //插入Tax Code
+                        goodsArray.getJSONObject(i).put("value9", "");
+                        //插入Tax Name
+                        goodsArray.getJSONObject(i).put("value10", "");
+                        //插入Tax Rate
+                        goodsArray.getJSONObject(i).put("value11", "0");
+                    }
+                }
+//                //插入Tax Code
+//                goodsArray.getJSONObject(i).put("value9", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value4"));
+//                //插入Tax Name
+//                goodsArray.getJSONObject(i).put("value10", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value5"));
+//                //插入Tax Rate
+//                goodsArray.getJSONObject(i).put("value11", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value6"));
             }
             return goodsArray.toString();
         } catch (Exception e) {
@@ -111,12 +132,33 @@ public class HQService_Detail extends BaseService {
             JSONArray goodsArray = new JSONArray(goods);
             JSONArray taxArray = new JSONArray(tax);
             for (int i = 0; i < goodsArray.length(); i++) {
-                //插入Tax Code
-                goodsArray.getJSONObject(i).put("value9", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value4"));
-                //插入Tax Name
-                goodsArray.getJSONObject(i).put("value10", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value5"));
-                //插入Tax Rate
-                goodsArray.getJSONObject(i).put("value11", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value6"));
+                //对税率进行遍历
+                for (int j = 0; j < taxArray.length(); j++) {
+                    if (goodsArray.getJSONObject(i).getString("value6").equals(taxArray.getJSONObject(j).getString("value1"))) {
+                        //插入Tax Code
+                        goodsArray.getJSONObject(i).put("value9", taxArray.getJSONObject(j).getString("value4"));
+                        //插入Tax Name
+                        goodsArray.getJSONObject(i).put("value10", taxArray.getJSONObject(j).getString("value5"));
+                        //插入Tax Rate
+                        goodsArray.getJSONObject(i).put("value11", taxArray.getJSONObject(j).getString("value6"));
+                        break;
+                    }
+                    //如果都没找到就将信息置空和0
+                    else if (j == taxArray.length() - 1) {
+                        //插入Tax Code
+                        goodsArray.getJSONObject(i).put("value9", "");
+                        //插入Tax Name
+                        goodsArray.getJSONObject(i).put("value10", "");
+                        //插入Tax Rate
+                        goodsArray.getJSONObject(i).put("value11", "0");
+                    }
+                }
+//                //插入Tax Code
+//                goodsArray.getJSONObject(i).put("value9", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value4"));
+//                //插入Tax Name
+//                goodsArray.getJSONObject(i).put("value10", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value5"));
+//                //插入Tax Rate
+//                goodsArray.getJSONObject(i).put("value11", taxArray.getJSONObject(goodsArray.getJSONObject(i).getInt("value6") - 1).getString("value6"));
             }
             return goodsArray.toString();
         } catch (Exception e) {
