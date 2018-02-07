@@ -346,6 +346,11 @@
                         type: 'danger',
                         placement: 'top'
                     }).show();
+                } else if ($("#tax_index2").val() == "0") {
+                    new $.zui.Messager('Tax Index can not be 0 !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
                 } else if ($("#barcode2").val() != "" && $("#barcode2").val().length < 8) {
                     new $.zui.Messager('The length of Barcode can not be less than 8 when you input the Barcode !', {
                         type: 'danger',

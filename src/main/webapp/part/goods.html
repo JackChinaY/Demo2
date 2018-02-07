@@ -350,7 +350,7 @@
                                         + '<td>&nbsp;&nbsp;<a name="chooseTaxIndex" href="#" title="select this one"><i class="icon icon-tag"></i></a></td></tr>';
                                 }
                                 html += '</tbody></table></div>';
-                            // <a href="fiscal.html">Add A New Fiscal</a>
+                                // <a href="fiscal.html">Add A New Fiscal</a>
                                 return html;
                             }
                         }
@@ -772,6 +772,11 @@
                     }).show();
                 } else if ($("#tax_index2").val() == "") {
                     new $.zui.Messager('Tax Index can not be empty !', {
+                        type: 'danger',
+                        placement: 'top'
+                    }).show();
+                } else if ($("#tax_index2").val() == "0") {
+                    new $.zui.Messager('Tax Index can not be 0 !', {
                         type: 'danger',
                         placement: 'top'
                     }).show();

@@ -131,6 +131,8 @@ public class HQAction_Part2 extends BaseAction {
             plu.setTax_Index(this.getRequest().getParameter("value6"));
             plu.setStock_Control(this.getRequest().getParameter("value7"));
             plu.setStock_Amount(this.getRequest().getParameter("value8"));
+            plu.setUsed("1");
+            //获取当前使用的外币
             String abbreviation = hqService_part2.getAbbreviation(databaseUrl + userId + programmingDB);
             if (abbreviation != null) {
                 plu.setCurrency(abbreviation);
@@ -216,6 +218,14 @@ public class HQAction_Part2 extends BaseAction {
             plu.setTax_Index(this.getRequest().getParameter("value6"));
             plu.setStock_Control(this.getRequest().getParameter("value7"));
             plu.setStock_Amount(this.getRequest().getParameter("value8"));
+            plu.setUsed("1");
+            //获取当前使用的外币
+            String abbreviation = hqService_part2.getAbbreviation(databaseUrl + userId + programmingDB);
+            if (abbreviation != null) {
+                plu.setCurrency(abbreviation);
+            } else {
+                plu.setCurrency("");
+            }
             String result = hqService_part2.updateOneGoods(databaseUrl + userId + goodsDB, plu);
             returnJsonObject(result);//可能的返回值：-1，0,1
         }

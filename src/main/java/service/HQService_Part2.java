@@ -102,7 +102,7 @@ public class HQService_Part2 extends BaseService {
     }
 
     /**
-     * 方法序号：4_5_0 获取当前外币
+     * 方法序号：4_5_0 获取当前使用的外币
      */
     public String getAbbreviation(String databaseUrl) {
         try {
@@ -160,6 +160,7 @@ public class HQService_Part2 extends BaseService {
      */
     public String deleteOneGoods(String databaseUrl, String goodsNumber, String goodsFlag) {
         try {
+            //0表示此商品无部类关联
             if (goodsFlag.equals("0")) {
                 return this.hqDao_part2.deleteOneGoods(databaseUrl, goodsNumber);
             } else {

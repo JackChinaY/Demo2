@@ -20,6 +20,7 @@ public class PLU {
     private String stock_Control;
     private String stock_Amount;
     private String Currency;
+    private String Used;
 
     public Integer getId() {
         return id;
@@ -101,14 +102,28 @@ public class PLU {
         Currency = currency;
     }
 
-    @Override
-    public String toString() {
-        return "PLU [id=" + id + ", number=" + number + ", name=" + name
-                + ", barcode=" + barcode + ", price=" + price
-                + ", tax_Index=" + tax_Index
-                + ", stock_Control=" + stock_Control + ", stock_Amount=" + stock_Amount
-                + "]";
+    public String getUsed() {
+        return Used;
     }
 
+    public void setUsed(String used) {
+        Used = used;
+    }
 
+    @Override
+    public String toString() {
+        return "PLU{" +
+                "id=" + id +
+                ", number='" + number + '\'' +
+                ", name='" + name + '\'' +
+                ", barcode='" + barcode + '\'' +
+                ", price='" + price + '\'' +
+                ", rrp='" + rrp + '\'' +
+                ", tax_Index='" + tax_Index + '\'' +
+                ", stock_Control='" + stock_Control + '\'' +
+                ", stock_Amount='" + stock_Amount + '\'' +
+                ", Currency='" + Currency + '\'' +
+                ", Used='" + Used + '\'' +
+                '}';
+    }
 }

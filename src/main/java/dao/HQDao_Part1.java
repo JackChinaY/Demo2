@@ -151,10 +151,10 @@ public class HQDao_Part1 extends BaseDAO_Sqlite {
     }
 
     /**
-     * 方法序号：3_5 将商品库中的所有商品的Currency设置为当前的外币的缩写
+     * 方法序号：3_5 将商品库中的所有商品的Currency设置为当前的外币的缩写，当且仅当商品的Used=1，而Used=0的商品的Currency不修改，继续为空
      */
     public String setAllGoodsCurrency(String databaseUrl, ForeignCurrency currency) {
-        String sql = "UPDATE Goods_Info SET Currency=?";
+        String sql = "UPDATE Goods_Info SET Currency=? WHERE Used=1";
         return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, currency.getCurrent()));
     }
 

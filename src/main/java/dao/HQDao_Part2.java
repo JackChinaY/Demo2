@@ -18,7 +18,7 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
      * 方法序号：4_2 查询商品总记录数
      */
     public String getGoodsCount(String databaseUrl) {
-        String sql = " SELECT count(*) as COUNTS from goods_info";
+        String sql = " SELECT COUNT(*) as COUNTS from Goods_Info";
         return Integer.toString(this.getCount(sql, databaseUrl));
     }
 
@@ -26,7 +26,7 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
      * 方法序号：4_3 查询商品最大编号
      */
     public String getGoodsMaxNumber(String databaseUrl) {
-        String sql = " SELECT MAX(Number) as MAXNUM from goods_info";
+        String sql = " SELECT MAX(Number) as MAXNUM from Goods_Info";
         return this.getOneRecard(sql, databaseUrl);
     }
 
@@ -34,7 +34,7 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
      * 方法序号：4_4 验证商品条形码是否存在
      */
     public String verifyGoodsbarcode(String databaseUrl, String barcode) {
-        String sql = " SELECT COUNT(*) as COUNTS from goods_info WHERE Barcode=?";
+        String sql = " SELECT COUNT(*) as COUNTS from Goods_Info WHERE Barcode=?";
         return Integer.toString(this.getCount(sql, databaseUrl, barcode));
     }
 
@@ -50,11 +50,11 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
      * 方法序号：4_5 保存单品
      */
     public String saveGoods(String databaseUrl, PLU plu) {
-        String sql = "INSERT INTO goods_info (Number,Name,Barcode,Price,RRP,Tax_Index,Stock_Control,Stock_Amount,Currency) VALUES (?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO Goods_Info (Number,Name,Barcode,Price,RRP,Tax_Index,Stock_Control,Stock_Amount,Currency,Used) VALUES (?,?,?,?,?,?,?,?,?,?)";
         return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, plu.getNumber(),
                 plu.getName(), plu.getBarcode(),
                 plu.getPrice(), plu.getRrp(), plu.getTax_Index(),
-                plu.getStock_Control(), plu.getStock_Amount(), plu.getCurrency()));
+                plu.getStock_Control(), plu.getStock_Amount(), plu.getCurrency(), plu.getUsed()));
     }
 
     /**
@@ -75,11 +75,19 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
         return Integer.toString(this.getCount(sql, databaseUrl, goodsNumber));
     }
 
+//    /**
+//     * 方法序号：4_7 删除一条商品
+//     */
+//    public String deleteOneGoods(String databaseUrl, String goodsNumber) {
+//        String sql = "DELETE FROM Goods_Info where Number=?";
+//        return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, goodsNumber));
+//    }
+
     /**
      * 方法序号：4_7 删除一条商品
      */
     public String deleteOneGoods(String databaseUrl, String goodsNumber) {
-        String sql = "DELETE FROM goods_info where Number=?";
+        String sql = "UPDATE Goods_Info SET Name='',Barcode='',Price=0,Tax_Index=0,RRP=0,Stock_Control=0,Stock_Amount=0,Currency='',Used=0 WHERE Number=? ";
         return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, goodsNumber));
     }
 
@@ -87,11 +95,11 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
      * 方法序号：4_8 修改一个商品
      */
     public String updateOneGoods(String databaseUrl, PLU plu) {
-        String sql = "UPDATE goods_info SET Name=?,Barcode=?,Price=?,Tax_Index=?,RRP=?,Stock_Control=?,Stock_Amount=? WHERE Number=? ";
+        String sql = "UPDATE Goods_Info SET Name=?,Barcode=?,Price=?,Tax_Index=?,RRP=?,Stock_Control=?,Stock_Amount=?,Currency=?,Used=? WHERE Number=? ";
         return Integer.toString(this.saveOrUpdateOrDelete(sql, databaseUrl, plu.getName(),
                 plu.getBarcode(), plu.getPrice(),
                 plu.getTax_Index(), plu.getRrp(), plu.getStock_Control(),
-                plu.getStock_Amount(), plu.getNumber()));
+                plu.getStock_Amount(), plu.getCurrency(), plu.getUsed(), plu.getNumber()));
     }
 
     /**

@@ -352,7 +352,7 @@ public class HQAction_Part1 extends BaseAction {
     }
 
     /**
-     * 方法序号：3_5 将商品库中的所有商品的Currency设置为当前的外币的缩写
+     * 方法序号：3_5 将商品库中的所有商品的Currency设置为当前的外币的缩写，当且仅当商品的Used=1，而Used=0的商品的Currency不修改，继续为空
      */
     public void setAllGoodsCurrency() throws IOException, JSONException {
         //如果用户登录超时，则需要重新登录
