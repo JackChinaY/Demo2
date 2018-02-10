@@ -310,7 +310,7 @@
             $("#tbody").on("click", "a[name='update']", function () {
                 //判断是否是前6位固定不可改税率
                 var temp = parseInt($(this).parents("tr").find(".Number").text());
-                if (temp <= 6) {
+                if (temp <= 5 ||temp === 8) {
                     new $.zui.Messager('This Fiscal can not be modified !', {
                         type: 'danger',
                         placement: 'top'
@@ -402,11 +402,11 @@
                 }
             });
             /*******************************************************************************************/
-            //删除收银员，因为表格是自动生成的，所以只能用on函数，click事件无效
+            //删除税率，因为表格是自动生成的，所以只能用on函数，click事件无效
             $("#tbody").on("click", "a[name='delete']", function () {
                 //判断是否是前6位固定不可改税率
                 var temp = parseInt($(this).parents("tr").find(".Number").text());
-                if (temp <= 6) {
+                if (temp <= 5 ||temp === 8) {
                     new $.zui.Messager('This Fiscal can not be deleted !', {
                         type: 'danger',
                         placement: 'top'
@@ -418,7 +418,7 @@
                 }
 
             });
-            //删除收银员 提交
+            //删除税率 提交
             $("#submit4").click(function () {
                 $.ajax({
                     type: "POST",
