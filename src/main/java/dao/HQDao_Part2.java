@@ -92,6 +92,15 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
     }
 
     /**
+     * 方法序号： 4_7_1 将一个部门关联的商品编号置0和删除一条商品
+     *
+     * @return json数组
+     */
+    public String setOneDeptGoodsNumber0DeleteOneGoods(String databaseUrl, String goodsNumber) {
+        return Integer.toString(this.setOneDeptGoodsNumber0AndDeleteOneGoods(databaseUrl, goodsNumber));
+    }
+
+    /**
      * 方法序号：4_8 修改一个商品
      */
     public String updateOneGoods(String databaseUrl, PLU plu) {
@@ -104,7 +113,6 @@ public class HQDao_Part2 extends BaseDAO_Sqlite {
 
     /**
      * 方法序号： 4_9 按商品编号查询商品信息
-     * Id,Number,Name,Barcode,Price,Tax_Index,Stock_Control,Stock_Amount
      *
      * @return json数组
      */

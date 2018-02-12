@@ -164,8 +164,9 @@ public class HQService_Part2 extends BaseService {
             if (goodsFlag.equals("0")) {
                 return this.hqDao_part2.deleteOneGoods(databaseUrl, goodsNumber);
             } else {
-                this.hqDao_part2.setOneDeptGoodsNumber0(databaseUrl, goodsNumber);
-                return this.hqDao_part2.deleteOneGoods(databaseUrl, goodsNumber);
+//                this.hqDao_part2.setOneDeptGoodsNumber0(databaseUrl, goodsNumber);
+//                return this.hqDao_part2.deleteOneGoods(databaseUrl, goodsNumber);
+                return this.hqDao_part2.setOneDeptGoodsNumber0DeleteOneGoods(databaseUrl, goodsNumber);
             }
         } catch (Exception e) {
             System.out.println("4_7 删除一条商品时出错！");

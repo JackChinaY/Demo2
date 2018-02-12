@@ -55,6 +55,29 @@ public class BaseDAO_Sqlite {
         }
         return 0;
     }
+//    public int getCount(String sql, String url, Object... args) {
+//        try {
+//            //连接数据库
+//            conn = DriverManager.getConnection(url);
+//            //取消自动提交
+//            conn.setAutoCommit(false);
+//            //向sql语句插入参数
+//            ps = conn.prepareStatement(sql);
+//            for (int i = 0; i < args.length; i++) {
+//                ps.setObject(i + 1, args[i]);
+//            }
+//            //执行查询
+//            rs = ps.executeQuery();
+//            if (rs.next()) {  //若为数据库null值就不执行此代码，而是返回0L
+//                return rs.getInt(1);  //返回count（*）的值
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            close(conn, ps, rs);
+//        }
+//        return 0;
+//    }
 
     /**
      * 查询符合条件的记录,结果只有一条，且只有一个字段
@@ -141,6 +164,46 @@ public class BaseDAO_Sqlite {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            close(conn, ps, null);
+        }
+        return 0;
+    }
+
+    /**
+     * 执行事务，将一个部门关联的商品编号置0和删除一条商品
+     *
+     * @param url         数据库路径
+     * @param goodsNumber 商品Number
+     * @return 操作结果，正数是成功，是受影响的行数，0为失败
+     */
+    public int setOneDeptGoodsNumber0AndDeleteOneGoods(String url, String goodsNumber) {
+        try {
+            conn = DriverManager.getConnection(url);
+            conn.setAutoCommit(false);// 更改JDBC事务的默认提交方式
+            //第一步，将一个部门关联的商品编号置0
+            ps = conn.prepareStatement("UPDATE Department_Associate SET PLU_No=0 WHERE PLU_No=? ");
+            ps.setObject(1, goodsNumber);
+            ps.executeUpdate();
+            //第二步，删除一条商品
+            ps = conn.prepareStatement("UPDATE Goods_Info SET Name='',Barcode='',Price=0,Tax_Index=0,RRP=0,Stock_Control=0,Stock_Amount=0,Currency='',Used=0 WHERE Number=? ");
+            ps.setObject(1, goodsNumber);
+            int result = ps.executeUpdate();
+            //提交事务
+            conn.commit();
+            return result;//此处即便返回了，也是在执行完finally里的代码后才返回
+        } catch (Exception e) {
+            try {
+                conn.rollback();//事务回滚
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.setAutoCommit(true);// 更改JDBC事务的默认提交方式
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             close(conn, ps, null);
         }
         return 0;
