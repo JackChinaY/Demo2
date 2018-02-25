@@ -179,7 +179,7 @@ public class BaseDAO_Sqlite {
     public int setOneDeptGoodsNumber0AndDeleteOneGoods(String url, String goodsNumber) {
         try {
             conn = DriverManager.getConnection(url);
-            conn.setAutoCommit(false);// 更改JDBC事务的默认提交方式
+            conn.setAutoCommit(false);// 更改JDBC事务的默认提交方式，取消自动提交
             //第一步，将一个部门关联的商品编号置0
             ps = conn.prepareStatement("UPDATE Department_Associate SET PLU_No=0 WHERE PLU_No=? ");
             ps.setObject(1, goodsNumber);
