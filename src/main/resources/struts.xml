@@ -11,11 +11,11 @@
     <!-- 	配置扩展名为action ? -->
     <constant name="struts.action.extension" value="action"/>
     <!--<constant name="struts.action.extension" value="action"/>-->
-    <!--<constant name="struts.multipart.saveDir" value="/temp/"/>-->
+    <constant name="struts.multipart.saveDir" value="/temp/"/>
     <!--<constant name="struts.enable.DynamicMethodInvocation" value="true"/>-->
     <!-- 配置文件上传 -->
-    <!--<bean type= "org.apache.struts2.dispatcher.multipart.MultiPartRequest" name= "myRequestParser" class= "control.RequestParseWrapper" scope= "default" optional= "true" />-->
-    <!--<constant name= "struts.multipart.handler" value= "myRequestParser" />-->
+    <bean type= "org.apache.struts2.dispatcher.multipart.MultiPartRequest" name= "myRequestParser" class= "control.RequestParseWrapper" scope= "default" optional= "true" />
+    <constant name= "struts.multipart.handler" value= "myRequestParser" />
 
     <!-- 配置主题 -->
     <!-- 	<constant name="struts.ui.theme" value="simple" /> -->

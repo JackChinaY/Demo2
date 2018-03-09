@@ -1,7 +1,17 @@
 package control;
 
 import entity.*;
+//import jxl.Sheet;
+//import jxl.Workbook;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,9 +21,13 @@ import util.SendEmail;
 import util.UtilsAll;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.math.BigDecimal;
 
 /**
@@ -296,6 +310,171 @@ public class HQAction_Part2 extends BaseAction {
             String userId = this.getSession().getAttribute("userId").toString();//获取用户UserId
             String result = hqService_part2.updateOneDept(databaseUrl + userId + goodsDB, Dept_No, PLU_No);
             returnJsonObject(result);//可能的返回值：-1，0,1
+        }
+    }
+
+    /**
+     * 方法序号：1_7 文件 上传
+     *
+     * @throws Exception
+     */
+    public void uploaderFile() throws Exception {
+        String userId = this.getSession().getAttribute("userId").toString();//获取用户UserId
+        //获取商品最大编号
+        int goodsMaxNumber = Integer.parseInt(hqService_part2.getGoodsMaxNumber(databaseUrl + userId + goodsDB));// 0表示0条记录，1表示有1条记录
+        goodsMaxNumber++;
+        // String result = hqService_Admin.findAllUser();
+//		System.out.println("开始上传");
+        //文件保存路径 比如：D:\programfile\Tomcat7.0\webapps\CashMachine\download\
+        String savePath = this.getServletContext().getRealPath("") + "\\download\\";
+        //请求路径 比如：http://localhost:8080/CashMachine/ActionAdmin_uploaderFile.action
+        String URL = this.getRequest().getRequestURL().toString();//带ip地址的路径
+        //下载地址 比如：http://localhost:8080/CashMachine/download/jquery.js
+        String downloadPath = null;
+//		String saveFileName=null;
+//		System.out.println(savePath);
+        File tempPathFile = new File(savePath);
+        //1、创建一个DiskFileItemFactory工厂
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        //设置工厂的缓冲区的大小，当上传的文件大小超过缓冲区的大小时，就会生成一个临时文件存放到指定的临时目录当中。
+        factory.setSizeThreshold(1024 * 1024); // 设置缓冲区大小，这里是1Mb,设置缓冲区的大小为100KB，如果不指定，那么缓冲区的大小默认是10KB
+        factory.setRepository(tempPathFile);//设置上传时生成的临时文件的保存目录
+        //2、创建一个文件上传解析器
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        //设置上传单个文件的大小的最大值，目前是设置为1024*1024字节，也就是1MB
+        upload.setFileSizeMax(1024 * 1024);
+        //设置上传文件总量的最大值，最大值=同时上传的多个文件的大小的最大值的和，目前设置为10MB
+        upload.setSizeMax(1024 * 1024 * 10);
+        //解决上传文件名的中文乱码
+        upload.setHeaderEncoding("utf-8");// 设置编码为utf-8
+        //监听文件上传进度
+//        upload.setProgressListener(new ProgressListener(){
+//            public void update(long pBytesRead, long pContentLength, int arg2) {
+//                System.out.println("文件大小为：" + pContentLength + ",当前已处理：" + pBytesRead);
+//            }
+//        });
+        //3、判断提交上来的数据是否是上传表单的数据
+//        if(!ServletFileUpload.isMultipartContent(this.getRequest())){
+//            System.out.println("提交上来的数据是传统表单的数据");
+//            return;
+//        }
+        //4、使用ServletFileUpload解析器解析上传数据，解析结果返回的是一个List<FileItem>集合，每一个FileItem对应一个Form表单的输入项
+        System.out.println("已经进入上传步骤1234567！");
+        List<FileItem> fileItemList = upload.parseRequest(this.getRequest());// 得到所有的文件
+        Iterator<FileItem> iterator = fileItemList.iterator();// 迭代器,搜索前端发送过来的文件
+        try {
+            while (iterator.hasNext()) {
+                FileItem fileItem = (FileItem) iterator.next();
+                //如果fileitem是普通输入项的数据
+                if (fileItem.isFormField()) {
+//					String name = fileItem.getFieldName();
+//					//解决普通输入项的数据的中文乱码问题
+//	                String value = fileItem.getString("UTF-8");
+//	                System.out.println("普通输入项:"+name + "=" + value);
+                }
+                //如果fileitem中封装的是上传文件
+                else {
+                    String fileName = fileItem.getName();
+                    //注意：不同的浏览器提交的文件名是不一样的，有些浏览器提交上来的文件名是带有路径的，如：  c:\a\b\1.txt，而有些只是单纯的文件名，如：1.txt
+                    //处理获取到的上传文件的文件名的路径部分，只保留文件名部分
+                    fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);//如：1.xls
+//					saveFileName=fileName;
+//					System.out.println("上传过来的文件的文件名："+fileName);
+                    if (fileName != null) {
+//						File fullFile = new File(new String(fileItem.getName().getBytes(),
+//								"utf-8")); // 解决文件名乱码问题
+//                        File savedFile = new File(savePath, fileName);
+//                        fileItem.write(savedFile);//保存
+                        // 获得工作簿
+                        Workbook workbook = null;
+                        //根据文件后缀名不同(xls和xlsx)获得不同的Workbook实现类对象
+                        if (fileName.endsWith("xls")) {
+                            //2003版
+                            workbook = new HSSFWorkbook(fileItem.getInputStream());
+                        } else if (fileName.endsWith("xlsx")) {
+                            //2007版
+                            workbook = new XSSFWorkbook(fileItem.getInputStream());
+                        }
+                        ArrayList<PLU> pluArrayList = new ArrayList<>();
+                        //工作表
+                        Sheet sheet = null;
+                        // 遍历所有工作表
+                        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {// 获取每个Sheet表
+                            sheet = workbook.getSheetAt(i);
+                            // getLastRowNum，获取最后一行的行标，从0开始，但第一行是标题，所以此处从1开始
+                            for (int j = 1; j < sheet.getLastRowNum() + 1; j++) {
+                                Row row = sheet.getRow(j);
+                                PLU plu = new PLU();
+                                if (row != null) {
+                                    //获取单元格数据
+                                    //Number
+                                    if (row.getCell(0) != null) {
+                                        plu.setNumber(String.valueOf(goodsMaxNumber++));
+                                    }
+                                    //Name
+                                    if (row.getCell(1) != null) {
+                                        plu.setNumber(row.getCell(1).toString());
+                                    }
+                                    //Barcode
+                                    if (row.getCell(2) != null) {
+                                        plu.setNumber(row.getCell(2).toString());
+                                    }
+                                    //Price
+                                    if (row.getCell(3) != null) {
+                                        plu.setNumber(row.getCell(3).toString());
+                                    }
+                                    //RRP
+                                    if (row.getCell(4) != null) {
+                                        plu.setNumber(row.getCell(4).toString());
+                                    }
+                                    //Tax_Index
+                                    if (row.getCell(5) != null) {
+                                        plu.setNumber(row.getCell(5).toString());
+                                    }
+                                    //Stock_Control
+                                    if (row.getCell(6) != null) {
+                                        plu.setNumber(row.getCell(6).toString());
+                                    }
+                                    //Stock_Amount
+                                    if (row.getCell(7) != null) {
+                                        plu.setNumber(row.getCell(7).toString());
+                                    }
+                                    //Currency
+                                    if (row.getCell(8) != null) {
+                                        plu.setNumber(row.getCell(8).toString());
+                                    }
+                                    //Used
+                                    if (row.getCell(9) != null) {
+                                        plu.setNumber(row.getCell(9).toString());
+                                    }
+                                }
+                                pluArrayList.add(plu);
+                                System.out.println(plu.toString());
+                            }
+                        }
+                        workbook.close();
+                        String result = hqService_part2.saveGoodsList(databaseUrl + userId + goodsDB, pluArrayList);// 1表示插入成功，0表示插入失败,-1表示已存在
+
+                    }
+                }
+            }
+            System.out.println("文件上传成功！");
+            JSONObject jo = new JSONObject();
+            jo.put("result", "ok");
+            jo.put("id", "10001");
+            jo.put("url", downloadPath);
+//			 System.out.println(downloadPath);
+            this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
+            this.getResponse().getWriter().print(jo);// 向前台发送json数据
+        } catch (Exception e) {
+            System.out.println("上传失败！");
+            e.printStackTrace();
+            JSONObject jo = new JSONObject();
+            jo.put("result", "failed");
+            jo.put("message", e.getMessage());
+            this.getResponse().setContentType("text/html;charset=UTF-8");//
+//			 设置响应数据类型
+            this.getResponse().getWriter().print(jo);// 向前台发送json数据
         }
     }
 

@@ -22,6 +22,19 @@ public class PLU {
     private String Currency;
     private String Used;
 
+    public PLU() {
+        this.number = "";
+        this.name = "";
+        this.barcode = "";
+        this.price = "";
+        this.rrp = "";
+        this.tax_Index = "";
+        this.stock_Control = "";
+        this.stock_Amount = "";
+        this.Currency = "";
+        this.Used = "";
+    }
+
     public Integer getId() {
         return id;
     }

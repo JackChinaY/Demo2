@@ -5,6 +5,8 @@ import dao.HQDao_Part2;
 import entity.*;
 import org.json.JSONArray;
 
+import java.util.ArrayList;
+
 /**
  * return返回值规定：0表示受影响行数为0，数据库出错；1表示受影响行数为1，
  * -1表示程序运行出错，服务器出错，-2表示该条记录在数据库中已存在，null也表示程序运行出错，服务器出错
@@ -156,7 +158,7 @@ public class HQService_Part2 extends BaseService {
     }
 
     /**
-     * 方法序号：4_7 删除一条商品
+     * 方法序号：4_7_1 删除一条商品
      */
     public String deleteOneGoods(String databaseUrl, String goodsNumber, String goodsFlag) {
         try {
@@ -170,6 +172,19 @@ public class HQService_Part2 extends BaseService {
             }
         } catch (Exception e) {
             System.out.println("4_7 删除一条商品时出错！");
+            e.printStackTrace();
+            return "-1";//程序运行出错，服务器出错
+        }
+    }
+
+    /**
+     * 方法序号：4_7_2 商品导入，保存一组商品集合，使用事务
+     */
+    public String saveGoodsList(String databaseUrl, ArrayList<PLU> pluArrayList) {
+        try {
+            return this.hqDao_part2.saveGoodsList(databaseUrl, pluArrayList);
+        } catch (Exception e) {
+            System.out.println("4_7_2 商品导入，保存一组商品集合，使用事务出错！");
             e.printStackTrace();
             return "-1";//程序运行出错，服务器出错
         }

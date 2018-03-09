@@ -3,10 +3,12 @@ package dao;
  * DAO层 常用的基本方法，封装在BaseDAO中
  */
 
+import entity.PLU;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * DAO层 常用的基本方法，封装在BaseDAO中
@@ -191,6 +193,51 @@ public class BaseDAO_Sqlite {
             //提交事务
             conn.commit();
             return result;//此处即便返回了，也是在执行完finally里的代码后才返回
+        } catch (Exception e) {
+            try {
+                conn.rollback();//事务回滚
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.setAutoCommit(true);// 更改JDBC事务的默认提交方式
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            close(conn, ps, null);
+        }
+        return 0;
+    }
+
+    /**
+     * 保存一组商品集合，使用事务
+     *
+     * @param url         数据库路径
+     * @return 操作结果，正数是成功，是受影响的行数，0为失败
+     */
+    public int saveGoodsListTran(String url, ArrayList<PLU> pluArrayList) {
+        try {
+            conn = DriverManager.getConnection(url);
+            conn.setAutoCommit(false);// 更改JDBC事务的默认提交方式，取消自动提交
+            for (int i = 0; i < pluArrayList.size(); i++) {
+                ps = conn.prepareStatement("INSERT INTO Goods_Info (Number,Name,Barcode,Price,RRP,Tax_Index,Stock_Control,Stock_Amount,Currency,Used) VALUES (?,?,?,?,?,?,?,?,?,?)");
+                ps.setObject(1, pluArrayList.get(i).getNumber());
+                ps.setObject(2, pluArrayList.get(i).getName());
+                ps.setObject(3, pluArrayList.get(i).getBarcode());
+                ps.setObject(4, pluArrayList.get(i).getPrice());
+                ps.setObject(5, pluArrayList.get(i).getRrp());
+                ps.setObject(6, pluArrayList.get(i).getTax_Index());
+                ps.setObject(7, pluArrayList.get(i).getStock_Control());
+                ps.setObject(8, pluArrayList.get(i).getStock_Amount());
+                ps.setObject(9, pluArrayList.get(i).getCurrency());
+                ps.setObject(10, pluArrayList.get(i).getUsed());
+                ps.executeUpdate();
+            }
+            //提交事务
+            conn.commit();
+            return pluArrayList.size();//此处即便返回了，也是在执行完finally里的代码后才返回
         } catch (Exception e) {
             try {
                 conn.rollback();//事务回滚

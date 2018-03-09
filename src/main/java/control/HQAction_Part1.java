@@ -561,5 +561,4 @@ public class HQAction_Part1 extends BaseAction {
         this.getResponse().setContentType("text/html;charset=UTF-8");// 设置响应数据类型
         this.getResponse().getWriter().print(jo);// 向前台发送json数据
     }
-
 }
