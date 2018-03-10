@@ -23,17 +23,30 @@
             //文件上传
             $('#tableUploader').uploader({
                 url: 'ActionPart2_uploaderFile.action',
-//                removeUploaded: true,
-//                deleteConfirm:true,
+                // url: 'uploaderFile.action',
+                removeUploaded: false,
+                renameByClick:false,//是否点击文件名即可重命名
+                deleteConfirm: false,//移除文件进行确认
+                multi_selection:false,//是否可用一次选取多个文件
 //                 staticFiles: {
 //                     type: xls / xlsx,           // 文件类型，例如"image/jpeg"
 //                 },
-                responseHandler: function (responseObject, file) {
-                    // 输出对象  调试用
-//                    alert(JSON.stringify(responseObject));
-                    if (responseObject.status == "200") {
-                    }
-                }
+                filters: {
+                    // 只允许上传图片或图标（.ico）
+                    mime_types: [
+                        {title: 'Excel', extensions: 'xls,xlsx'}
+                    ],
+                    // 最大上传文件为 5MB
+                    max_file_size: '5Mb',
+                    // 不允许上传重复文件
+                    prevent_duplicates: true
+                },
+//                 responseHandler: function (responseObject, file) {
+//                     // 输出对象  调试用
+// //                    alert(JSON.stringify(responseObject));
+//                     if (responseObject.status == "200") {
+//                     }
+//                 }
             });
             //submit1点击事件
             $("#submit_back").click(function () {
@@ -84,8 +97,8 @@
                 <thead>
                 <tr>
                     <th colspan="2">File Name</th>
-                    <th style="width: 100px">Size(byte)</th>
-                    <th style="width: 160px; text-align: center;">State</th>
+                    <th style="width: 120px">Size</th>
+                    <th style="width: 210px; text-align: center;">State</th>
                 </tr>
                 </thead>
                 <tbody class="uploader-files">
@@ -148,148 +161,6 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--对话框 新增-->
-<div class="modal fade" id="myModal1">
-    <div class="modal-dialog modal-moveable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
-                        class="sr-only">Close</span></button>
-                <h4 class="modal-title">Add A New Fiscal</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label class="col-sm-3">Number</label>
-                        <label id="number" class="col-sm-6" style="text-align: center"></label>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Tax Code</label>
-                        <div class="col-sm-6">
-                            <input id="code" type="tel" class="form-control" maxlength="15"
-                                   placeholder="" style="ime-mode: disabled"
-                                   onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">
-                        </div>
-                        <strong>*</strong>
-                        <label style="padding-left: 10px"><i id="code_flag1" class="icon icon-check" hidden
-                                                             style="color: green"></i> <i id="code_flag2"
-                                                                                          class="icon icon-times"
-                                                                                          hidden
-                                                                                          style="color: red"></i></label>
-                        <label id="code_info" hidden="hidden"></label>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Tax Name</label>
-                        <div class="col-sm-6">
-                            <input id="name" type="text" class="form-control" maxlength="15"
-                                   placeholder="1-15 characters" style="ime-mode: disabled"
-                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
-                        </div>
-                        <strong>*</strong>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Tax Rate</label>
-                        <div class="col-sm-6">
-                            <input id="rate" type="text" class="form-control" maxlength="6"
-                                   placeholder="0.0000-1.0000" style="ime-mode: disabled"
-                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
-                        </div>
-                        <strong>*</strong>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
-                </button>
-                <button id="submit1_1" class="btn btn-primary" type="button">
-                    Submit
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--对话框 修改-->
-<div class="modal fade" id="myModal2">
-    <div class="modal-dialog modal-moveable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
-                        class="sr-only">Close</span></button>
-                <h4 class="modal-title">Add A New Fiscal</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label class="col-sm-3">Number</label>
-                        <label id="number2" class="col-sm-6" style="text-align: center"></label>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Tax Code</label>
-                        <label id="code2" class="col-sm-6" style="text-align: center"></label>
-                        <!--<div class="col-sm-6">-->
-                        <!--<input id="code2" type="tel" class="form-control" maxlength="3"-->
-                        <!--placeholder="" style="ime-mode: disabled"-->
-                        <!--onkeyup="this.value=this.value.replace(/[^\da-zA-Z]/g,'')">-->
-                        <!--</div>-->
-                        <!--<strong>*</strong>-->
-                        <!--<label style="padding-left: 10px"><i id="code_flag3" class="icon icon-check" hidden-->
-                        <!--style="color: green"></i> <i id="code_flag4"-->
-                        <!--class="icon icon-times" hidden-->
-                        <!--style="color: red"></i></label>-->
-                        <!--<label id="code_info2" hidden="hidden"></label>-->
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Tax Name</label>
-                        <div class="col-sm-6">
-                            <input id="name2" type="text" class="form-control" maxlength="15"
-                                   placeholder="1-15 characters" style="ime-mode: disabled"
-                                   onkeyup="this.value=this.value.replace(/[^\d\s()a-zA-Z+-]/g,'')">
-                        </div>
-                        <strong>*</strong>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3">Tax Rate</label>
-                        <div class="col-sm-6">
-                            <input id="rate2" type="text" class="form-control" maxlength="6"
-                                   placeholder="0.0000-1.0000" style="ime-mode: disabled"
-                                   onkeyup="this.value=this.value.replace(/[^\d\.]/g,'')">
-                        </div>
-                        <strong>*</strong>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
-                </button>
-                <button id="submit2_1" class="btn btn-primary" type="button">
-                    Submit
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--对话框 删除-->
-<div class="modal fade" id="myModal3">
-    <div class="modal-dialog modal-moveable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
-                        class="sr-only">Close</span></button>
-                <h4 class="modal-title">Delete Or Not</h4>
-            </div>
-            <div class="modal-body">
-                <div style="display: none">
-                    <input id="deleteId">
-                </div>
-                <p id="deleteTip" style="font-weight: 800"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button id="submit4" type="button" class="btn btn-primary">Confirm</button>
             </div>
         </div>
     </div>

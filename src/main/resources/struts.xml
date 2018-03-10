@@ -11,12 +11,15 @@
     <!-- 	配置扩展名为action ? -->
     <constant name="struts.action.extension" value="action"/>
     <!--<constant name="struts.action.extension" value="action"/>-->
-    <constant name="struts.multipart.saveDir" value="/temp/"/>
+    <constant name="struts.i18n.encoding" value="UTF-8"></constant>
     <!--<constant name="struts.enable.DynamicMethodInvocation" value="true"/>-->
     <!-- 配置文件上传 -->
-    <bean type= "org.apache.struts2.dispatcher.multipart.MultiPartRequest" name= "myRequestParser" class= "control.RequestParseWrapper" scope= "default" optional= "true" />
-    <constant name= "struts.multipart.handler" value= "myRequestParser" />
-
+    <bean type="org.apache.struts2.dispatcher.multipart.MultiPartRequest" name="myMultiPartRequest"
+          class="control.RequestParseWrapper" scope="default" optional="true"/>
+    <constant name="struts.multipart.parser" value="myMultiPartRequest"/>
+    <!--<constant name="struts.multipart.parser" value="jakarta"/>-->
+    <constant name="struts.multipart.maxSize" value="10240000"/>
+    <constant name="struts.multipart.saveDir" value="/temp/"/>
     <!-- 配置主题 -->
     <!-- 	<constant name="struts.ui.theme" value="simple" /> -->
 
@@ -44,5 +47,12 @@
         <!--管理员查看用户明细的请求 -->
         <action name="ActionDetail_*" class="control.HQAction_Detail" method="{1}">
         </action>
+        <!--用于上传文件的请求 -->
+        <!--<action name="uploaderFile" class="control.HQAction_Part2" method="uploaderFile">-->
+            <!--<interceptor-ref name="fileUpload">-->
+                <!--<param name="maximumSize">1000000</param>-->
+            <!--</interceptor-ref>-->
+            <!--<interceptor-ref name="defaultStack"></interceptor-ref>-->
+        <!--</action>-->
     </package>
 </struts>

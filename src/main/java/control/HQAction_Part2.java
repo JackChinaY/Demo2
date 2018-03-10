@@ -1,9 +1,6 @@
 package control;
 
 import entity.*;
-//import jxl.Sheet;
-//import jxl.Workbook;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -12,23 +9,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import service.HQService;
 import service.HQService_Part2;
-import util.SendEmail;
-import util.UtilsAll;
-
-import javax.servlet.http.HttpSession;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.math.BigDecimal;
 
 /**
  * 在intellij快捷键：ctrl+/:注释及反注释；alt+L是格式化代码，ctrl+X删除行，sout、psvm是全拼
@@ -63,6 +49,14 @@ public class HQAction_Part2 extends BaseAction {
         }
         //登录未超时
         else {
+//            //获取所有的消息头名称
+//            Enumeration<String> headerNames = this.getRequest().getHeaderNames();
+//            //获取获取的消息头名称，获取对应的值，并输出
+//            while (headerNames.hasMoreElements()) {
+//                String nextElement = headerNames.nextElement();
+//                System.out.println(nextElement + ":" + this.getRequest().getHeader(nextElement));
+//            }
+
             String userId = this.getSession().getAttribute("userId").toString();//获取用户UserId
             Page page = new Page();
             page.setPageIndex(Integer.parseInt(this.getRequest().getParameter("pageIndex")));//当前页码
@@ -358,11 +352,23 @@ public class HQAction_Part2 extends BaseAction {
 //            System.out.println("提交上来的数据是传统表单的数据");
 //            return;
 //        }
+
         //4、使用ServletFileUpload解析器解析上传数据，解析结果返回的是一个List<FileItem>集合，每一个FileItem对应一个Form表单的输入项
-        System.out.println("已经进入上传步骤1234567！");
-        List<FileItem> fileItemList = upload.parseRequest(this.getRequest());// 得到所有的文件
+        List<FileItem> fileItemList = upload.parseRequest(this.getRequest());// 得到所有的文件，一个请求里包含多个文件项，但文件可能只有一个
         Iterator<FileItem> iterator = fileItemList.iterator();// 迭代器,搜索前端发送过来的文件
         try {
+//            System.out.println("iterator个数：" + fileItemList.size());
+//            //获取所有的消息头名称
+//            Enumeration<String> headerNames = this.getRequest().getHeaderNames();
+//            //获取获取的消息头名称，获取对应的值，并输出
+//            while (headerNames.hasMoreElements()) {
+//                String nextElement = headerNames.nextElement();
+//                System.out.println(nextElement + ":" + this.getRequest().getHeader(nextElement));
+//            }
+            //插入数据库的结果
+            String result = "-9";//默认是-9，代表上传有问题
+            ArrayList<PLU> pluArrayList = new ArrayList<>();
+//            while (iterator.hasNext()) {
             while (iterator.hasNext()) {
                 FileItem fileItem = (FileItem) iterator.next();
                 //如果fileitem是普通输入项的数据
@@ -395,15 +401,22 @@ public class HQAction_Part2 extends BaseAction {
                             //2007版
                             workbook = new XSSFWorkbook(fileItem.getInputStream());
                         }
-                        ArrayList<PLU> pluArrayList = new ArrayList<>();
+
                         //工作表
                         Sheet sheet = null;
                         // 遍历所有工作表
-                        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {// 获取每个Sheet表
-                            sheet = workbook.getSheetAt(i);
+//                        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {// 获取每个Sheet表
+                        sheet = workbook.getSheetAt(0);//指操作第一张sheet表
+//                        System.out.println("列数：" + sheet.getRow(0).getLastCellNum());
+                        if (sheet.getRow(0).getLastCellNum() != 10) {
+                            result = "格式有误";
+//                            System.out.println("格式有误");
+                        } else {
+//                            System.out.println("格式正确");
                             // getLastRowNum，获取最后一行的行标，从0开始，但第一行是标题，所以此处从1开始
                             for (int j = 1; j < sheet.getLastRowNum() + 1; j++) {
                                 Row row = sheet.getRow(j);
+
                                 PLU plu = new PLU();
                                 if (row != null) {
                                     //获取单元格数据
@@ -413,59 +426,73 @@ public class HQAction_Part2 extends BaseAction {
                                     }
                                     //Name
                                     if (row.getCell(1) != null) {
-                                        plu.setNumber(row.getCell(1).toString());
+                                        plu.setName(row.getCell(1).toString());
                                     }
                                     //Barcode
                                     if (row.getCell(2) != null) {
-                                        plu.setNumber(row.getCell(2).toString());
+                                        plu.setBarcode(row.getCell(2).toString());
                                     }
                                     //Price
                                     if (row.getCell(3) != null) {
-                                        plu.setNumber(row.getCell(3).toString());
+                                        plu.setPrice(row.getCell(3).toString());
                                     }
                                     //RRP
                                     if (row.getCell(4) != null) {
-                                        plu.setNumber(row.getCell(4).toString());
+                                        plu.setRrp(row.getCell(4).toString());
                                     }
                                     //Tax_Index
                                     if (row.getCell(5) != null) {
-                                        plu.setNumber(row.getCell(5).toString());
+                                        plu.setTax_Index(row.getCell(5).toString());
                                     }
                                     //Stock_Control
                                     if (row.getCell(6) != null) {
-                                        plu.setNumber(row.getCell(6).toString());
+                                        plu.setStock_Control(row.getCell(6).toString());
                                     }
                                     //Stock_Amount
                                     if (row.getCell(7) != null) {
-                                        plu.setNumber(row.getCell(7).toString());
+                                        plu.setStock_Amount(row.getCell(7).toString());
                                     }
                                     //Currency
                                     if (row.getCell(8) != null) {
-                                        plu.setNumber(row.getCell(8).toString());
+                                        plu.setCurrency(row.getCell(8).toString());
                                     }
                                     //Used
                                     if (row.getCell(9) != null) {
-                                        plu.setNumber(row.getCell(9).toString());
+                                        plu.setUsed(row.getCell(9).toString());
                                     }
+                                    pluArrayList.add(plu);
+//                                    System.out.println(plu.toString());
                                 }
-                                pluArrayList.add(plu);
-                                System.out.println(plu.toString());
                             }
+//                        }
+                            workbook.close();
+                            result = hqService_part2.saveGoodsList(databaseUrl + userId + goodsDB, pluArrayList);// 1表示插入成功，0表示插入失败,-1表示已存在
                         }
-                        workbook.close();
-                        String result = hqService_part2.saveGoodsList(databaseUrl + userId + goodsDB, pluArrayList);// 1表示插入成功，0表示插入失败,-1表示已存在
-
                     }
                 }
             }
-            System.out.println("文件上传成功！");
-            JSONObject jo = new JSONObject();
-            jo.put("result", "ok");
-            jo.put("id", "10001");
-            jo.put("url", downloadPath);
-//			 System.out.println(downloadPath);
-            this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
-            this.getResponse().getWriter().print(jo);// 向前台发送json数据
+            if (result.equals("-9")) {
+//                System.out.println("文件上传失败,请重试！");
+                JSONObject jo = new JSONObject();
+                jo.put("result", "failed");
+                jo.put("message", "Failed to upload, please try later!");
+                this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
+                this.getResponse().getWriter().print(jo);// 向前台发送json数据
+            } else if (result.equals("格式有误")) {
+//                System.out.println("文件格式有误！");
+                JSONObject jo = new JSONObject();
+                jo.put("result", "failed");
+                jo.put("message", "File format is wrong !");
+                this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
+                this.getResponse().getWriter().print(jo);// 向前台发送json数据
+            } else if (result.equals(String.valueOf(pluArrayList.size()))) {//文件上传成功
+//                System.out.println("文件上传成功！");
+                JSONObject jo = new JSONObject();
+                jo.put("result", "ok");
+                jo.put("message", result + " records are submitted successfully !");
+                this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
+                this.getResponse().getWriter().print(jo);// 向前台发送json数据
+            }
         } catch (Exception e) {
             System.out.println("上传失败！");
             e.printStackTrace();
