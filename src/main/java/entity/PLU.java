@@ -2,7 +2,7 @@ package entity;
 
 import java.math.BigDecimal;
 
-public class PLU {
+public class PLU implements Cloneable {
     /**
      * 单品
      * number PLU编号；Barcode PLU条码；Name PLU名称；Price PLU单价；
@@ -121,6 +121,11 @@ public class PLU {
 
     public void setUsed(String used) {
         Used = used;
+    }
+
+    @Override
+    public PLU clone() throws CloneNotSupportedException {
+        return (PLU) super.clone();
     }
 
     @Override

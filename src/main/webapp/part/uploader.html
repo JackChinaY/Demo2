@@ -25,9 +25,9 @@
                 url: 'ActionPart2_uploaderFile.action',
                 // url: 'uploaderFile.action',
                 removeUploaded: false,
-                renameByClick:false,//是否点击文件名即可重命名
+                renameByClick: false,//是否点击文件名即可重命名
                 deleteConfirm: false,//移除文件进行确认
-                multi_selection:false,//是否可用一次选取多个文件
+                multi_selection: false,//是否可用一次选取多个文件
 //                 staticFiles: {
 //                     type: xls / xlsx,           // 文件类型，例如"image/jpeg"
 //                 },
@@ -41,12 +41,20 @@
                     // 不允许上传重复文件
                     prevent_duplicates: true
                 },
-//                 responseHandler: function (responseObject, file) {
-//                     // 输出对象  调试用
-// //                    alert(JSON.stringify(responseObject));
-//                     if (responseObject.status == "200") {
-//                     }
-//                 }
+                responseHandler: function (responseObject, file) {
+                    // 输出对象  调试用
+                    // alert(JSON.stringify(responseObject.response));
+                    var obj = eval('(' + responseObject.response + ')');
+                    console.log(obj);
+                    if (obj.result === "ok") {
+                        // alert(obj.message);
+                        console.log(obj.message);
+                        this.showMessage(obj.message, 'success', 5000);
+                    } else if (obj.result === "failed") {
+                        console.log(obj.message);
+                        this.showMessage(obj.message, 'danger', 5000);
+                    }
+                }
             });
             //submit1点击事件
             $("#submit_back").click(function () {

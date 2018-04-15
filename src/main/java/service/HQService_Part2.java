@@ -274,7 +274,7 @@ public class HQService_Part2 extends BaseService {
     }
 
     /**
-     * 方法序号：5_2 简易查询所有商品信息
+     * 方法序号：5_2 简易查询所有商品信息 Number AS value1, Name AS value2, Barcode AS value3, Price AS value4
      *
      * @return json数组字符串
      */

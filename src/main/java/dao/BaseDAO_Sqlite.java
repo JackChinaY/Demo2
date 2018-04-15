@@ -113,7 +113,12 @@ public class BaseDAO_Sqlite {
      *
      * @param sql  要执行的sql语句
      * @param args 给sql语句中的？赋值的参数列表
-     * @return 要查询的类的集合，返回Json，如果没值就返回空数组[ ]
+     * @return 要查询的类的集合，返回Json,如：[
+     * { "firstName":"Bill" , "lastName":"Gates" },
+     * { "firstName":"George" , "lastName":"Bush" },
+     * { "firstName":"Thomas" , "lastName": "Carter" }
+     * ]
+     * ，如果没值就返回空数组[ ]
      */
     public String getForJson(String sql, String url, Object... args) {
         try {

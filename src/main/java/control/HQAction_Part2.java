@@ -9,9 +9,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import service.HQService_Part2;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -368,6 +370,7 @@ public class HQAction_Part2 extends BaseAction {
             //插入数据库的结果
             String result = "-9";//默认是-9，代表上传有问题
             ArrayList<PLU> pluArrayList = new ArrayList<>();
+            ArrayList<PLU> pluArrayList_repeat = new ArrayList<>();
 //            while (iterator.hasNext()) {
             while (iterator.hasNext()) {
                 FileItem fileItem = (FileItem) iterator.next();
@@ -401,7 +404,6 @@ public class HQAction_Part2 extends BaseAction {
                             //2007版
                             workbook = new XSSFWorkbook(fileItem.getInputStream());
                         }
-
                         //工作表
                         Sheet sheet = null;
                         // 遍历所有工作表
@@ -416,7 +418,6 @@ public class HQAction_Part2 extends BaseAction {
                             // getLastRowNum，获取最后一行的行标，从0开始，但第一行是标题，所以此处从1开始
                             for (int j = 1; j < sheet.getLastRowNum() + 1; j++) {
                                 Row row = sheet.getRow(j);
-
                                 PLU plu = new PLU();
                                 if (row != null) {
                                     //获取单元格数据
@@ -466,7 +467,33 @@ public class HQAction_Part2 extends BaseAction {
                             }
 //                        }
                             workbook.close();
-                            result = hqService_part2.saveGoodsList(databaseUrl + userId + goodsDB, pluArrayList);// 1表示插入成功，0表示插入失败,-1表示已存在
+                            //剔除barcode相同的数据，barcode相同的数据不插入到数据库中
+                            String goods = hqService_part2.findAllGoodsInfo(databaseUrl + userId + goodsDB);
+                            JSONArray goodsJsonArray = new JSONArray(goods);
+                            Iterator<PLU> pluIterator = pluArrayList.iterator();
+                            //遍历文件中的数组
+                            while (pluIterator.hasNext()) {//没有指针下移操作，只是判断是否存在下一个元素
+                                PLU plu = pluIterator.next();
+                                if (plu.getBarcode().equals("")) {
+                                    continue;//如果barcode字段为空，则进行下一轮循环
+                                } else {
+                                    //遍历数据库中的数组
+                                    for (int i = 0; i < goodsJsonArray.length(); i++) {
+                                        if (plu.getBarcode().equals(goodsJsonArray.getJSONObject(i).get("value3").toString())) {
+                                            //如果和数据库中的barcode相同，则删除该文件中元素
+                                            pluArrayList_repeat.add(plu.clone());
+                                            pluIterator.remove();
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            System.out.println("数组长度：" + pluArrayList.size());
+                            if (pluArrayList.size() == 0) {
+                                result = "0";
+                            }else {
+                                result = hqService_part2.saveGoodsList(databaseUrl + userId + goodsDB, pluArrayList);// 1表示插入成功，0表示插入失败,-1表示已存在
+                            }
                         }
                     }
                 }
@@ -489,7 +516,19 @@ public class HQAction_Part2 extends BaseAction {
 //                System.out.println("文件上传成功！");
                 JSONObject jo = new JSONObject();
                 jo.put("result", "ok");
-                jo.put("message", result + " records are submitted successfully !");
+                //如果有部分数据没被插入到数据库中，就提醒
+                StringBuilder temp = new StringBuilder();
+                if (!pluArrayList_repeat.isEmpty()) {
+                    temp.append("<br>But, " + pluArrayList_repeat.size() + " records submitted failed, because these barcodes already existed in Database. These are: ");
+                    for (int i = 0; i < pluArrayList_repeat.size(); i++) {
+                        if (i == pluArrayList_repeat.size() - 1) {
+                            temp.append(pluArrayList_repeat.get(i).getBarcode() + ". ");
+                        } else {
+                            temp.append(pluArrayList_repeat.get(i).getBarcode() + ", ");
+                        }
+                    }
+                }
+                jo.put("message", result + " records submitted successfully !" + temp.toString());
                 this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
                 this.getResponse().getWriter().print(jo);// 向前台发送json数据
             }
