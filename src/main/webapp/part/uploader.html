@@ -37,28 +37,51 @@
                         {title: 'Excel', extensions: 'xls,xlsx'}
                     ],
                     // 最大上传文件为 5MB
-                    max_file_size: '5Mb',
+                    max_file_size: '10MB',
                     // 不允许上传重复文件
                     prevent_duplicates: true
                 },
                 responseHandler: function (responseObject, file) {
                     // 输出对象  调试用
                     // alert(JSON.stringify(responseObject.response));
+                    //将字符串转换成json对象
                     var obj = eval('(' + responseObject.response + ')');
-                    console.log(obj);
+                    // console.log(obj);
+                    //如果上传成功
                     if (obj.result === "ok") {
                         // alert(obj.message);
-                        console.log(obj.message);
-                        this.showMessage(obj.message, 'success', 5000);
-                    } else if (obj.result === "failed") {
-                        console.log(obj.message);
-                        this.showMessage(obj.message, 'danger', 5000);
+                        // console.log(obj.message);
+                        $("#modal-content").html(obj.message);
+                        $("#myModal").modal({moveable: true});
+                        // this.showMessage(obj.message, 'success', 5000);
+                    }
+                    //如果上传失败
+                    else if (obj.result === "failed") {
+                        // console.log(obj.message);
+                        $("#modal-content").html(obj.message);
+                        $("#myModal").modal({moveable: true});
+                        // this.showMessage(obj.message, 'danger', 5000);
                     }
                 }
             });
-            //submit1点击事件
+            //上传提交按钮 检查是否有文件待上传
+            $("#upload_submit").click(function () {
+                var uploader = $('#tableUploader').data('zui.uploader');
+                // console.log(uploader.getTotal());
+                if (uploader.getTotal().queued === 0) {
+                    new $.zui.Messager("No files to be uploaded !", {
+                        type: 'warning',
+                        placement: 'top' // 定义显示位置
+                    }).show();
+                }
+            });
+            //返回商品管理页面
             $("#submit_back").click(function () {
                 location.href = "goods.html";//重定向
+            });
+            //刷新本页面
+            $("#submit2").click(function () {
+                location.href = "uploader.html";//重定向
             });
             /*******************************************************************************************/
         });
@@ -79,7 +102,7 @@
     </style>
 </head>
 <body>
-<!--税率-->
+<!--文件上传-->
 <div>
     <div style="margin-top: 10px;width: 100%;height: 40px;">
         <span class="label label-badge label-primary label-define"
@@ -87,9 +110,10 @@
         <!--<button id="submit1" class="btn btn-primary" type="button"-->
         <!--style="float: right; margin-right: 20px"><i class="icon icon-plus"></i> Add-->
         <!--</button>-->
-        <!--<button id="submit2" class="btn btn-primary" type="button"-->
-        <!--style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i> Refresh-->
-        <!--</button>-->
+        <button id="submit2" class="btn btn-primary" type="button" data-toggle="tooltip"
+                data-tip-class="tooltip-default" title="refresh" data-placement="left"
+                style="float: right; margin-right: 20px"><i class="icon icon-refresh"></i>
+        </button>
         <button id="submit_back" class="btn btn-primary" type="button" data-toggle="tooltip"
                 data-tip-class="tooltip-default" title="return to goods management" data-placement="left"
                 style="float: right; margin-right: 20px;"><i class="icon icon-reply"></i>
@@ -97,16 +121,16 @@
     </div>
     <div>
         <div id="tableUploader" class="uploader">
-            <div class="uploader-message text-center">
-                <div class="content"></div>
-                <button type="button" class="close">×</button>
-            </div>
+            <!--<div class="uploader-message text-center">-->
+            <!--<div class="content"></div>-->
+            <!--<button type="button" class="close">×</button>-->
+            <!--</div>-->
             <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th colspan="2">File Name</th>
                     <th style="width: 120px">Size</th>
-                    <th style="width: 210px; text-align: center;">State</th>
+                    <!--<th style="width: 210px; text-align: center;">State</th>-->
                 </tr>
                 </thead>
                 <tbody class="uploader-files">
@@ -121,19 +145,19 @@
                         </div>
                     </td>
                     <td><span class="file-size text-muted"></span></td>
-                    <td class="actions text-right" style="padding: 0 4px;">
-                        <div class="file-status" data-toggle="tooltip" style="margin: 8px;"><i class="icon"></i>
-                            <span class="text"></span></div>
-                        <a data-toggle="tooltip" class="btn btn-link btn-download-file" target="_blank"><i
-                                class="icon icon-download-alt"></i></a>
-                        <button type="button" data-toggle="tooltip" class="btn btn-link btn-reset-file"
-                                title="Repeat"><i class="icon icon-repeat"></i></button>
-                        <button type="button" data-toggle="tooltip" class="btn btn-link btn-rename-file"
-                                title="Rename"><i class="icon icon-pencil"></i></button>
-                        <button type="button" data-toggle="tooltip" title="Remove"
-                                class="btn btn-link btn-delete-file"><i class="icon icon-trash text-danger"></i>
-                        </button>
-                    </td>
+                    <!--<td class="actions text-right" style="padding: 0 4px;">-->
+                    <!--<div class="file-status" data-toggle="tooltip" style="margin: 8px;"><i class="icon"></i>-->
+                    <!--<span class="text"></span></div>-->
+                    <!--<a data-toggle="tooltip" class="btn btn-link btn-download-file" target="_blank"><i-->
+                    <!--class="icon icon-download-alt"></i></a>-->
+                    <!--<button type="button" data-toggle="tooltip" class="btn btn-link btn-reset-file"-->
+                    <!--title="Repeat"><i class="icon icon-repeat"></i></button>-->
+                    <!--<button type="button" data-toggle="tooltip" class="btn btn-link btn-rename-file"-->
+                    <!--title="Rename"><i class="icon icon-pencil"></i></button>-->
+                    <!--<button type="button" data-toggle="tooltip" title="Remove"-->
+                    <!--class="btn btn-link btn-delete-file"><i class="icon icon-trash text-danger"></i>-->
+                    <!--</button>-->
+                    <!--</td>-->
                 </tr>
                 </tbody>
                 <tfoot>
@@ -144,7 +168,7 @@
                             <button type="button" class="btn btn-link uploader-btn-browse"><i
                                     class="icon icon-plus"></i> Choose
                             </button>
-                            <button type="button" class="btn btn-link uploader-btn-start"><i
+                            <button type="button" class="btn btn-link uploader-btn-start" id="upload_submit"><i
                                     class="icon icon-cloud-upload"></i> Submit
                             </button>
                         </div>
@@ -165,7 +189,7 @@
                 <h4 class="modal-title">Messages</h4>
             </div>
             <div class="modal-body">
-                <p id="modal-content" style="font-weight: 800"></p>
+                <p id="modal-content" style="font-weight: 600"></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>

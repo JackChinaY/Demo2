@@ -488,10 +488,10 @@ public class HQAction_Part2 extends BaseAction {
                                     }
                                 }
                             }
-                            System.out.println("数组长度：" + pluArrayList.size());
+//                            System.out.println("数组长度：" + pluArrayList.size());
                             if (pluArrayList.size() == 0) {
                                 result = "0";
-                            }else {
+                            } else {
                                 result = hqService_part2.saveGoodsList(databaseUrl + userId + goodsDB, pluArrayList);// 1表示插入成功，0表示插入失败,-1表示已存在
                             }
                         }
@@ -502,14 +502,14 @@ public class HQAction_Part2 extends BaseAction {
 //                System.out.println("文件上传失败,请重试！");
                 JSONObject jo = new JSONObject();
                 jo.put("result", "failed");
-                jo.put("message", "Failed to upload, please try later!");
+                jo.put("message", "Error: Failed to upload, please try later!");
                 this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
                 this.getResponse().getWriter().print(jo);// 向前台发送json数据
             } else if (result.equals("格式有误")) {
 //                System.out.println("文件格式有误！");
                 JSONObject jo = new JSONObject();
                 jo.put("result", "failed");
-                jo.put("message", "File format is wrong !");
+                jo.put("message", "Error: File format is wrong !");
                 this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
                 this.getResponse().getWriter().print(jo);// 向前台发送json数据
             } else if (result.equals(String.valueOf(pluArrayList.size()))) {//文件上传成功
@@ -519,7 +519,7 @@ public class HQAction_Part2 extends BaseAction {
                 //如果有部分数据没被插入到数据库中，就提醒
                 StringBuilder temp = new StringBuilder();
                 if (!pluArrayList_repeat.isEmpty()) {
-                    temp.append("<br>But, " + pluArrayList_repeat.size() + " records submitted failed, because these barcodes already existed in Database. These are: ");
+                    temp.append("<br>Warning: " + pluArrayList_repeat.size() + " records submitted failed, because these barcodes already existed in Database. These are: ");
                     for (int i = 0; i < pluArrayList_repeat.size(); i++) {
                         if (i == pluArrayList_repeat.size() - 1) {
                             temp.append(pluArrayList_repeat.get(i).getBarcode() + ". ");
@@ -528,7 +528,7 @@ public class HQAction_Part2 extends BaseAction {
                         }
                     }
                 }
-                jo.put("message", result + " records submitted successfully !" + temp.toString());
+                jo.put("message", "Infomation: " + result + " records submitted successfully !" + temp.toString());
                 this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
                 this.getResponse().getWriter().print(jo);// 向前台发送json数据
             }
@@ -537,7 +537,7 @@ public class HQAction_Part2 extends BaseAction {
             e.printStackTrace();
             JSONObject jo = new JSONObject();
             jo.put("result", "failed");
-            jo.put("message", e.getMessage());
+            jo.put("message", "Error: " + e.getMessage());
             this.getResponse().setContentType("text/html;charset=UTF-8");//
 //			 设置响应数据类型
             this.getResponse().getWriter().print(jo);// 向前台发送json数据
