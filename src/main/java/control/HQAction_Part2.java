@@ -519,7 +519,7 @@ public class HQAction_Part2 extends BaseAction {
                 //如果有部分数据没被插入到数据库中，就提醒
                 StringBuilder temp = new StringBuilder();
                 if (!pluArrayList_repeat.isEmpty()) {
-                    temp.append("<br>Warning: " + pluArrayList_repeat.size() + " records submitted failed, because these barcodes already existed in Database. These are: ");
+                    temp.append("<br>Warning: " + pluArrayList_repeat.size() + " records submitted failed, because these barcodes already existed in Database，these are: ");
                     for (int i = 0; i < pluArrayList_repeat.size(); i++) {
                         if (i == pluArrayList_repeat.size() - 1) {
                             temp.append(pluArrayList_repeat.get(i).getBarcode() + ". ");
@@ -528,7 +528,7 @@ public class HQAction_Part2 extends BaseAction {
                         }
                     }
                 }
-                jo.put("message", "Infomation: " + result + " records submitted successfully !" + temp.toString());
+                jo.put("message", "Information: " + result + " records submitted successfully in this file !" + temp.toString());
                 this.getResponse().setContentType("text/html;charset=UTF-8");//设置响应数据类型
                 this.getResponse().getWriter().print(jo);// 向前台发送json数据
             }
