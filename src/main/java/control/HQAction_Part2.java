@@ -97,6 +97,7 @@ public class HQAction_Part2 extends BaseAction {
             String userId = this.getSession().getAttribute("userId").toString();//获取用户userId
             String result = hqService_part2.getGoodsMaxNumber(databaseUrl + userId + goodsDB);// 0表示0条记录，1表示有1条记录
             if (result == null) {
+                //如果数据库中没有数据，结果就为null，此时用“null”表示
                 result = "null";
             }
             returnJsonObject(result);//可能的返回值：-1，0,5
@@ -317,7 +318,12 @@ public class HQAction_Part2 extends BaseAction {
     public void uploaderFile() throws Exception {
         String userId = this.getSession().getAttribute("userId").toString();//获取用户UserId
         //获取商品最大编号
-        int goodsMaxNumber = Integer.parseInt(hqService_part2.getGoodsMaxNumber(databaseUrl + userId + goodsDB));// 0表示0条记录，1表示有1条记录
+        String goodsMaxNumberString = hqService_part2.getGoodsMaxNumber(databaseUrl + userId + goodsDB);
+        int goodsMaxNumber = 0;
+        //如果数据库中有数据
+        if (goodsMaxNumberString != null) {
+            goodsMaxNumber = Integer.parseInt(goodsMaxNumberString);// 0表示0条记录，1表示有1条记录
+        }
         goodsMaxNumber++;
         // String result = hqService_Admin.findAllUser();
 //		System.out.println("开始上传");
