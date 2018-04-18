@@ -37,8 +37,8 @@
 
     <!--实现在tomcat启动时执行某段代码-->
     <!--<listener>-->
-        <!--<listener-class>control.InitListener</listener-class>-->
-        <!--<listener-class>control.HQAction</listener-class>-->
+    <!--<listener-class>control.InitListener</listener-class>-->
+    <!--<listener-class>control.HQAction</listener-class>-->
     <!--</listener>-->
     <!--表示使用的是struts2-->
     <filter>
@@ -58,7 +58,7 @@
     <!--log4j配置文件加载-->
     <!--<context-param>-->
     <!--<param-name>log4jConfigLocation</param-name>-->
-        <!--<param-value>/WEB-INF/classes/log4j.properties</param-value>-->
+    <!--<param-value>/WEB-INF/classes/log4j.properties</param-value>-->
     <!--&lt;!&ndash;<param-value>classpath:log4j.properties</param-value>&ndash;&gt;-->
     <!--</context-param>-->
     <!--&lt;!&ndash;启动一个watchdog线程每1800秒扫描一下log4j配置文件的变化&ndash;&gt;-->
@@ -83,14 +83,22 @@
         <exception-type>java.lang.NullPointerException</exception-type>
         <location>/error.html</location>
     </error-page>
+    <!--禁止用户访问一些目录或目录中的文件-->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Forbidden</web-resource-name>
+            <url-pattern>/database/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>
     <!--定义https https://localhost:8080 https://localhost:8443//-->
     <!--<security-constraint>-->
-        <!--<web-resource-collection>-->
-            <!--<web-resource-name>SSL</web-resource-name>-->
-            <!--<url-pattern>/*</url-pattern>-->
-        <!--</web-resource-collection>-->
-        <!--<user-data-constraint>-->
-            <!--<transport-guarantee>CONFIDENTIAL</transport-guarantee>-->
-        <!--</user-data-constraint>-->
+    <!--<web-resource-collection>-->
+    <!--<web-resource-name>SSL</web-resource-name>-->
+    <!--<url-pattern>/*</url-pattern>-->
+    <!--</web-resource-collection>-->
+    <!--<user-data-constraint>-->
+    <!--<transport-guarantee>CONFIDENTIAL</transport-guarantee>-->
+    <!--</user-data-constraint>-->
     <!--</security-constraint>-->
 </web-app>
