@@ -10,20 +10,12 @@
         <property name="driverClass">com.mysql.cj.jdbc.Driver</property>
         <!--  本地测试时用以下数据库 用户名 密码-->
         <!--<property name="jdbcUrl">jdbc:mysql://localhost:3306/taxmastercomputer</property>-->
-        <!--&lt;!&ndash;用户名&ndash;&gt;-->
-        <!--<property name="user">root</property>-->
-        <!--&lt;!&ndash;密码&ndash;&gt;-->
-        <!--<property name="password"></property>-->
 
-        <!--  部署在阿里云上用以下数据库 用户名 密码47.93.232.64 -->
+        <!--  部署在阿里云上用以下数据库 用户名 密码 -->
         <!--<property name="jdbcUrl">jdbc:mysql://localhost:3306/taxmastercomputer</property>-->
         <!--6.0的版本需要加上时区 UTC-->
         <property name="jdbcUrl">jdbc:mysql://localhost:3306/taxmastercomputer?serverTimezone=Hongkong&amp;characterEncoding=utf8&amp;useSSL=true</property>
-        <!--用户名-->
-        <property name="user">root</property>
-        <!--部署在阿里云上用到以下密码-->
-        <property name="password">1236547</property>
-        <!--<property name="password"></property>-->
+        
         <!--以下为sqlite的连接方式-->
         <!-- 	<property name="driverClass">org.sqlite.JDBC</property> -->
         <!-- 	<property name="jdbcUrl">jdbc:sqlite:E:\\DB\\programmingDB.db</property> -->
